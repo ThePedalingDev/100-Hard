@@ -115,6 +115,7 @@ export function AvatarCropper({ id, existingUrl, onFile }: Props) {
             id={id}
             type="file"
             accept="image/*"
+            form="unbound-avatar-file"
             className="sr-only"
             onChange={(event) => {
               const file = event.target.files?.[0];

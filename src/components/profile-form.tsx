@@ -24,7 +24,7 @@ export function ProfileForm({
         className="space-y-4"
         onSubmit={(event) => {
           event.preventDefault();
-          const formData = new FormData(event.currentTarget);
+          const formData = textFieldsOnly(new FormData(event.currentTarget));
           start(async () => {
             setError(null);
             const saved = await saveProfileAction(formData);
@@ -58,4 +58,12 @@ export function ProfileForm({
       </form>
     </Plate>
   );
+}
+
+function textFieldsOnly(source: FormData) {
+  const next = new FormData();
+  for (const [key, value] of source.entries()) {
+    if (typeof value === "string") next.set(key, value);
+  }
+  return next;
 }

@@ -28,7 +28,7 @@ export default function OnboardingProfilePage() {
           onSubmit={(event) => {
             event.preventDefault();
             const form = event.currentTarget;
-            const formData = new FormData(form);
+            const formData = textFieldsOnly(new FormData(form));
             start(async () => {
               setError(null);
               const saved = await saveProfileAction(formData);
@@ -73,4 +73,12 @@ export default function OnboardingProfilePage() {
       </Plate>
     </main>
   );
+}
+
+function textFieldsOnly(source: FormData) {
+  const next = new FormData();
+  for (const [key, value] of source.entries()) {
+    if (typeof value === "string") next.set(key, value);
+  }
+  return next;
 }
