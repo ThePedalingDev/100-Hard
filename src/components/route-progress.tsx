@@ -1,9 +1,16 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { LoadingBreadcrumb } from "@/components/loader";
 
 const EVENT = "100hard:route-pending";
+const FADE_MS = 340;
+const MIN_VISIBLE_MS = 360;
+
+function cx(...parts: Array<string | false | undefined | null>) {
+  return parts.filter(Boolean).join(" ");
+}
 
 export function signalRoutePending() {
   if (typeof window === "undefined") return;
@@ -26,17 +33,56 @@ export function usePlatePending() {
 
 export function RouteProgress() {
   const pathname = usePathname();
-  const [armed, setArmed] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [active, setActive] = useState(false);
+  const shownAtRef = useRef(0);
+  const pathnameRef = useRef(pathname);
+  const armedPathRef = useRef(pathname);
+  const exitTimersRef = useRef<number[]>([]);
 
-  useEffect(() => {
-    setArmed(false);
-    setVisible(false);
-  }, [pathname]);
+  pathnameRef.current = pathname;
+
+  function clearExitTimers() {
+    for (const timer of exitTimersRef.current) {
+      window.clearTimeout(timer);
+    }
+    exitTimersRef.current = [];
+  }
+
+  function scheduleExit() {
+    clearExitTimers();
+
+    const elapsed = Date.now() - shownAtRef.current;
+    const wait = Math.max(0, MIN_VISIBLE_MS - elapsed);
+
+    const startFade = window.setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setActive(false);
+
+          const unmount = window.setTimeout(() => {
+            setMounted(false);
+            clearExitTimers();
+          }, FADE_MS);
+
+          exitTimersRef.current.push(unmount);
+        });
+      });
+    }, wait);
+
+    exitTimersRef.current.push(startFade);
+  }
 
   useEffect(() => {
     function arm() {
-      setArmed(true);
+      clearExitTimers();
+      armedPathRef.current = pathnameRef.current;
+      shownAtRef.current = Date.now();
+      setMounted(true);
+      setActive(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setActive(true));
+      });
     }
 
     function onClick(event: MouseEvent) {
@@ -66,25 +112,27 @@ export function RouteProgress() {
   }, []);
 
   useEffect(() => {
-    if (!armed) {
-      setVisible(false);
-      return;
-    }
-    const show = window.setTimeout(() => setVisible(true), 120);
-    return () => window.clearTimeout(show);
-  }, [armed]);
+    if (!mounted) return;
+    if (pathname === armedPathRef.current) return;
+    scheduleExit();
+    return clearExitTimers;
+  }, [pathname, mounted]);
 
-  if (!visible) return null;
+  useEffect(() => () => clearExitTimers(), []);
+
+  if (!mounted) return null;
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[2px] bg-club/10"
+      className={cx(
+        "route-progress-overlay fixed inset-0 z-50 grid place-items-center bg-canvas/72",
+        active && "is-active",
+      )}
       role="status"
       aria-live="polite"
-      aria-busy="true"
+      aria-busy={active}
     >
-      <span className="route-progress-bar block h-full bg-signal" />
-      <span className="sr-only">Working</span>
+      <LoadingBreadcrumb text="Cooking" className="route-progress-panel" />
     </div>
   );
 }

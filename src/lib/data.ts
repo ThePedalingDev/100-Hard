@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { createMediaSignedUrl, mediaSrc } from "@/lib/media";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/admin";
 import { addDays, dateInChallengeTz, raceLaneProgress } from "@/lib/challenge";
@@ -92,7 +94,7 @@ function spoonBalance(entries: SpoonEntry[], userId: string): number {
     }, 0);
 }
 
-function statsFor(userId: string, checkins: DailyCheckin[], spoons: SpoonEntry[], today: string) {
+function statsFor(userId: string, checkins: StatsCheckin[], spoons: SpoonEntry[], today: string) {
   const mine = checkins.filter((row) => row.user_id === userId);
   const perfectDays = mine.filter((row) => row.status === "perfect").length;
   const completed = mine.reduce((sum, row) => sum + completedCategories(row), 0);
@@ -132,15 +134,33 @@ function baseContext(
   };
 }
 
-export async function requireUser() {
+const CHECKIN_STATS =
+  "user_id, challenge_id, challenge_date, status, diet_complete, workout_1_complete, workout_2_complete, outdoor_complete, water_complete, bible_complete, finalized_at";
+
+type StatsCheckin = Pick<
+  DailyCheckin,
+  | "user_id"
+  | "challenge_id"
+  | "challenge_date"
+  | "status"
+  | "diet_complete"
+  | "workout_1_complete"
+  | "workout_2_complete"
+  | "outdoor_complete"
+  | "water_complete"
+  | "bible_complete"
+  | "finalized_at"
+>;
+
+export const requireUser = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return { supabase, user };
-}
+});
 
-export async function loadAppContext(): Promise<AppContext | null> {
+export const loadAppContext = cache(async (): Promise<AppContext | null> => {
   try {
     return await loadAppContextInner();
   } catch (error) {
@@ -149,6 +169,29 @@ export async function loadAppContext(): Promise<AppContext | null> {
     if (!user) return null;
     return baseContext(user.id, user.email, dateInChallengeTz(), { loadError: message });
   }
+});
+
+async function maybeFinalizeYesterday(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  challenge: Challenge,
+  memberIds: string[],
+  today: string,
+) {
+  const yesterday = addDays(today, -1);
+  if (memberIds.length === 0 || yesterday < challenge.start_date || yesterday > challenge.end_date) return;
+
+  const { data } = await supabase
+    .from("daily_checkins")
+    .select("user_id, finalized_at")
+    .eq("challenge_id", challenge.id)
+    .eq("challenge_date", yesterday)
+    .in("user_id", memberIds);
+
+  const rows = data ?? [];
+  const finalized = rows.filter((row) => row.finalized_at);
+  if (finalized.length >= memberIds.length) return;
+
+  await supabase.rpc("finalize_challenge_day", { target_date: yesterday });
 }
 
 async function loadAppContextInner(): Promise<AppContext | null> {
@@ -201,9 +244,15 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   const { data: profileRows } = await supabase.from("profiles").select("*").in("id", memberIds);
   const profilesById = new Map(((profileRows ?? []) as Profile[]).map((row) => [row.id, row]));
 
-  const { data: allCheckins } = await supabase.from("daily_checkins").select("*").in("challenge_id", challengeIds);
-  const { data: allSpoons } = await supabase.from("spoon_entries").select("*").in("challenge_id", challengeIds);
-  const typedCheckins = (allCheckins ?? []) as DailyCheckin[];
+  const { data: allCheckins } = await supabase
+    .from("daily_checkins")
+    .select(CHECKIN_STATS)
+    .in("challenge_id", challengeIds);
+  const { data: allSpoons } = await supabase
+    .from("spoon_entries")
+    .select("id, challenge_id, user_id, type, quantity, daily_checkin_id, created_at")
+    .in("challenge_id", challengeIds);
+  const typedCheckins = (allCheckins ?? []) as StatsCheckin[];
   const typedSpoons = (allSpoons ?? []) as SpoonEntry[];
 
   const memberships: MembershipSummary[] = membershipRows.flatMap((row) => {
@@ -233,9 +282,13 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     return baseContext(user.id, user.email, today, { profile: typedProfile, memberships });
   }
 
-  await supabase.rpc("finalize_challenge_day", { target_date: addDays(today, -1) });
-
   const active = challenge;
+  const activeMemberIds = (allMemberRows ?? [])
+    .filter((row) => row.challenge_id === active.id)
+    .map((row) => row.user_id);
+
+  await maybeFinalizeYesterday(supabase, active, activeMemberIds, today);
+
   const remaining = daysRemainingFor(active.start_date, active.end_date, today);
   const finished = isChallengeComplete(active.end_date, today);
   const startBound = active.start_date;
@@ -248,7 +301,13 @@ async function loadAppContextInner(): Promise<AppContext | null> {
       row.challenge_date <= endBound,
   );
   const activeSpoons = typedSpoons.filter((row) => row.challenge_id === active.id);
-  const todayCheckins = activeCheckins.filter((row) => row.challenge_date === today);
+
+  const { data: todayFullRows } = await supabase
+    .from("daily_checkins")
+    .select("*")
+    .eq("challenge_id", active.id)
+    .eq("challenge_date", today);
+  const todayCheckins = (todayFullRows ?? []) as DailyCheckin[];
   const checkinIds = todayCheckins.map((row) => row.id);
 
   const { data: likes } = checkinIds.length
@@ -259,10 +318,6 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     : { data: [] as DailyComment[] };
   const typedLikes = (likes ?? []) as DailyLike[];
   const typedComments = (comments ?? []) as DailyComment[];
-
-  const activeMemberIds = (allMemberRows ?? [])
-    .filter((row) => row.challenge_id === active.id)
-    .map((row) => row.user_id);
 
   function viewFor(profileRow: Profile): MemberView {
     const existing = todayCheckins.find((row) => row.user_id === profileRow.id);
@@ -309,14 +364,8 @@ export function asFields(checkin: DailyCheckin): CheckinFields {
   return checkin;
 }
 
-export async function loadMonth(challengeId: string, month: string) {
+export async function loadRange(challengeId: string, start: string, end: string) {
   const supabase = await createClient();
-  const start = month.slice(0, 7) + "-01";
-  const endDate = new Date(`${start}T00:00:00Z`);
-  endDate.setUTCMonth(endDate.getUTCMonth() + 1);
-  endDate.setUTCDate(0);
-  const end = endDate.toISOString().slice(0, 10);
-
   const { data } = await supabase
     .from("daily_checkins")
     .select("user_id, challenge_date, status")
@@ -325,6 +374,15 @@ export async function loadMonth(challengeId: string, month: string) {
     .lte("challenge_date", end);
 
   return (data ?? []) as Array<Pick<DailyCheckin, "user_id" | "challenge_date" | "status">>;
+}
+
+export async function loadMonth(challengeId: string, month: string) {
+  const start = month.slice(0, 7) + "-01";
+  const endDate = new Date(`${start}T00:00:00Z`);
+  endDate.setUTCMonth(endDate.getUTCMonth() + 1);
+  endDate.setUTCDate(0);
+  const end = endDate.toISOString().slice(0, 10);
+  return loadRange(challengeId, start, end);
 }
 
 export async function loadDay(challengeId: string, date: string) {
@@ -390,6 +448,19 @@ export async function loadPhotos(challengeId: string) {
   return (data ?? []) as ProgressPhoto[];
 }
 
+export async function loadSystemChatNotices(challengeId: string, userId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("challenge_id", challengeId)
+    .neq("user_id", userId)
+    .like("body", "[sys:day_complete:%")
+    .order("created_at", { ascending: false })
+    .limit(30);
+  return (data ?? []) as ChatMessage[];
+}
+
 export async function loadChat(challengeId: string) {
   const supabase = await createClient();
   const { data: messages } = await supabase
@@ -412,16 +483,19 @@ export async function loadCheckin(id: string) {
   return (data as DailyCheckin | null) ?? null;
 }
 
-export function mediaSrc(path: string | null, bucket: "avatars" | "progress") {
-  if (!path) return null;
-  const safe = path
-    .split("/")
-    .filter(Boolean)
-    .map((part) => encodeURIComponent(part))
-    .join("/");
-  return `/api/media/${bucket}/${safe}`;
+export async function loadCheckinsByIds(ids: string[]) {
+  if (ids.length === 0) return new Map<string, DailyCheckin>();
+  const supabase = await createClient();
+  const { data } = await supabase.from("daily_checkins").select("*").in("id", ids);
+  return new Map(((data ?? []) as DailyCheckin[]).map((row) => [row.id, row]));
 }
 
+export { createMediaSignedUrl, mediaSrc, type MediaBucket } from "@/lib/media";
+
 export async function signedUrl(path: string | null, bucket: "avatars" | "progress") {
+  if (!path) return null;
+  const supabase = await createClient();
+  const { data, error } = await createMediaSignedUrl(supabase, path, bucket);
+  if (!error && data?.signedUrl) return data.signedUrl;
   return mediaSrc(path, bucket);
 }

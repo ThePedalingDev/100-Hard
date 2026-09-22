@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SpoonIcon } from "@/components/icons";
 import { Plate, StatusMark } from "@/components/plate";
 import type { MemberView } from "@/lib/data";
+import { todayDisplayStatus } from "@/lib/scoring";
 
 export function MemberPlate({
   member,
@@ -12,7 +13,7 @@ export function MemberPlate({
   mine: boolean;
   avatarUrl: string | null;
 }) {
-  const todayStatus = member.checkin?.finalized_at ? member.checkin.status : "pending";
+  const todayStatus = todayDisplayStatus(member.checkin);
 
   return (
     <Plate as="article">
@@ -26,7 +27,7 @@ export function MemberPlate({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="size-full object-cover" />
           ) : (
-            <span className="stamp flex size-full items-center justify-center text-[18px] text-brass">
+            <span className="stamp flex size-full items-center justify-center text-[18px] text-mark">
               {member.profile.display_name.slice(0, 1)}
             </span>
           )}
@@ -34,7 +35,7 @@ export function MemberPlate({
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <h2 className="truncate text-[18px] leading-none">{member.profile.display_name}</h2>
-            {mine ? <p className="stamp shrink-0 text-[11px] text-brass">You</p> : null}
+            {mine ? <p className="stamp shrink-0 text-[11px] text-mark">You</p> : null}
           </div>
           <div className="mt-3">
             <StatusMark status={todayStatus} />
@@ -47,13 +48,13 @@ export function MemberPlate({
       ) : null}
 
       <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-steel/20 pt-5">
-        <Stat value={member.stats.perfectDays} label="Perfect days" />
+        <Stat value={member.stats.perfectDays} label="Perfect days" accent="success" />
         <Stat value={`${member.stats.completion}%`} label="Completion" />
         <Stat value={member.stats.streak} label="Current streak" />
         <Stat value={member.stats.longest} label="Longest streak" />
         <div>
           <dt className="stamp text-[11px] text-steel">Spoons</dt>
-          <dd className="stamp mt-2 flex items-center gap-1 text-[32px] leading-none tabular text-brass">
+          <dd className="stamp mt-2 flex items-center gap-1 text-[32px] leading-none tabular text-mark">
             <SpoonIcon className="size-5" />
             {member.stats.spoons}
           </dd>
@@ -70,11 +71,21 @@ export function MemberPlate({
   );
 }
 
-function Stat({ value, label }: { value: string | number; label: string }) {
+function Stat({
+  value,
+  label,
+  accent,
+}: {
+  value: string | number;
+  label: string;
+  accent?: "success";
+}) {
   return (
     <div>
       <dt className="stamp text-[11px] text-steel">{label}</dt>
-      <dd className="stamp mt-2 text-[32px] leading-none tabular">{value}</dd>
+      <dd className={`stamp mt-2 text-[32px] leading-none tabular ${accent === "success" ? "text-success" : ""}`}>
+        {value}
+      </dd>
     </div>
   );
 }

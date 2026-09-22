@@ -61,6 +61,85 @@ export function deriveStatus(fields: CheckinFields, finalized: boolean): DayStat
   return isPerfect(fields) ? "perfect" : "failed";
 }
 
+export type TodayDisplayStatus = "perfect" | "failed" | "pending" | "complete";
+
+export function todayDisplayStatus(
+  checkin: (CheckinFields & { finalized_at?: string | null }) | null | undefined,
+): TodayDisplayStatus {
+  if (!checkin) return "pending";
+  if (checkin.finalized_at) {
+    return checkin.status === "perfect" ? "perfect" : "failed";
+  }
+  if (isPerfect(checkin)) return "complete";
+  return "pending";
+}
+
+export type TodayRingMetric = {
+  id: ScoredCategory;
+  label: string;
+  current: number;
+  total: number;
+  progress: number;
+};
+
+export function todayRingMetrics(
+  checkin: CheckinFields | null | undefined,
+): TodayRingMetric[] {
+  const empty = (id: ScoredCategory, label: string, total: number): TodayRingMetric => ({
+    id,
+    label,
+    current: 0,
+    total,
+    progress: 0,
+  });
+
+  if (!checkin) {
+    return [
+      empty("diet", "Diet", 1),
+      empty("workout", "Workout", 3),
+      empty("water", "Water", 1),
+      empty("bible", "Bible", 1),
+    ];
+  }
+
+  const workoutDone = [
+    checkin.workout_1_complete,
+    checkin.workout_2_complete,
+    checkin.outdoor_complete,
+  ].filter(Boolean).length;
+
+  return [
+    {
+      id: "diet",
+      label: "Diet",
+      current: checkin.diet_complete ? 1 : 0,
+      total: 1,
+      progress: checkin.diet_complete ? 1 : 0,
+    },
+    {
+      id: "workout",
+      label: "Workout",
+      current: workoutDone,
+      total: 3,
+      progress: workoutDone / 3,
+    },
+    {
+      id: "water",
+      label: "Water",
+      current: checkin.water_complete ? 1 : 0,
+      total: 1,
+      progress: checkin.water_complete ? 1 : 0,
+    },
+    {
+      id: "bible",
+      label: "Bible",
+      current: checkin.bible_complete ? 1 : 0,
+      total: 1,
+      progress: checkin.bible_complete ? 1 : 0,
+    },
+  ];
+}
+
 export function completionPercent(completed: number, possible: number): number {
   if (possible <= 0) return 0;
   return Math.round((completed / possible) * 1000) / 10;

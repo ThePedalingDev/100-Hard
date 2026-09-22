@@ -4,6 +4,7 @@ import { Atkinson_Hyperlegible_Next } from "next/font/google";
 import { PageEnter } from "@/components/page-enter";
 import { RouteProgress } from "@/components/route-progress";
 import { SafariChrome } from "@/components/safari-chrome";
+import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
 const display = localFont({
@@ -17,13 +18,15 @@ const body = Atkinson_Hyperlegible_Next({
   subsets: ["latin"],
   variable: "--font-body-face",
   display: "swap",
+  adjustFontFallback: false,
+  fallback: ["system-ui", "sans-serif"],
 });
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#F4F7FA",
+  themeColor: "#E3ECF4",
   interactiveWidget: "resizes-content",
 };
 
@@ -71,9 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <SafariChrome />
         <RouteProgress />
-        <div id="main-content" tabIndex={-1} className="focus:outline-none">
-          <PageEnter isolate>{children}</PageEnter>
-        </div>
+        <ToastProvider>
+          <div id="main-content" tabIndex={-1} className="focus:outline-none">
+            <PageEnter isolate>{children}</PageEnter>
+          </div>
+        </ToastProvider>
       </body>
     </html>
   );

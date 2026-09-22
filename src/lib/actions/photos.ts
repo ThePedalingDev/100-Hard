@@ -53,3 +53,36 @@ export async function uploadPhotoAction(formData: FormData): Promise<ActionResul
   revalidatePath("/photos");
   return { ok: true, data: undefined };
 }
+
+export async function deletePhotoAction(photoId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Session expired. Sign in again.", code: "AUTH_EXPIRED" };
+
+  const { data: photo, error: loadError } = await supabase
+    .from("progress_photos")
+    .select("id, user_id, storage_path")
+    .eq("id", photoId)
+    .maybeSingle();
+
+  if (loadError) return { ok: false, error: loadError.message, code: "PHOTO_DELETE_FAILED" };
+  if (!photo) return { ok: false, error: "Photo not found.", code: "NOT_FOUND" };
+  if (photo.user_id !== user.id) {
+    return { ok: false, error: "You can only remove your own plate.", code: "FORBIDDEN" };
+  }
+
+  const { error: storageError } = await supabase.storage.from("progress").remove([photo.storage_path]);
+  if (storageError) {
+    return { ok: false, error: storageError.message, code: "PHOTO_DELETE_FAILED" };
+  }
+
+  const { error: deleteError } = await supabase.from("progress_photos").delete().eq("id", photoId);
+  if (deleteError) {
+    return { ok: false, error: deleteError.message, code: "PHOTO_DELETE_FAILED" };
+  }
+
+  revalidatePath("/photos");
+  return { ok: true, data: undefined };
+}

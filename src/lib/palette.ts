@@ -1,8 +1,9 @@
 export const PALETTE = {
-  canvas: "#F4F7FA",
+  canvas: "#E3ECF4",
   iron: "#FFFFFF",
-  proof: "#FF6B00",
-  signal: "#FFB600",
+  proof: "#E25F00",
+  proofInk: "#964818",
+  signal: "#D4A017",
   ink: "#002040",
   steel: "#3D5A73",
   club: "#002040",

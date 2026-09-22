@@ -41,8 +41,10 @@ export function InviteShare({
           ? "Share the invite so the next pin can land on the rack. Up to 12 members."
           : "Copy the code or the join link. Up to 12 members."}
       </p>
-      <p className="stamp mt-5 select-all text-[32px] leading-none tabular text-brass">{code}</p>
-      <p className="stamp mt-3 text-[11px] text-steel">{path}</p>
+      <p className="stamp mt-5 select-all break-all text-[22px] leading-tight tabular text-mark sm:text-[32px] sm:leading-none">
+        {code}
+      </p>
+      <p className="stamp mt-3 break-all text-[11px] leading-5 text-steel">{path}</p>
       <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <Button type="button" className="w-full sm:w-auto" onClick={() => copy("code")}>
           <CopyIcon className="size-4" />

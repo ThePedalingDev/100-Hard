@@ -52,7 +52,7 @@ export function AdminDesk({
                       className="size-full object-cover"
                     />
                   ) : (
-                    <span className="stamp flex size-full items-center justify-center text-[18px] text-brass">
+                    <span className="stamp flex size-full items-center justify-center text-[18px] text-mark">
                       {(account.display_name ?? "?").slice(0, 1).toUpperCase()}
                     </span>
                   )}
@@ -79,7 +79,7 @@ export function AdminDesk({
                       key={challenge.id}
                       className={`stamp rounded-plate border px-2 py-1 text-[11px] ${
                         challenge.active
-                          ? "border-brass text-brass"
+                          ? "border-brass text-mark"
                           : "border-steel/30 text-steel"
                       }`}
                     >
