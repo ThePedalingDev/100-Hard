@@ -38,16 +38,38 @@ export default async function ProfilePage() {
           />
         ) : null}
       </Plate>
+      {context.isAdmin ? (
+        <Link
+          href="/admin"
+          className="stamp stamp-press inline-flex min-h-12 items-center justify-center rounded-plate border border-steel/50 px-4 text-[15px] font-bold"
+        >
+          Admin locker
+        </Link>
+      ) : null}
+      {context.challenge ? (
+        <Plate>
+          <h2 className="text-[18px] leading-none">History</h2>
+          <p className="mt-2 text-sm leading-6 text-steel">
+            Open any challenge day to see the stamps, notes, and spoon record for that inspection.
+          </p>
+          <Link
+            href="/profile/history"
+            className="stamp-press mt-4 inline-flex min-h-12 items-center rounded-plate bg-brass px-4 text-[15px] font-bold tracking-[-0.01em] text-onproof"
+          >
+            View my history
+          </Link>
+        </Plate>
+      ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href="/onboarding/challenge"
-          className="stamp stamp-press inline-flex min-h-11 items-center justify-center rounded-plate bg-brass px-4 text-[13px] text-onproof"
+          className="stamp stamp-press inline-flex min-h-12 items-center justify-center rounded-plate bg-brass px-4 text-[15px] font-bold text-onproof"
         >
           Create challenge
         </Link>
         <Link
           href="/onboarding/challenge#join"
-          className="stamp stamp-press inline-flex min-h-11 items-center justify-center rounded-plate border border-steel/50 px-4 text-[13px]"
+          className="stamp stamp-press inline-flex min-h-12 items-center justify-center rounded-plate border border-steel/50 px-4 text-[15px] font-bold"
         >
           Join with a code
         </Link>

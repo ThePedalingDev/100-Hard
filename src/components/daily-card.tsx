@@ -72,13 +72,23 @@ export function DailyCard({
 
   return (
     <article
-      className="relative rounded-plate border border-steel/35 bg-iron px-4 py-4 md:px-5 md:py-5"
+      className="plate-metal relative rounded-plate border border-steel/45 bg-iron px-5 py-5 md:px-6 md:py-6"
       aria-busy={pending || undefined}
     >
-      <span className="pointer-events-none absolute left-2 top-2 size-1.5 rounded-full bg-brass" />
-      <span className="pointer-events-none absolute right-2 top-2 size-1.5 rounded-full bg-brass" />
-      <header className="mb-4 flex items-center gap-3">
-        <div className="size-11 overflow-hidden rounded-plate border border-brass/70 bg-graphite">
+      <span className="pointer-events-none absolute left-2 top-2 size-3 rounded-full border border-brass bg-club" aria-hidden="true">
+        <span className="absolute inset-[3px] rounded-full bg-brass" />
+      </span>
+      <span className="pointer-events-none absolute right-2 top-2 size-3 rounded-full border border-brass bg-club" aria-hidden="true">
+        <span className="absolute inset-[3px] rounded-full bg-brass" />
+      </span>
+      <span className="pointer-events-none absolute bottom-2 left-2 size-3 rounded-full border border-brass bg-club" aria-hidden="true">
+        <span className="absolute inset-[3px] rounded-full bg-brass" />
+      </span>
+      <span className="pointer-events-none absolute bottom-2 right-2 size-3 rounded-full border border-brass bg-club" aria-hidden="true">
+        <span className="absolute inset-[3px] rounded-full bg-brass" />
+      </span>
+      <header className="mb-5 flex items-center gap-3">
+        <div className="size-12 overflow-hidden rounded-plate border border-brass/70 bg-graphite">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="size-full object-cover" />
@@ -89,7 +99,7 @@ export function DailyCard({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="stamp truncate text-[16px] leading-none">{owner.display_name}</h3>
+          <h3 className="truncate text-[18px] leading-none">{owner.display_name}</h3>
           <p className="mt-1 text-sm text-steel">{complete} / 4 complete</p>
         </div>
         <StatusMark status={status} />

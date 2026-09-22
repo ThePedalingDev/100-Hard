@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isAdminEmail } from "@/lib/admin";
 import { addDays, dateInChallengeTz, raceLaneProgress } from "@/lib/challenge";
 import { daysRemainingFor, isChallengeComplete } from "@/lib/challenge-dates";
 import {
@@ -52,6 +53,7 @@ export type AppContext = {
   schemaReady: boolean;
   loadError?: string;
   me: MemberView | null;
+  isAdmin: boolean;
 };
 
 function emptyCheckin(challengeId: string, userId: string, date: string): DailyCheckin {
@@ -125,6 +127,7 @@ function baseContext(
     finished: false,
     schemaReady: true,
     me: null,
+    isAdmin: isAdminEmail(email),
     ...extras,
   };
 }
@@ -291,10 +294,14 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     finished,
     schemaReady: true,
     me,
+    isAdmin: isAdminEmail(user.email),
   };
 }
 
-export function lanePercent(perfectDays: number): number {
+export function lanePercent(perfectDays: number, totalDays?: number): number {
+  if (totalDays && totalDays > 0) {
+    return Math.round(Math.min(perfectDays / totalDays, 1) * 100);
+  }
   return Math.round(raceLaneProgress(perfectDays) * 100);
 }
 
@@ -341,6 +348,18 @@ export async function loadDay(challengeId: string, date: string) {
     likes: (likes ?? []) as DailyLike[],
     comments: (comments ?? []) as DailyComment[],
   };
+}
+
+export async function loadUserCheckin(challengeId: string, userId: string, date: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("daily_checkins")
+    .select("*")
+    .eq("challenge_id", challengeId)
+    .eq("user_id", userId)
+    .eq("challenge_date", date)
+    .maybeSingle();
+  return (data as DailyCheckin | null) ?? null;
 }
 
 export async function loadSpoons(challengeId: string) {

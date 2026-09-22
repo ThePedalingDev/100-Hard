@@ -2,6 +2,7 @@
 
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { CalendarIcon, ChatIcon, HomeIcon, PhotoIcon, ProfileIcon, SpoonIcon } from "@/components/icons";
 import { StampLoader } from "@/components/loader";
 
@@ -17,20 +18,36 @@ const items = [
 export function AppNav() {
   const pathname = usePathname();
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const viewport = window.visualViewport;
+    function sync() {
+      const height = viewport?.height ?? window.innerHeight;
+      root.style.setProperty("--vv-height", `${Math.round(height)}px`);
+    }
+    sync();
+    viewport?.addEventListener("resize", sync);
+    viewport?.addEventListener("scroll", sync);
+    window.addEventListener("orientationchange", sync);
+    return () => {
+      viewport?.removeEventListener("resize", sync);
+      viewport?.removeEventListener("scroll", sync);
+      window.removeEventListener("orientationchange", sync);
+      root.style.removeProperty("--vv-height");
+    };
+  }, []);
+
   return (
-    <nav
-      aria-label="Challenge"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-steel/30 bg-canvas md:static md:mb-6 md:border-t-0 md:border-b"
-    >
-      <ul className="mx-auto flex max-w-3xl items-stretch justify-between px-2 md:justify-start md:gap-1 md:px-0">
+    <nav aria-label="Challenge" className="tabbar">
+      <ul className="mx-auto flex w-full items-stretch justify-between px-1 md:px-2">
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
-            <li key={item.href} className="flex-1 md:flex-none">
+            <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
-                className={`flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[11px] font-bold tracking-[-0.01em] md:min-h-12 md:flex-row md:px-3 md:text-[12px] ${
+                className={`relative flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[11px] font-bold tracking-[-0.01em] md:min-h-12 md:flex-row md:gap-2 md:text-[13px] ${
                   active ? "text-brass" : "text-steel hover:text-offwhite"
                 }`}
               >
@@ -39,6 +56,9 @@ export function AppNav() {
                   <NavPendingHint />
                 </span>
                 {item.label}
+                {active ? (
+                  <span className="absolute inset-x-2 bottom-1 h-0.5 bg-brass md:bottom-2" aria-hidden="true" />
+                ) : null}
               </Link>
             </li>
           );
@@ -52,7 +72,7 @@ function NavPendingHint() {
   const { pending } = useLinkStatus();
   if (!pending) return null;
   return (
-    <span className="absolute inset-0 grid place-items-center bg-canvas" aria-hidden="true">
+    <span className="absolute inset-0 grid place-items-center bg-canvas md:bg-iron" aria-hidden="true">
       <StampLoader className="size-4 text-brass" />
     </span>
   );

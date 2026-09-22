@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DailyCard } from "@/components/daily-card";
+import { PageHeader } from "@/components/plate";
 import { formatStampDate } from "@/lib/challenge";
+import { challengeDayNumber, challengeMilestones } from "@/lib/challenge-dates";
 import { loadAppContext, loadDay, signedUrl } from "@/lib/data";
 
 export default async function DayPage({ params }: { params: Promise<{ date: string }> }) {
@@ -21,10 +24,30 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
       ] as const),
     ),
   );
+  const dayNumber = challengeDayNumber(date, context.challenge.start_date);
+  const milestone = challengeMilestones(context.challenge.start_date, context.challenge.end_date).find(
+    (item) => item.iso === date,
+  );
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-[36px] leading-none">{formatStampDate(date)}</h1>
+      <PageHeader
+        title={formatStampDate(date)}
+        kicker={
+          <>
+            Day {dayNumber}
+            {milestone ? ` · ${milestone.label}` : ""}
+          </>
+        }
+        action={
+          <Link
+            className="stamp-press inline-flex min-h-12 items-center rounded-plate border border-steel/40 px-4 text-[15px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite"
+            href="/calendar"
+          >
+            Calendar
+          </Link>
+        }
+      />
       {context.members.map((member) => {
         const checkin = day.checkins.find((row) => row.user_id === member.profile.id);
         if (!checkin) {

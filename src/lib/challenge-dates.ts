@@ -1,4 +1,4 @@
-import { compareIsoDates, daysBetweenInclusive } from "@/lib/challenge";
+import { addDays, compareIsoDates, daysBetweenInclusive } from "@/lib/challenge";
 import type { ActionResult, ChallengeStatus } from "@/lib/supabase/types";
 
 export const MAX_CHALLENGE_MEMBERS = 12;
@@ -15,6 +15,16 @@ export function validateChallengeRange(
   }
   if (compareIsoDates(start, today) < 0) {
     return { ok: false, error: "Start must be today or later.", code: "START_IN_PAST" };
+  }
+  if (compareIsoDates(end, start) <= 0) {
+    return { ok: false, error: "End must be after start.", code: "END_NOT_AFTER_START" };
+  }
+  return { ok: true, data: undefined };
+}
+
+export function validateAdminChallengeRange(start: string, end: string): ActionResult {
+  if (!ISO.test(start) || !ISO.test(end)) {
+    return { ok: false, error: "Use calendar dates.", code: "VALIDATION" };
   }
   if (compareIsoDates(end, start) <= 0) {
     return { ok: false, error: "End must be after start.", code: "END_NOT_AFTER_START" };
@@ -42,4 +52,34 @@ export function challengeLifecycleStatus(startDate: string, endDate: string, tod
   if (compareIsoDates(today, startDate) < 0) return "pending";
   if (compareIsoDates(today, endDate) > 0) return "complete";
   return "active";
+}
+
+export function challengeLength(startDate: string, endDate: string): number {
+  return daysBetweenInclusive(startDate, endDate);
+}
+
+export function challengeDayNumber(iso: string, startDate: string): number {
+  return daysBetweenInclusive(startDate, iso);
+}
+
+export type ChallengeMilestone = {
+  day: number;
+  iso: string;
+  kind: "start" | "end" | "interval";
+  label: string;
+};
+
+export function challengeMilestones(startDate: string, endDate: string): ChallengeMilestone[] {
+  const total = challengeLength(startDate, endDate);
+  const marks: ChallengeMilestone[] = [{ day: 1, iso: startDate, kind: "start", label: "Start" }];
+  for (let day = 25; day < total; day += 25) {
+    marks.push({
+      day,
+      iso: addDays(startDate, day - 1),
+      kind: "interval",
+      label: `Day ${day}`,
+    });
+  }
+  marks.push({ day: total, iso: endDate, kind: "end", label: "End" });
+  return marks;
 }
