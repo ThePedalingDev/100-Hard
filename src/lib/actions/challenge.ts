@@ -77,13 +77,20 @@ export async function joinChallengeAction(formData: FormData): Promise<ActionRes
     return { ok: false, error: "Invite code is required.", code: "VALIDATION" };
   }
 
-  const { data: challenge, error } = await supabase
-    .from("challenges")
-    .select("id, start_date, end_date")
-    .eq("invite_code", code)
-    .maybeSingle();
+  const { data: inviteRows, error: inviteError } = await supabase.rpc("get_challenge_by_invite_code", {
+    p_code: code,
+  });
 
-  if (error || !challenge) {
+  if (inviteError) {
+    return {
+      ok: false,
+      error: "Could not verify that invite. Try again.",
+      code: "INVITE_LOOKUP_FAILED",
+    };
+  }
+
+  const challenge = inviteRows?.[0] ?? null;
+  if (!challenge) {
     return { ok: false, error: "That invite is expired or invalid.", code: "INVITE_EXPIRED" };
   }
 
@@ -95,12 +102,7 @@ export async function joinChallengeAction(formData: FormData): Promise<ActionRes
     .maybeSingle();
 
   if (!existing) {
-    const { count } = await supabase
-      .from("challenge_members")
-      .select("id", { count: "exact", head: true })
-      .eq("challenge_id", challenge.id);
-
-    if ((count ?? 0) >= MAX_CHALLENGE_MEMBERS) {
+    if (Number(challenge.member_count ?? 0) >= MAX_CHALLENGE_MEMBERS) {
       return { ok: false, error: "This challenge is full.", code: "CHALLENGE_FULL" };
     }
 
