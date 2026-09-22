@@ -56,7 +56,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<ActionResu
     const path = `${user.id}/avatar.webp`;
     const { error } = await supabase.storage.from("avatars").upload(path, file, {
       upsert: true,
-      contentType: file.type || "image/webp",
+      contentType: "image/webp",
     });
     if (error) {
       return { ok: false, error: error.message, code: "AVATAR_UPLOAD_FAILED" };

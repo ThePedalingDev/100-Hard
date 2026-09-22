@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { resolveActiveChallengeId } from "@/lib/active-challenge";
 import { dateInChallengeTz } from "@/lib/challenge";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult, DailyCheckin } from "@/lib/supabase/types";
@@ -34,12 +35,9 @@ async function ownOpenCheckin() {
   } = await supabase.auth.getUser();
   if (!user) return { error: { message: "Session expired. Sign in again.", code: "AUTH_EXPIRED" } as const };
 
-  const { data: membership } = await supabase
-    .from("challenge_members")
-    .select("challenge_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (!membership) return { error: { message: "Join a challenge first.", code: "NO_CHALLENGE" } as const };
+  const challengeId = await resolveActiveChallengeId(supabase, user.id);
+  if (!challengeId) return { error: { message: "Join a challenge first.", code: "NO_CHALLENGE" } as const };
+  const membership = { challenge_id: challengeId };
 
   const today = dateInChallengeTz();
   const { data: existing } = await supabase

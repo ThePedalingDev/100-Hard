@@ -7,7 +7,6 @@ import { loginAction, registerAction, resetPasswordAction } from "@/lib/actions/
 import { PlateMark } from "@/components/art";
 import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
 import { usePlatePending } from "@/components/route-progress";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
   const router = useRouter();
@@ -17,12 +16,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
 
   return (
     <Plate className="mx-auto w-full max-w-md">
-      <div className="mb-1 flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <PlateMark size={48} />
-          <h1 className="stamp text-[32px] leading-none">100 Hard</h1>
-        </div>
-        <ThemeToggle />
+      <div className="mb-1 flex items-center gap-3">
+        <PlateMark size={48} />
+        <h1 className="text-[32px] leading-none">100 Hard</h1>
       </div>
       <p className="mt-2 text-sm text-steel">
         {mode === "login"
@@ -30,7 +26,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
           : mode === "register"
             ? "Create an account for the private two-person challenge."
             : "Reset the password for this private challenge."}{" "}
-        Ends <span className="stamp tabular text-offwhite">31 December 2026</span>.
+        Ends <span className="tabular font-bold text-offwhite">31 December 2026</span>.
       </p>
       <form
         className="mt-6 space-y-4"

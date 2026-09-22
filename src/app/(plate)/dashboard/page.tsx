@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DailyCard } from "@/components/daily-card";
-import { HeadToHead } from "@/components/head-to-head";
 import { InviteShare } from "@/components/invite-share";
+import { Leaderboard } from "@/components/leaderboard";
 import { PageHeader, Plate } from "@/components/plate";
 import { SpoonIcon } from "@/components/icons";
+import { formatStampDate } from "@/lib/challenge";
+import { MAX_CHALLENGE_MEMBERS } from "@/lib/challenge-dates";
 import { loadAppContext, signedUrl } from "@/lib/data";
 
 export default async function DashboardPage() {
@@ -13,7 +15,7 @@ export default async function DashboardPage() {
   if (!context.schemaReady) {
     return (
       <Plate>
-        <h1 className="stamp text-[32px] leading-none">Schema not applied</h1>
+        <h1 className="text-[32px] leading-none">Schema not applied</h1>
         <p className="mt-2 text-sm leading-6 text-steel">
           The 100-Hard Supabase project is empty. Approve the proposed schema in
           `supabase/proposed/001_mvp.sql` and I will apply it.
@@ -28,8 +30,15 @@ export default async function DashboardPage() {
     redirect("/onboarding/challenge");
   }
 
-  const meAvatar = await signedUrl(context.profile.avatar_path, "avatars");
-  const otherAvatar = await signedUrl(context.partner?.avatar_path ?? null, "avatars");
+  const avatars = new Map(
+    await Promise.all(
+      context.members.map(async (member) => [
+        member.profile.id,
+        await signedUrl(member.profile.avatar_path, "avatars"),
+      ] as const),
+    ),
+  );
+  const others = context.members.filter((member) => member.profile.id !== context.userId);
 
   if (context.finished) {
     return (
@@ -40,10 +49,15 @@ export default async function DashboardPage() {
         />
         <Plate>
           <div className="grid grid-cols-2 gap-4">
-            <FinalColumn title={context.me?.profile.display_name ?? "You"} stats={context.me?.stats} />
-            <FinalColumn title={context.other?.profile.display_name ?? "Partner"} stats={context.other?.stats} />
+            {context.members.map((member) => (
+              <FinalColumn
+                key={member.profile.id}
+                title={member.profile.id === context.userId ? "You" : member.profile.display_name}
+                stats={member.stats}
+              />
+            ))}
           </div>
-          <Link href="/spoons" className="stamp mt-5 inline-flex min-h-11 items-center text-brass">
+          <Link href="/spoons" className="mt-5 inline-flex min-h-12 items-center font-bold tracking-[-0.01em] text-brass">
             Open spoon repayment
           </Link>
         </Plate>
@@ -57,18 +71,15 @@ export default async function DashboardPage() {
         title={context.challenge.name}
         kicker={
           <>
-            Ends 31 December · <span className="stamp tabular text-offwhite">{context.remaining}</span> days remaining
+            Ends {formatStampDate(context.challenge.end_date)} ·{" "}
+            <span className="stamp tabular text-offwhite">{context.remaining}</span> days remaining
           </>
         }
         action={<p className="stamp text-[11px] text-steel">SAST</p>}
       />
 
-      {context.me ? (
-        <HeadToHead
-          me={context.me}
-          other={context.other}
-          avatars={{ me: meAvatar, other: otherAvatar }}
-        />
+      {context.members.length > 0 ? (
+        <Leaderboard members={context.members} userId={context.userId} />
       ) : null}
 
       {context.me ? (
@@ -83,7 +94,7 @@ export default async function DashboardPage() {
       ) : null}
 
       <section className="flex flex-col gap-4">
-        <h2 className="stamp text-[18px] leading-none">Today</h2>
+        <h2 className="text-[18px] leading-none">Today</h2>
         {context.me ? (
           <DailyCard
             checkin={context.me.checkin!}
@@ -92,24 +103,30 @@ export default async function DashboardPage() {
             likes={context.me.likes}
             comments={context.me.comments}
             canEdit
-            avatarUrl={meAvatar}
+            avatarUrl={avatars.get(context.userId) ?? null}
           />
         ) : null}
-        {context.other ? (
+        {others.map((member) => (
           <DailyCard
-            checkin={context.other.checkin!}
-            owner={context.other.profile}
+            key={member.profile.id}
+            checkin={member.checkin!}
+            owner={member.profile}
             viewerId={context.userId}
-            likes={context.other.likes}
-            comments={context.other.comments}
+            likes={member.likes}
+            comments={member.comments}
             canEdit={false}
-            avatarUrl={otherAvatar}
+            avatarUrl={avatars.get(member.profile.id) ?? null}
           />
-        ) : (
+        ))}
+        {context.members.length < 2 ? (
           <Plate>
             <InviteShare waiting code={context.challenge.invite_code} />
           </Plate>
-        )}
+        ) : context.members.length < MAX_CHALLENGE_MEMBERS ? (
+          <Plate>
+            <InviteShare code={context.challenge.invite_code} />
+          </Plate>
+        ) : null}
       </section>
     </div>
   );
@@ -136,7 +153,7 @@ function FinalColumn({
 }) {
   return (
     <div>
-      <h2 className="stamp text-[16px] leading-none">{title}</h2>
+      <h2 className="text-[16px] leading-none">{title}</h2>
       <ul className="mt-3 space-y-2 text-sm leading-6 text-steel">
         <li>Perfect days {stats?.perfectDays ?? 0}</li>
         <li>Completion {stats?.completion ?? 0}%</li>

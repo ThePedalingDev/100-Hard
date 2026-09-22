@@ -15,7 +15,7 @@ function Lane({
   return (
     <div className="space-y-2">
       <div className="flex items-end justify-between gap-3">
-        <p className="stamp text-[16px] leading-none text-offwhite">{member.profile.display_name}</p>
+        <p className="text-[16px] leading-none font-semibold tracking-[-0.03em] text-offwhite">{member.profile.display_name}</p>
         <p className="stamp text-[11px] text-steel">{member.stats.perfectDays} perfect</p>
       </div>
       <div className="relative h-10 rounded-plate border border-steel/30 bg-graphite">
@@ -57,7 +57,7 @@ export function HeadToHead({
   return (
     <Plate>
       <div className="mb-4 flex items-end justify-between">
-        <h2 className="stamp text-[18px] leading-none text-offwhite">Head to head</h2>
+        <h2 className="text-[18px] leading-none text-offwhite">Head to head</h2>
         <p className="stamp text-[11px] text-steel">31 Dec</p>
       </div>
       <div className="space-y-6">

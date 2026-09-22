@@ -15,7 +15,7 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg items-center px-4 py-10">
       <Plate className="w-full">
-        <h1 className="stamp text-[32px] leading-none">Join 100 Hard</h1>
+        <h1 className="text-[32px] leading-none">Join 100 Hard</h1>
         <p className="mt-2 text-sm text-steel">Invite code {code}</p>
         <Button
           className="mt-6 w-full"

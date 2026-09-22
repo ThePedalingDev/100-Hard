@@ -35,11 +35,11 @@ export function InviteShare({
 
   return (
     <div>
-      <p className="stamp text-[16px] leading-none">{waiting ? "Waiting for partner" : "Invite"}</p>
+      <p className="text-[16px] leading-none font-semibold tracking-[-0.03em]">{waiting ? "Waiting for members" : "Invite"}</p>
       <p className="mt-2 text-sm leading-6 text-steel">
         {waiting
-          ? "Share the invite so the second pin can land on the rack. Two members only."
-          : "Copy the code or the join link. Two members only."}
+          ? "Share the invite so the next pin can land on the rack. Up to 12 members."
+          : "Copy the code or the join link. Up to 12 members."}
       </p>
       <p className="stamp mt-5 select-all text-[32px] leading-none tabular text-brass">{code}</p>
       <p className="stamp mt-3 text-[11px] text-steel">{path}</p>

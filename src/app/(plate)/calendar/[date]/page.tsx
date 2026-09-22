@@ -10,41 +10,43 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
   const context = await loadAppContext();
   if (!context) redirect("/login");
   if (!context.challenge) redirect("/onboarding/challenge");
+  if (date < context.challenge.start_date || date > context.challenge.end_date) notFound();
 
   const day = await loadDay(context.challenge.id, date);
-  const meAvatar = await signedUrl(context.profile?.avatar_path ?? null, "avatars");
-  const otherAvatar = await signedUrl(context.partner?.avatar_path ?? null, "avatars");
-
-  const mine = day.checkins.find((row) => row.user_id === context.userId);
-  const theirs = day.checkins.find((row) => row.user_id !== context.userId);
+  const avatars = new Map(
+    await Promise.all(
+      context.members.map(async (member) => [
+        member.profile.id,
+        await signedUrl(member.profile.avatar_path, "avatars"),
+      ] as const),
+    ),
+  );
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="stamp text-[36px] leading-none">{formatStampDate(date)}</h1>
-      {context.me && mine ? (
-        <DailyCard
-          checkin={mine}
-          owner={context.me.profile}
-          viewerId={context.userId}
-          likes={day.likes.filter((like) => like.daily_checkin_id === mine.id)}
-          comments={day.comments.filter((comment) => comment.daily_checkin_id === mine.id)}
-          canEdit={date === context.today && !mine.finalized_at}
-          avatarUrl={meAvatar}
-        />
-      ) : (
-        <p className="text-sm text-steel">No inspection recorded for you on this date.</p>
-      )}
-      {context.other && theirs ? (
-        <DailyCard
-          checkin={theirs}
-          owner={context.other.profile}
-          viewerId={context.userId}
-          likes={day.likes.filter((like) => like.daily_checkin_id === theirs.id)}
-          comments={day.comments.filter((comment) => comment.daily_checkin_id === theirs.id)}
-          canEdit={false}
-          avatarUrl={otherAvatar}
-        />
-      ) : null}
+      <h1 className="text-[36px] leading-none">{formatStampDate(date)}</h1>
+      {context.members.map((member) => {
+        const checkin = day.checkins.find((row) => row.user_id === member.profile.id);
+        if (!checkin) {
+          return (
+            <p key={member.profile.id} className="text-sm text-steel">
+              No inspection recorded for {member.profile.id === context.userId ? "you" : member.profile.display_name} on this date.
+            </p>
+          );
+        }
+        return (
+          <DailyCard
+            key={member.profile.id}
+            checkin={checkin}
+            owner={member.profile}
+            viewerId={context.userId}
+            likes={day.likes.filter((like) => like.daily_checkin_id === checkin.id)}
+            comments={day.comments.filter((comment) => comment.daily_checkin_id === checkin.id)}
+            canEdit={member.profile.id === context.userId && date === context.today && !checkin.finalized_at}
+            avatarUrl={avatars.get(member.profile.id) ?? null}
+          />
+        );
+      })}
     </div>
   );
 }

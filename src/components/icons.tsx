@@ -51,6 +51,15 @@ export function SpoonIcon(props: IconProps) {
   );
 }
 
+export function ChatIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="3.5" y="5" width="17" height="12" rx="1.5" />
+      <path d="M8 17v3l4-3h8.5" />
+    </svg>
+  );
+}
+
 export function ProfileIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

@@ -2,16 +2,14 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageHeader, Plate, StatusMark } from "@/components/plate";
 import {
-  CHALLENGE_END,
-  CHALLENGE_START,
   addDays,
-  clampToChallenge,
   dateInChallengeTz,
   daysInMonth,
   monthKey,
   monthLabel,
   weekdayIndexMonday,
 } from "@/lib/challenge";
+import { clampToChallengeRange } from "@/lib/challenge-dates";
 import { loadAppContext, loadMonth } from "@/lib/data";
 
 export default async function CalendarPage({
@@ -25,13 +23,16 @@ export default async function CalendarPage({
 
   const params = await searchParams;
   const today = dateInChallengeTz();
-  const month = clampToChallenge(monthKey(params.month ?? today));
+  const start = context.challenge.start_date;
+  const end = context.challenge.end_date;
+  const month = monthKey(clampToChallengeRange(monthKey(params.month ?? today), start, end));
   const year = Number(month.slice(0, 4));
   const monthIndex = Number(month.slice(5, 7)) - 1;
   const first = `${month.slice(0, 7)}-01`;
   const lead = weekdayIndexMonday(first);
   const count = daysInMonth(year, monthIndex);
   const rows = await loadMonth(context.challenge.id, month);
+  const memberIds = context.members.map((member) => member.profile.id);
 
   const prev = addDays(first, -1);
   const next = addDays(`${month.slice(0, 7)}-${String(count).padStart(2, "0")}`, 1);
@@ -42,17 +43,17 @@ export default async function CalendarPage({
         title={monthLabel(month)}
         action={
           <div className="flex gap-2">
-            {prev >= CHALLENGE_START ? (
+            {prev >= start ? (
               <Link
-                className="stamp stamp-press inline-flex min-h-11 items-center rounded-plate border border-steel/40 px-3 text-[11px] text-steel hover:border-offwhite hover:text-offwhite"
+                className="stamp-press inline-flex min-h-12 items-center rounded-plate border border-steel/40 px-4 text-[15px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite"
                 href={`/calendar?month=${monthKey(prev)}`}
               >
                 Previous
               </Link>
             ) : null}
-            {next <= CHALLENGE_END ? (
+            {next <= end ? (
               <Link
-                className="stamp stamp-press inline-flex min-h-11 items-center rounded-plate border border-steel/40 px-3 text-[11px] text-steel hover:border-offwhite hover:text-offwhite"
+                className="stamp-press inline-flex min-h-12 items-center rounded-plate border border-steel/40 px-4 text-[15px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite"
                 href={`/calendar?month=${monthKey(next)}`}
               >
                 Next
@@ -75,9 +76,7 @@ export default async function CalendarPage({
           ))}
           {Array.from({ length: count }, (_, index) => {
             const iso = `${month.slice(0, 7)}-${String(index + 1).padStart(2, "0")}`;
-            const mine = rows.find((row) => row.user_id === context.userId && row.challenge_date === iso);
-            const theirs = rows.find((row) => row.user_id !== context.userId && row.challenge_date === iso);
-            const inChallenge = iso >= CHALLENGE_START && iso <= CHALLENGE_END;
+            const inChallenge = iso >= start && iso <= end;
             return (
               <Link
                 key={iso}
@@ -88,9 +87,11 @@ export default async function CalendarPage({
               >
                 <p className="stamp tabular text-[11px]">{index + 1}</p>
                 {inChallenge ? (
-                  <div className="flex gap-1">
-                    <StatusMark compact status={mine?.status ?? "pending"} />
-                    {context.partner ? <StatusMark compact status={theirs?.status ?? "pending"} /> : null}
+                  <div className="flex flex-wrap gap-1">
+                    {memberIds.map((id) => {
+                      const row = rows.find((item) => item.user_id === id && item.challenge_date === iso);
+                      return <StatusMark key={id} compact status={row?.status ?? "pending"} />;
+                    })}
                   </div>
                 ) : null}
               </Link>

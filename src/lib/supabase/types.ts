@@ -9,6 +9,7 @@ export type Profile = {
   display_name: string;
   avatar_path: string | null;
   diet_commitment: string | null;
+  active_challenge_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -107,6 +108,14 @@ export type ProgressPhoto = {
   created_at: string;
 };
 
+export type ChatMessage = {
+  id: string;
+  challenge_id: string;
+  user_id: string;
+  body: string;
+  created_at: string;
+};
+
 export type ActionResult<T = undefined> =
   | { ok: true; data: T; next?: string }
   | { ok: false; error: string; code: string };
@@ -123,6 +132,7 @@ export type Database = {
       spoon_entries: { Row: SpoonEntry; Insert: Partial<SpoonEntry> & { challenge_id: string; user_id: string; type: SpoonType; quantity: number }; Update: Partial<SpoonEntry> };
       spoon_repayments: { Row: SpoonRepayment; Insert: Partial<SpoonRepayment> & { challenge_id: string; debtor_user_id: string; requested_by_user_id: string; title: string; spoon_cost: number }; Update: Partial<SpoonRepayment> };
       progress_photos: { Row: ProgressPhoto; Insert: Partial<ProgressPhoto> & { challenge_id: string; user_id: string; month: string; storage_path: string }; Update: Partial<ProgressPhoto> };
+      chat_messages: { Row: ChatMessage; Insert: Partial<ChatMessage> & { challenge_id: string; user_id: string; body: string }; Update: Partial<ChatMessage> };
     };
   };
 };

@@ -14,6 +14,14 @@ export default async function SpoonsPage() {
 
   const { entries, repayments } = await loadSpoons(context.challenge.id);
   const earned = entries.filter((entry) => entry.type === "earned");
+  const nameById = new Map(context.members.map((member) => [member.profile.id, member.profile.display_name]));
+  const debtors = context.members
+    .filter((member) => member.profile.id !== context.userId && member.stats.spoons > 0)
+    .map((member) => ({
+      id: member.profile.id,
+      name: member.profile.display_name,
+      spoons: member.stats.spoons,
+    }));
 
   const history = await Promise.all(
     earned.map(async (entry) => {
@@ -36,15 +44,20 @@ export default async function SpoonsPage() {
         kicker="One spoon per failed day. Explanation is not exemption."
       />
       <Plate>
-        <div className="grid grid-cols-2 gap-4">
-          <Balance name={context.profile?.display_name ?? "You"} count={context.me?.stats.spoons ?? 0} />
-          <Balance name={context.partner?.display_name ?? "Partner"} count={context.other?.stats.spoons ?? 0} />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          {context.members.map((member) => (
+            <Balance
+              key={member.profile.id}
+              name={member.profile.id === context.userId ? "You" : member.profile.display_name}
+              count={member.stats.spoons}
+            />
+          ))}
         </div>
       </Plate>
       <section className="flex flex-col gap-4">
-        <h2 className="stamp text-[18px] leading-none">Ledger</h2>
+        <h2 className="text-[18px] leading-none">Ledger</h2>
         {history.length === 0 ? (
-          <EmptyStill src={ART.spoon} alt="Wooden spoon on a navy iron inspection plate">
+          <EmptyStill src={ART.spoon} alt="Wooden spoon on a white inspection plate">
             No spoons issued yet.
           </EmptyStill>
         ) : (
@@ -55,7 +68,7 @@ export default async function SpoonsPage() {
                 {formatStampDate(date)}
               </p>
               <p className="mt-2 text-sm leading-6 text-steel">
-                {entry.user_id === context.userId ? "You" : context.partner?.display_name ?? "Partner"}
+                {entry.user_id === context.userId ? "You" : nameById.get(entry.user_id) ?? "Member"}
               </p>
               {missed.length ? <p className="mt-1 text-sm leading-6">Missed: {missed.join(", ")}</p> : null}
             </Plate>
@@ -65,8 +78,7 @@ export default async function SpoonsPage() {
       <RepaymentBoard
         finished={context.finished}
         userId={context.userId}
-        partnerId={context.partner?.id ?? null}
-        partnerName={context.partner?.display_name ?? "Partner"}
+        debtors={debtors}
         repayments={repayments}
       />
     </div>
@@ -76,7 +88,7 @@ export default async function SpoonsPage() {
 function Balance({ name, count }: { name: string; count: number }) {
   return (
     <div>
-      <p className="stamp text-[32px] leading-none tabular text-brass">{count}</p>
+      <p className="font-display text-[32px] leading-none tabular text-brass">{count}</p>
       <p className="stamp mt-2 text-[11px] text-steel">{name}</p>
     </div>
   );
