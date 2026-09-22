@@ -2,17 +2,18 @@
 name: 100 Hard
 description: Daylight load-rating plates, colorized with South African Planet Fitness navy, orange, and yellow. Light only.
 colors:
-  brass: "#FF6B00"
+  brass: "#E25F00"
+  mark: "#964818"
   club: "#002040"
   success: "#3F6A46"
   failure: "#8B3D38"
-  graphite: "#E6EDF3"
+  graphite: "#D5E0EA"
   iron: "#FFFFFF"
   offwhite: "#002040"
   steel: "#3D5A73"
   onProof: "#002040"
-  signal: "#FFB600"
-  canvas: "#F4F7FA"
+  signal: "#D4A017"
+  canvas: "#E3ECF4"
 rounded:
   plate: "8px"
 spacing:
@@ -123,7 +124,7 @@ components:
     height: "56px"
   nav-item-active:
     backgroundColor: "{colors.canvas}"
-    textColor: "{colors.brass}"
+    textColor: "{colors.mark}"
     typography: "{typography.action}"
     padding: "0 12px"
     height: "56px"
@@ -154,10 +155,11 @@ Confirmed visual rejections: gradients, neon, glow, glassmorphism, oversized rad
 
 ## Colors
 
-South African Planet Fitness local brand: navy `#002040`, orange `#FF6B00`, yellow `#FFB600` / `#FFC107`. Neutrals are navy-tinted paper, not cream sand and not graphite night. Tailwind `brass` maps to proof orange. Club purple is not in the system.
+South African Planet Fitness local brand, baked down for daylight plates: navy `#002040`, proof fill `#E25F00` (from club `#FF6B00`), proof ink `#964818`, signal `#D4A017` (from club `#FFB600`). Neutrals are navy-tinted paper, not cream sand and not graphite night. Tailwind `brass` is the fill; `mark` is the text. Club purple is not in the system.
 
 ### Primary
-- **Proof Orange** (`{colors.brass}` / `#FF6B00`): Rivets, caret, primary-button fill, active nav, spoon counts, invite codes, liked state. Sparse on purpose.
+- **Proof Orange** (`{colors.brass}` / `#E25F00`): Button fills, rivet pins, thin proof edges. Same hue as club orange, lower chroma so it reads as enamel, not a highlighter.
+- **Proof Ink** (`{colors.mark}` / `#964818`): Caret, active nav type, spoon counts, invite codes, liked state — orange that holds AA on paper.
 
 ### Secondary
 - **Capacity Green** (`{colors.success}`): Perfect / Done marks and success notices. Ledger complete, not brand chrome.
@@ -166,13 +168,13 @@ South African Planet Fitness local brand: navy `#002040`, orange `#FF6B00`, yell
 - **Failed Iron-Red** (`{colors.failure}`): Failed / Missed marks, danger buttons, error-banner stroke. Ledger incomplete, not alarm decoration.
 
 ### Neutral
-- **Locker Paper** (`{colors.canvas}`): The only canvas.
+- **Locker Paper** (`{colors.canvas}` / `#E3ECF4`): The only canvas. Navy-tinted graph paper, deep enough that white plates lift.
 - **Well** (`{colors.graphite}`): Input wells, autofill fill, pale tracks.
 - **Club Navy** (`{colors.club}` / `#002040`): Ink, rivet cups, skip-link fill. Not purple.
 - **Iron Plate** (`{colors.iron}` / `#FFFFFF`): Plate fill.
 - **Steel Legend** (`{colors.steel}` / `#3D5A73`): Helper copy, field labels, 1px borders (typically `/35`–`/50`), scrollbar thumb, pending marks.
 - **On-proof ink** (`{colors.onProof}` / `#002040`): Navy legend on orange fills so actions meet AA.
-- **Signal Yellow** (`{colors.signal}` / `#FFB600`): Primary hover, selection, 3px focus ring, route-progress bar.
+- **Signal Ochre** (`{colors.signal}` / `#D4A017`): Primary hover, selection, 3px focus ring, route-progress bar.
 
 ### Named Rules
 **The Proof-Mark Rule.** Orange is a mark and the primary action, not a wash.
@@ -207,7 +209,7 @@ South African Planet Fitness local brand: navy `#002040`, orange `#FF6B00`, yell
 
 ## Layout
 
-Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: locked to the visual viewport on small screens, with the document scroll disabled so Safari cannot hide the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`). Padding is `max(safe-area-inset-bottom, --safari-chrome)` because latest iOS Safari overlays a bottom URL bar that `svh` does not exclude. `content-shell` is 48rem on small screens, 56rem from 640px, 80rem from 1024px, with 16/24/32px gutters. From `md` the frame unlocks and the tab bar becomes a top plate.
+Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: locked to the visual viewport on small screens, with the document scroll disabled so Safari cannot hide the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`). Padding is `max(safe-area-inset-bottom, --safari-chrome)` because latest iOS Safari overlays a bottom URL bar that `svh` does not exclude. `content-shell` is 48rem on small screens, 56rem from 640px, 64rem from 1024px, with 16/24/32px gutters. From `md` the shell and tab bar sit left of center so a well slab can hang in the right field. The frame unlocks and the tab bar becomes a top plate.
 
 Rhythm is 8 / 16 / 24. Plate padding is 20px, 24px from `md`. Form stacks are 16px gaps; field label-to-control is 8px. Inspection pages stack plates at 24px. Dashboard uses a two-column board from `lg`: pin rack leading, stats plate supporting.
 
@@ -215,7 +217,7 @@ Mobile is the primary density. Desktop login is the same plate, not a split mark
 
 ## Elevation & Depth
 
-Flat. Depth is tonal: paper floor, white plate, pale wells. No drop shadows on plates. The only shadows are an inset autofill fill and a 2px yellow focus ring. Texture is two hatches: 32px graph paper on the floor, 16px plate-metal on cards.
+Flat. Depth is tonal: navy-tinted paper floor, white plate, pale wells. The floor is asymmetric on purpose: an 8px navy spine on the left, a loose well plate hanging off the top-right, and a ghost 100 in the lower-left field. No drop shadows on content plates. The only shadows are that spine, an inset autofill fill, and a 3px yellow focus ring. Texture is 32px graph paper on the floor and 16px plate-metal on cards.
 
 ### Shadow Vocabulary
 None on content plates. Focus is a 3px signal-yellow outline, 3px offset.
@@ -225,7 +227,7 @@ None on content plates. Focus is a 3px signal-yellow outline, 3px offset.
 
 ## Shapes
 
-Every plate, field, button, banner, and avatar well uses an 8px corner. Edges are 1px steel (often at 35–50% opacity). Rivets are 12px circles: navy cup, orange ring, orange pin. Daily cards use the same four corner rivets.
+Every plate, field, button, banner, and avatar well uses an 8px corner. Edges are 1px steel (often at 35–50% opacity). Rivets are 12px circles: navy cup, orange ring, orange pin. They appear only on daily inspection plaques, not on utility plates.
 
 Hairline dividers inside cards are steel at 20% opacity. Race pins are 36px squares with an 8px corner, orange stroke on the viewer, sliding on a 1px steel rail with yellow ticks at Start, every 25 days, and End.
 
@@ -234,7 +236,7 @@ Hairline dividers inside cards are steel at 20% opacity. Race pins are 36px squa
 
 ## Motion
 
-Operate motion is feedback, not choreography. Shared ease is exponential out (`cubic-bezier(0.16, 1, 0.3, 1)`). Pages enter 10px and fade over 280ms. Primary controls lift 2px on hover and compress on press. A check lands as a 280ms stamp. Head-to-head pins slide 280ms. Route progress is a 2px yellow bar. Reduced motion drops spatial movement and keeps colour/state. Native scrolling only; no scroll hijacking.
+Operate motion is feedback, not choreography. Shared ease is exponential out (`cubic-bezier(0.16, 1, 0.3, 1)`). Pages enter 10px and fade over 280ms. Primary controls lift 2px on hover and compress on press. A check lands as a 280ms stamp. Between-page waits keep the outgoing plate and land that same stamp over the route, with a 2px signal bar. Head-to-head pins slide 280ms. Reduced motion drops spatial movement and keeps colour/state. Native scrolling only; no scroll hijacking. No skeleton shimmer.
 
 ## Components
 
@@ -251,7 +253,8 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 - **Shadow Strategy:** None
 - **Border:** 1px steel at 35% opacity
 - **Internal Padding:** 20px (24px from `md`)
-- **Signature:** Four corner rivets on `Plate` and daily cards.
+- **Tones:** Iron (white hatch) for default plates; well (graphite) for supporting boards; club (navy hatch) for identity.
+- **Signature:** Four corner rivets only on the outer daily inspection plaque. The four scored requirements sit as inner plates: a generated still as the header, a well body for the stamps. Hatch tiles are not used as category icons.
 
 ### Inputs / Fields
 - **Style:** Pale well, 1px steel/40 stroke, 8px corners, 48px minimum height, 16px Atkinson navy.
@@ -262,7 +265,7 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 
 ### Navigation
 - Paper in-flow tab bar, 1px steel/30 rule on small screens, padded by `max(safe-area-inset-bottom, --safari-chrome)` so the latest iOS Safari overlay URL bar cannot cover labels; plate-metal hatch and 8px corners from `md`.
-- Mixed-case labels, 20px stroke icons, min-height 56px (48px row on `md`).
+- Mixed-case labels, 20px Lucide stroke icons (1.6 weight), min-height 56px (48px row on `md`). The wooden spoon stays a custom mark.
 - Idle: steel. Hover: navy. Active: proof orange plus a 2px orange underline.
 
 ### Status marks
@@ -294,7 +297,7 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 ## Do's and Don'ts
 
 ### Do:
-- **Do** set plates on locker paper with white fill, 8px corners, 1px steel edges, and orange rivets or dots.
+- **Do** set plates on locker paper with white fill, 8px corners, and 1px steel edges. Reserve orange rivets for daily inspection plaques. Use navy for identity and graphite wells for supporting boards.
 - **Do** set titles in Bricolage Grotesque, mixed case, tight tracking.
 - **Do** use Atkinson Hyperlegible Next for helper copy, fields, buttons, and nav.
 - **Do** keep proof orange on rivets, caret, primary action, active nav, and proof numerals.

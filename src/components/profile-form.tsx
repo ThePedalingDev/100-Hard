@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { saveProfileAction, uploadAvatarAction } from "@/lib/actions/profile";
 import { AvatarCropper } from "@/components/avatar-cropper";
-import { Button, ErrorBanner, Field, Plate, TextArea, TextInput } from "@/components/plate";
+import { Button, Field, Plate, TextArea, TextInput } from "@/components/plate";
+import { useToast } from "@/components/toast";
 
 export function ProfileForm({
   displayName,
@@ -14,7 +15,7 @@ export function ProfileForm({
   dietCommitment: string;
   avatarUrl?: string | null;
 }) {
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
   const [pending, start] = useTransition();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
@@ -28,18 +29,21 @@ export function ProfileForm({
           if (pending) return;
           const formData = textFieldsOnly(new FormData(event.currentTarget));
           start(async () => {
-            setError(null);
             const saved = await saveProfileAction(formData);
             if (!saved.ok) {
-              setError(saved.error);
+              toast.error(saved.error);
               return;
             }
             if (avatarFile) {
               const uploadData = new FormData();
               uploadData.set("avatar", avatarFile);
               const uploaded = await uploadAvatarAction(uploadData);
-              if (!uploaded.ok) setError(uploaded.error);
+              if (!uploaded.ok) {
+                toast.error(uploaded.error);
+                return;
+              }
             }
+            toast.success("Plate saved");
           });
         }}
       >
@@ -53,7 +57,6 @@ export function ProfileForm({
           <p className="stamp text-[11px] text-steel">Replace picture</p>
           <AvatarCropper id="avatar" existingUrl={avatarUrl} onFile={setAvatarFile} />
         </div>
-        {error ? <ErrorBanner message={error} /> : null}
         <Button type="submit" pending={pending}>
           Save plate
         </Button>

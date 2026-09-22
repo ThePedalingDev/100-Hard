@@ -5,6 +5,10 @@ import Image from "next/image";
 
 export const ART = {
   spoon: "/art/spoon.webp",
+  diet: "/art/diet.png",
+  workout: "/art/workout.png",
+  water: "/art/water.png",
+  bible: "/art/bible.png",
 } as const;
 
 export type StampKind = "diet" | "workout" | "water" | "bible";
@@ -91,6 +95,20 @@ export function PlateMark({ size = 48 }: { size?: number }) {
   );
 }
 
+export function CategoryStill({ kind }: { kind: StampKind }) {
+  return (
+    <div className="requirement-still">
+      <Image
+        src={ART[kind]}
+        alt=""
+        fill
+        sizes="(max-width: 767px) 100vw, 40rem"
+        className="object-cover object-center"
+      />
+    </div>
+  );
+}
+
 export function CategoryStamp({ kind, size = 28 }: { kind: StampKind; size?: number }) {
   return (
     <PlateTile size={size}>
@@ -156,20 +174,25 @@ export function EmptyStill({
   alt,
   children,
 }: {
-  src: string;
+  src?: string;
   alt: string;
   children: ReactNode;
 }) {
+  const still = src || ART.spoon;
   return (
     <figure>
-      <Image
-        src={src}
-        alt={alt}
-        width={1024}
-        height={1024}
-        className="mx-auto w-full max-w-[220px]"
-        style={{ borderRadius: 8 }}
-      />
+      {still ? (
+        <Image
+          src={still}
+          alt={alt}
+          width={1024}
+          height={1024}
+          className="mx-auto w-full max-w-[220px]"
+          style={{ borderRadius: 8 }}
+        />
+      ) : (
+        <EmptyPlate />
+      )}
       <figcaption className="mt-3 text-center text-sm text-steel">{children}</figcaption>
     </figure>
   );

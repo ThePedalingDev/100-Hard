@@ -84,7 +84,7 @@ export default async function DashboardPage() {
               />
             ))}
           </div>
-          <Link href="/spoons" className="mt-5 inline-flex min-h-12 items-center font-bold tracking-[-0.01em] text-brass">
+          <Link href="/spoons" className="mt-5 inline-flex min-h-12 items-center font-bold tracking-[-0.01em] text-mark">
             Open spoon repayment
           </Link>
         </Plate>
@@ -102,7 +102,6 @@ export default async function DashboardPage() {
             <span className="stamp tabular text-offwhite">{context.remaining}</span> days remaining
           </>
         }
-        action={<p className="stamp text-[11px] text-steel">SAST</p>}
       />
 
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start">
@@ -116,12 +115,12 @@ export default async function DashboardPage() {
         ) : null}
 
         {context.me ? (
-          <Plate>
+          <Plate tone="well">
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <Stat value={context.me.stats.perfectDays} label="Perfect days" />
+              <Stat value={context.me.stats.perfectDays} label="Perfect days" accent="success" />
               <Stat value={`${context.me.stats.completion}%`} label="Completion" />
               <Stat value={context.me.stats.streak} label="Current streak" />
-              <Stat value={context.me.stats.spoons} label="Spoons" icon />
+              <Stat value={context.me.stats.spoons} label="Spoons" icon accent="proof" />
             </div>
           </Plate>
         ) : null}
@@ -166,11 +165,22 @@ export default async function DashboardPage() {
   );
 }
 
-function Stat({ value, label, icon }: { value: string | number; label: string; icon?: boolean }) {
+function Stat({
+  value,
+  label,
+  icon,
+  accent,
+}: {
+  value: string | number;
+  label: string;
+  icon?: boolean;
+  accent?: "proof" | "success";
+}) {
+  const tone = accent === "proof" ? "text-mark" : accent === "success" ? "text-success" : "";
   return (
     <div>
-      <p className="stamp flex items-center gap-1 text-[32px] leading-none tabular">
-        {icon ? <SpoonIcon className="size-5 text-brass" /> : null}
+      <p className={`stamp flex items-center gap-1 text-[32px] leading-none tabular ${tone}`}>
+        {icon ? <SpoonIcon className="size-5 text-mark" /> : null}
         {value}
       </p>
       <p className="stamp mt-2 text-[11px] text-steel">{label}</p>

@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { resolveActiveChallengeId } from "@/lib/active-challenge";
 import { dateInChallengeTz } from "@/lib/challenge";
+import { dayCompleteBody } from "@/lib/chat-system";
+import { isPerfect } from "@/lib/scoring";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult, DailyCheckin } from "@/lib/supabase/types";
 
@@ -97,6 +99,28 @@ export async function toggleCheckAction(key: BooleanKey, value: boolean): Promis
 
   if (error) {
     return { ok: false, error: error.message, code: "CHECKIN_SAVE_FAILED" };
+  }
+
+  const before = opened.existing;
+  const after = { ...before, [key]: value };
+  if (!isPerfect(before) && isPerfect(after)) {
+    const today = dateInChallengeTz();
+    const { data: existingNotice } = await opened.supabase
+      .from("chat_messages")
+      .select("id")
+      .eq("challenge_id", opened.membership.challenge_id)
+      .eq("user_id", opened.user!.id)
+      .eq("body", dayCompleteBody(today))
+      .maybeSingle();
+
+    if (!existingNotice) {
+      await opened.supabase.from("chat_messages").insert({
+        challenge_id: opened.membership.challenge_id,
+        user_id: opened.user!.id,
+        body: dayCompleteBody(today),
+      });
+      revalidatePath("/social");
+    }
   }
 
   revalidatePath("/dashboard");

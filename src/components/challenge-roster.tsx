@@ -43,7 +43,7 @@ export function ChallengeRoster({
         const active = challenge.id === activeId;
         const status = challengeLifecycleStatus(challenge.start_date, challenge.end_date, today);
         return (
-          <Plate key={challenge.id} as="article">
+          <Plate key={challenge.id} as="article" className={active ? "plate-proof" : undefined}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="text-[18px] leading-none">{challenge.name}</h2>
@@ -51,7 +51,7 @@ export function ChallengeRoster({
                   {formatStampDate(challenge.start_date)} — {formatStampDate(challenge.end_date)}
                 </p>
               </div>
-              <p className="stamp shrink-0 text-[11px] text-brass">{active ? "Active" : labelFor(status)}</p>
+              <p className="stamp shrink-0 text-[11px] text-mark">{active ? "Active" : labelFor(status)}</p>
             </div>
             <ul className="mt-4 space-y-3">
               {membership.members.map((member) => (
@@ -64,7 +64,7 @@ export function ChallengeRoster({
                       className="size-10 rounded-plate border border-steel/40 object-cover"
                     />
                   ) : (
-                    <span className="stamp grid size-10 place-items-center rounded-plate border border-steel/40 text-[11px] text-brass">
+                    <span className="stamp grid size-10 place-items-center rounded-plate border border-steel/40 text-[11px] text-mark">
                       {member.profile.display_name.slice(0, 1)}
                     </span>
                   )}
@@ -74,7 +74,7 @@ export function ChallengeRoster({
                     </p>
                     <p className="stamp mt-1 inline-flex items-center gap-2 text-[11px] text-steel">
                       {member.stats.perfectDays} perfect
-                      <span className="inline-flex items-center gap-1 text-brass">
+                      <span className="inline-flex items-center gap-1 text-mark">
                         <SpoonIcon className="size-3.5" />
                         {member.stats.spoons}
                       </span>

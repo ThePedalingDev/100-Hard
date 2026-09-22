@@ -105,6 +105,26 @@ export function weekdayIndexMonday(iso: string): number {
   return day === 0 ? 6 : day - 1;
 }
 
+export function startOfWeekMonday(iso: string): string {
+  return addDays(iso, -weekdayIndexMonday(iso));
+}
+
+export function weekDates(iso: string): string[] {
+  const start = startOfWeekMonday(iso);
+  return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+}
+
+export function weekRangeLabel(startIso: string, endIso: string): string {
+  const startDate = parseIsoDate(startIso);
+  const endDate = parseIsoDate(endIso);
+  const year = startIso.slice(0, 4);
+  if (startIso.slice(0, 7) === endIso.slice(0, 7)) {
+    const month = new Intl.DateTimeFormat("en-GB", { timeZone: "UTC", month: "short" }).format(startDate);
+    return `${startDate.getUTCDate()}–${endDate.getUTCDate()} ${month} ${year}`;
+  }
+  return `${formatShortDate(startIso)} – ${formatShortDate(endIso)}, ${year}`;
+}
+
 export function inviteCode(): string {
   const bytes = new Uint8Array(6);
   crypto.getRandomValues(bytes);

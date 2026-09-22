@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { loginAction, registerAction, resetPasswordAction } from "@/lib/actions/auth";
 import { PlateMark } from "@/components/art";
-import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
+import { Button, Field, Plate, TextInput } from "@/components/plate";
+import { useToast } from "@/components/toast";
 import { usePlatePending } from "@/components/route-progress";
 
 export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const toast = useToast();
   const { pending, start, leave } = usePlatePending();
 
   return (
@@ -36,8 +35,6 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
           if (pending) return;
           const formData = new FormData(event.currentTarget);
           start(async () => {
-            setError(null);
-            setNotice(null);
             const result =
               mode === "login"
                 ? await loginAction(formData)
@@ -45,14 +42,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
                   ? await registerAction(formData)
                   : await resetPasswordAction(formData);
             if (!result.ok) {
-              setError(result.error);
+              toast.error(result.error);
               return;
             }
             if (result.next) {
               leave(result.next, router);
               return;
             }
-            if (mode === "forgot") setNotice("If that email exists, a reset link is on its way.");
+            if (mode === "forgot") {
+              toast.success("If that email exists, a reset link is on its way.");
+            }
           });
         }}
       >
@@ -71,8 +70,6 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
             />
           </Field>
         ) : null}
-        {error ? <ErrorBanner message={error} /> : null}
-        {notice ? <p className="text-sm text-success">{notice}</p> : null}
         <Button type="submit" pending={pending} className="w-full">
           {mode === "login" ? "Enter the plate" : mode === "register" ? "Register" : "Send reset link"}
         </Button>

@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { EmptyPlate } from "@/components/art";
 import { PhotoUpload } from "@/components/photo-upload";
-import { PageHeader, Plate } from "@/components/plate";
-import { monthLabel } from "@/lib/challenge";
+import { ProgressPhotoCard } from "@/components/progress-photo-card";
+import { PageHeader } from "@/components/plate";
+import { monthKey, monthLabel } from "@/lib/challenge";
 import { loadAppContext, loadPhotos, signedUrl } from "@/lib/data";
 
 export default async function PhotosPage() {
@@ -11,7 +12,22 @@ export default async function PhotosPage() {
   if (!context.challenge) redirect("/onboarding/challenge");
 
   const photos = await loadPhotos(context.challenge.id);
+  const currentMonth = monthKey(context.today);
+  const hasCurrentMonth = photos.some(
+    (photo) => photo.user_id === context.userId && photo.month === currentMonth,
+  );
   const nameById = new Map(context.members.map((member) => [member.profile.id, member.profile.display_name]));
+
+  const cards = await Promise.all(
+    photos.map(async (photo) => ({
+      photo,
+      url: await signedUrl(photo.storage_path, "progress"),
+      owner:
+        photo.user_id === context.userId
+          ? context.profile?.display_name
+          : nameById.get(photo.user_id),
+    })),
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -19,7 +35,7 @@ export default async function PhotosPage() {
         title="Progress plates"
         kicker="Optional. Private. One official photo each calendar month."
       />
-      <PhotoUpload month={context.today} />
+      {hasCurrentMonth ? null : <PhotoUpload month={context.today} />}
       <div className="flex flex-col gap-4">
         {photos.length === 0 ? (
           <figure className="flex flex-col items-center">
@@ -29,32 +45,17 @@ export default async function PhotosPage() {
             </figcaption>
           </figure>
         ) : null}
-        {await Promise.all(
-          photos.map(async (photo) => {
-            const url = await signedUrl(photo.storage_path, "progress");
-            const owner =
-              photo.user_id === context.userId
-                ? context.profile?.display_name
-                : nameById.get(photo.user_id);
-            return (
-              <Plate key={photo.id} as="article">
-                <p className="text-[16px] leading-none font-semibold tracking-[-0.03em]">{monthLabel(photo.month)}</p>
-                <p className="mt-2 text-sm leading-6 text-steel">{owner}</p>
-                {url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={url}
-                    alt=""
-                    className="mt-4 aspect-[4/3] w-full rounded-plate border border-steel/30 object-cover"
-                  />
-                ) : (
-                  <p className="mt-3 text-sm text-failure">Could not open this photo.</p>
-                )}
-                {photo.caption ? <p className="mt-2 text-sm">{photo.caption}</p> : null}
-              </Plate>
-            );
-          }),
-        )}
+        {cards.map(({ photo, url, owner }) => (
+          <ProgressPhotoCard
+            key={photo.id}
+            id={photo.id}
+            monthLabel={monthLabel(photo.month)}
+            owner={owner}
+            url={url}
+            caption={photo.caption}
+            canRemove={photo.user_id === context.userId}
+          />
+        ))}
       </div>
     </div>
   );

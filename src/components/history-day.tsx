@@ -61,7 +61,7 @@ export function HistoryDay({ checkin }: { checkin: DailyCheckin }) {
 
       {status === "failed" || checkin.failure_reason ? (
         <section className="mt-5 border-t border-steel/20 pt-4">
-          <p className="stamp text-[11px] text-brass">Wooden spoon</p>
+          <p className="stamp text-[11px] text-mark">Wooden spoon</p>
           {status === "failed" && missed.length ? (
             <p className="mt-2 text-sm leading-6 text-steel">Missed: {missed.join(", ")}</p>
           ) : null}

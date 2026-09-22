@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImageCropper } from "@/components/image-cropper";
 import { uploadPhotoAction } from "@/lib/actions/photos";
-import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
+import { Button, Field, Plate, TextInput } from "@/components/plate";
+import { useToast } from "@/components/toast";
 
 export function PhotoUpload({ month }: { month: string }) {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
   const [photo, setPhoto] = useState<File | null>(null);
   const [pending, start] = useTransition();
 
@@ -21,18 +22,18 @@ export function PhotoUpload({ month }: { month: string }) {
           event.preventDefault();
           if (pending) return;
           if (!photo) {
-            setError("Crop this month's photo before stamping it.");
+            toast.error("Crop this month's photo before stamping it.");
             return;
           }
           const formData = new FormData(event.currentTarget);
           formData.set("photo", photo);
           start(async () => {
-            setError(null);
             const result = await uploadPhotoAction(formData);
             if (!result.ok) {
-              setError(result.error);
+              toast.error(result.error);
               return;
             }
+            toast.success("Photo stamped");
             router.refresh();
           });
         }}
@@ -51,7 +52,6 @@ export function PhotoUpload({ month }: { month: string }) {
         <Field label="Caption" htmlFor="caption">
           <TextInput id="caption" name="caption" maxLength={120} />
         </Field>
-        {error ? <ErrorBanner message={error} /> : null}
         <Button type="submit" pending={pending}>
           Stamp this month
         </Button>

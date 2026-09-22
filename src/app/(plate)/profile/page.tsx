@@ -27,8 +27,8 @@ export default async function ProfilePage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Profile" />
-      <Plate>
-        <p className="text-sm leading-6 text-steel">{context.email}</p>
+      <Plate tone="club">
+        <p className="text-sm leading-6 text-canvas">{context.email}</p>
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -47,7 +47,7 @@ export default async function ProfilePage() {
         </Link>
       ) : null}
       {context.challenge ? (
-        <Plate>
+        <Plate tone="well">
           <h2 className="text-[18px] leading-none">History</h2>
           <p className="mt-2 text-sm leading-6 text-steel">
             Open any challenge day to see the stamps, notes, and spoon record for that inspection.
@@ -61,7 +61,7 @@ export default async function ProfilePage() {
         </Plate>
       ) : null}
       {context.challenge ? (
-        <Plate>
+        <Plate tone="well">
           <h2 className="text-[18px] leading-none">Members</h2>
           <p className="mt-2 text-sm leading-6 text-steel">
             Inspection plates for everyone on this challenge: stats for the race, and a way onto their days.

@@ -1,13 +1,23 @@
+import type { CSSProperties } from "react";
 import { SpoonIcon } from "@/components/icons";
 import type { MemberView } from "@/lib/data";
 
-function ticks(totalDays: number) {
+type ScaleMark = {
+  day: number;
+  percent: number;
+  label: string;
+  edge: "start" | "mid" | "end";
+};
+
+function ticks(totalDays: number): ScaleMark[] {
   const length = Math.max(totalDays, 1);
-  const marks = [{ day: 1, percent: 0, label: "Start" }];
+  const marks: ScaleMark[] = [{ day: 1, percent: 0, label: "Start", edge: "start" }];
   for (let day = 25; day < length; day += 25) {
-    marks.push({ day, percent: (day / length) * 100, label: `${day}` });
+    const percent = (day / length) * 100;
+    if (percent >= 92) continue;
+    marks.push({ day, percent, label: `${day}`, edge: "mid" });
   }
-  marks.push({ day: length, percent: 100, label: "End" });
+  marks.push({ day: length, percent: 100, label: "End", edge: "end" });
   return marks;
 }
 
@@ -36,14 +46,14 @@ export function RaceRack({
 
   return (
     <div className="space-y-5">
-      <div className="relative h-4">
+      <div className="relative h-4 px-6">
         {scale.map((mark) => (
           <p
             key={mark.day}
-            className={`stamp absolute text-[10px] text-steel ${
-              mark.percent === 0 ? "" : mark.percent === 100 ? "-translate-x-full" : "-translate-x-1/2"
+            className={`stamp absolute top-0 text-[10px] text-steel ${
+              mark.edge === "start" ? "left-0" : mark.edge === "end" ? "right-0" : "-translate-x-1/2"
             }`}
-            style={{ left: `${mark.percent}%` }}
+            style={mark.edge === "mid" ? { left: `${mark.percent}%` } : undefined}
           >
             {mark.label}
           </p>
@@ -74,25 +84,29 @@ export function RaceRack({
                 />
               ))}
               <div
-                className={`pin-slide absolute top-1/2 size-9 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-plate border-2 bg-iron ${
-                  mine ? "z-10 border-brass" : "border-steel/55"
-                }`}
-                style={{ left: pinLeft(member.stats.perfectDays, totalDays) }}
-                title={`${member.profile.display_name}: ${member.stats.perfectDays} perfect`}
+                className="pin-rail"
+                style={{ "--pin-x": pinLeft(member.stats.perfectDays, totalDays) } as CSSProperties}
               >
-                {avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={avatar} alt="" width={36} height={36} className="size-full object-cover" />
-                ) : (
-                  <span className="stamp flex size-full items-center justify-center text-[11px] text-brass">
-                    {member.profile.display_name.slice(0, 1)}
-                  </span>
-                )}
+                <div
+                  className={`pin-slide absolute top-1/2 size-9 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-plate border-2 bg-iron ${
+                    mine ? "z-10 border-brass" : "border-steel/55"
+                  }`}
+                  title={`${member.profile.display_name}: ${member.stats.perfectDays} perfect`}
+                >
+                  {avatar ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={avatar} alt="" width={36} height={36} className="size-full object-cover" />
+                  ) : (
+                    <span className="stamp flex size-full items-center justify-center text-[11px] text-mark">
+                      {member.profile.display_name.slice(0, 1)}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-between text-steel">
               <p className="stamp text-[11px]">{member.stats.streak} day streak</p>
-              <p className="stamp inline-flex items-center gap-1 text-[11px] text-brass">
+              <p className="stamp inline-flex items-center gap-1 text-[11px] text-mark">
                 <SpoonIcon className="size-3.5" />
                 {member.stats.spoons}
               </p>

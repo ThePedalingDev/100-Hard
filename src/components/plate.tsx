@@ -1,11 +1,21 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
+import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { StampLoader } from "@/components/loader";
+
+type PlateTone = "iron" | "club" | "well";
 
 type PlateProps = {
   children: ReactNode;
   className?: string;
   as?: "section" | "article" | "div";
   id?: string;
+  plaque?: boolean;
+  tone?: PlateTone;
+};
+
+const plateTone: Record<PlateTone, string> = {
+  iron: "plate-metal bg-iron",
+  club: "plate-club",
+  well: "plate-well",
 };
 
 export function PageHeader({
@@ -28,16 +38,27 @@ export function PageHeader({
   );
 }
 
-export function Plate({ children, className = "", as: Tag = "section", id }: PlateProps) {
+export function Plate({
+  children,
+  className = "",
+  as: Tag = "section",
+  id,
+  plaque = false,
+  tone = "iron",
+}: PlateProps) {
   return (
     <Tag
       id={id}
-      className={`plate-metal relative rounded-plate border border-steel/45 bg-iron px-5 py-5 md:px-6 md:py-6 ${className}`}
+      className={`relative rounded-plate border px-5 py-5 md:px-6 md:py-6 ${plateTone[tone]} ${className}`}
     >
-      <Rivet className="left-2 top-2" />
-      <Rivet className="right-2 top-2" />
-      <Rivet className="bottom-2 left-2" />
-      <Rivet className="bottom-2 right-2" />
+      {plaque ? (
+        <>
+          <Rivet className="left-2 top-2" />
+          <Rivet className="right-2 top-2" />
+          <Rivet className="bottom-2 left-2" />
+          <Rivet className="bottom-2 right-2" />
+        </>
+      ) : null}
       <div className="relative">{children}</div>
     </Tag>
   );
@@ -77,8 +98,15 @@ export function StatusMark({
         ? "text-failure"
         : "text-steel";
 
+  const chip =
+    status === "perfect" || status === "complete"
+      ? "bg-success/12"
+      : status === "failed" || status === "incomplete"
+        ? "bg-failure/12"
+        : "bg-graphite";
+
   return (
-    <span className={`inline-flex items-center gap-1 ${tone}`}>
+    <span className={`inline-flex items-center gap-1 rounded-plate px-2 py-1 ${tone} ${chip}`}>
       <span aria-hidden="true">{mark}</span>
       <span className={compact ? "sr-only" : "stamp text-[11px]"}>{word}</span>
     </span>
@@ -111,31 +139,42 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      {...props}
-      className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${props.className ?? ""}`}
-    />
-  );
-}
+export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
+  function TextArea({ className = "", ...props }, ref) {
+    return (
+      <textarea
+        ref={ref}
+        {...props}
+        className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
+      />
+    );
+  },
+);
 
 export function Button({
   children,
   variant = "primary",
+  size = "default",
   pending = false,
   disabled,
   className = "",
   onClick,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "danger";
+  variant?: "primary" | "ghost" | "secondary" | "danger";
+  size?: "default" | "compact";
   pending?: boolean;
 }) {
   const styles = {
     primary: "bg-brass text-onproof hover:bg-actionhover hover:text-onactionhover",
     ghost: "border border-steel/50 bg-transparent text-offwhite hover:border-club",
+    secondary:
+      "border border-steel/40 bg-well text-ink hover:border-club hover:bg-graphite/60",
     danger: "border border-failure/70 bg-transparent text-failure hover:bg-failure hover:text-canvas",
+  } as const;
+  const sizes = {
+    default: "min-h-12 px-5 text-[15px] tracking-[-0.01em]",
+    compact: "min-h-10 px-4 text-[13px] stamp",
   } as const;
   const busy = pending || Boolean(disabled);
 
@@ -152,7 +191,7 @@ export function Button({
         }
         onClick?.(event);
       }}
-      className={`stamp-press inline-flex min-h-12 items-center justify-center gap-2 rounded-plate px-5 text-[15px] font-bold tracking-[-0.01em] disabled:pointer-events-none disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`stamp-press inline-flex items-center justify-center gap-2 rounded-plate font-bold disabled:pointer-events-none disabled:opacity-50 ${sizes[size]} ${styles[variant]} ${className}`}
     >
       {pending ? <StampLoader /> : null}
       {children}

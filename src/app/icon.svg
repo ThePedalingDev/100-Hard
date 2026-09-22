@@ -2,14 +2,14 @@
   <rect width="48" height="48" rx="8" fill="#FFFFFF"/>
   <rect width="48" height="48" rx="8" fill="url(#hatch)"/>
   <rect x="0.5" y="0.5" width="47" height="47" rx="8" stroke="#3D5A73" stroke-opacity="0.5"/>
-  <circle cx="7" cy="7" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
-  <circle cx="7" cy="7" r="0.9" fill="#FF6B00"/>
-  <circle cx="41" cy="7" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
-  <circle cx="41" cy="7" r="0.9" fill="#FF6B00"/>
-  <circle cx="7" cy="41" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
-  <circle cx="7" cy="41" r="0.9" fill="#FF6B00"/>
-  <circle cx="41" cy="41" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
-  <circle cx="41" cy="41" r="0.9" fill="#FF6B00"/>
+  <circle cx="7" cy="7" r="2.2" fill="#002040" stroke="#E25F00" stroke-width="1"/>
+  <circle cx="7" cy="7" r="0.9" fill="#E25F00"/>
+  <circle cx="41" cy="7" r="2.2" fill="#002040" stroke="#E25F00" stroke-width="1"/>
+  <circle cx="41" cy="7" r="0.9" fill="#E25F00"/>
+  <circle cx="7" cy="41" r="2.2" fill="#002040" stroke="#E25F00" stroke-width="1"/>
+  <circle cx="7" cy="41" r="0.9" fill="#E25F00"/>
+  <circle cx="41" cy="41" r="2.2" fill="#002040" stroke="#E25F00" stroke-width="1"/>
+  <circle cx="41" cy="41" r="0.9" fill="#E25F00"/>
   <text x="24" y="29" text-anchor="middle" fill="#002040" font-family="Arial Narrow, Helvetica Neue, sans-serif" font-size="16" font-weight="700" letter-spacing="-0.03em">100</text>
   <defs>
     <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse">

@@ -1,55 +1,174 @@
-type LoaderProps = {
-  className?: string;
-  label?: string;
-};
+"use client";
 
-export function StampLoader({ className = "size-4", label }: LoaderProps) {
+import { ChevronRight } from "lucide-react";
+import { forwardRef, useLayoutEffect, useRef, useState } from "react";
+
+const PATH_D =
+  "M4.43431 2.42415C-0.789139 6.90104 1.21472 15.2022 8.434 15.9242C15.5762 16.6384 18.8649 9.23035 15.9332 4.5183C14.1316 1.62255 8.43695 0.0528911 7.51841 3.33733C6.48107 7.04659 15.2699 15.0195 17.4343 16.9241";
+
+let cachedPathLength = 0;
+
+function cx(...parts: Array<string | false | undefined | null>) {
+  return parts.filter(Boolean).join(" ");
+}
+
+type LoaderSize = "xs" | "sm" | "lg" | number;
+
+function resolveSize(size: LoaderSize): number {
+  if (typeof size === "number") return size;
+  switch (size) {
+    case "xs":
+      return 18;
+    case "sm":
+      return 32;
+    case "lg":
+    default:
+      return 64;
+  }
+}
+
+interface PathLoaderProps extends React.SVGProps<SVGSVGElement> {
+  size?: LoaderSize;
+  strokeWidth?: number;
+  label?: string;
+}
+
+export const PathLoader = forwardRef<SVGSVGElement, PathLoaderProps>(function PathLoader(
+  { className, size = "lg", strokeWidth = 2, label, ...props },
+  ref,
+) {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [pathLength, setPathLength] = useState(cachedPathLength);
+  const ready = pathLength > 0;
+  const pixels = resolveSize(size);
+
+  useLayoutEffect(() => {
+    if (!cachedPathLength && pathRef.current) {
+      const length = pathRef.current.getTotalLength();
+      if (length > 0) {
+        cachedPathLength = length;
+        setPathLength(length);
+      }
+    }
+  }, []);
+
+  return (
+    <svg
+      ref={ref}
+      role="status"
+      aria-label={label ?? "Loading"}
+      viewBox="0 0 19 19"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      width={pixels}
+      height={pixels}
+      className={cx("shrink-0 text-current", className)}
+      {...props}
+    >
+      {label ? <title>{label}</title> : null}
+      <path
+        ref={pathRef}
+        d={PATH_D}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        style={
+          ready
+            ? ({
+                strokeDasharray: pathLength,
+                "--path-length": `${pathLength}px`,
+              } as React.CSSProperties)
+            : undefined
+        }
+        className={cx(
+          "transition-opacity duration-300",
+          ready ? "path-loader-stroke opacity-100" : "opacity-0",
+        )}
+      />
+    </svg>
+  );
+});
+
+export function LoadingLabel({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center ${className}`}
-      role={label ? "status" : undefined}
-      aria-live={label ? "polite" : undefined}
-      aria-busy={label ? true : undefined}
+      className={cx(
+        "loader-shimmer text-[15px] font-medium tracking-wide",
+        className,
+      )}
     >
-      <svg
-        className="stamp-spin size-full"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="8" opacity="0.28" />
-        <path d="M12 4v3.2M20 12h-3.2M12 20v-3.2M4 12h3.2" />
-        <path d="M12 8.2a3.8 3.8 0 1 1-3.8 3.8" />
-      </svg>
-      {label ? <span className="sr-only">{label}</span> : null}
+      {text}
     </span>
   );
 }
 
-export function PlateBusy({ label = "Working" }: { label?: string }) {
+export function LoadingBreadcrumb({
+  text = "Cooking",
+  className,
+}: {
+  text?: string;
+  className?: string;
+}) {
   return (
     <div
-      className="plate-metal relative flex min-h-48 flex-col items-center justify-center gap-3 border border-steel/35 bg-iron px-4 py-10"
-      style={{ borderRadius: 8 }}
-      aria-busy="true"
+      className={cx("flex items-center gap-2", className)}
+      role="status"
       aria-live="polite"
+      aria-busy="true"
     >
-      <StampLoader className="size-8 text-brass" label={label} />
-      <p className="stamp text-[12px] text-steel">{label}</p>
+      <PathLoader
+        size="xs"
+        strokeWidth={2.5}
+        className="text-steel"
+        aria-hidden
+      />
+      <LoadingLabel text={text} />
+      <ChevronRight size={16} className="text-steel" aria-hidden />
     </div>
   );
 }
 
-export function PlateSkeleton() {
+export function RippleLoader({
+  size = "lg",
+  label = "Loading",
+  className,
+}: {
+  size?: "xs" | "sm" | "lg";
+  label?: string;
+  className?: string;
+}) {
   return (
-    <div className="space-y-4" aria-busy="true" aria-live="polite">
-      <div className="h-9 w-44 border border-steel/30 bg-iron" style={{ borderRadius: 8 }} />
-      <PlateBusy />
-      <div className="h-28 border border-steel/30 bg-iron" style={{ borderRadius: 8 }} />
+    <PathLoader size={size} label={label} className={cx("text-proof", className)} />
+  );
+}
+
+export function StampLoader({
+  className = "",
+  label,
+}: {
+  className?: string;
+  label?: string;
+}) {
+  return (
+    <PathLoader
+      size="xs"
+      strokeWidth={2.5}
+      label={label ?? "Loading"}
+      className={className}
+    />
+  );
+}
+
+export function PlateBusy({ label = "Cooking" }: { label?: string }) {
+  return (
+    <div className="flex min-h-48 items-center justify-center py-10">
+      <LoadingBreadcrumb text={label} />
     </div>
   );
 }
