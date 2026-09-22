@@ -59,10 +59,10 @@ html {
 
 @media (max-width: 767px) {
   html:has(.plate-frame) {
-    height: 100svh;
-    height: var(--vv-height, 100svh);
-    max-height: 100svh;
-    max-height: var(--vv-height, 100svh);
+    height: 100dvh;
+    height: var(--vv-height, 100dvh);
+    max-height: 100dvh;
+    max-height: var(--vv-height, 100dvh);
     overflow: hidden;
     overscroll-behavior: none;
   }
@@ -280,7 +280,7 @@ textarea:-webkit-autofill:focus {
 .auth-shell::after {
   position: absolute;
   left: 0.75rem;
-  bottom: max(5.75rem, 8%);
+  bottom: max(4.25rem, 8%);
   z-index: 0;
   width: min(46vw, 17rem);
   height: min(18vw, 6.5rem);
@@ -323,12 +323,8 @@ textarea:-webkit-autofill:focus {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-@supports (-webkit-touch-callout: none) {
-  @media (max-width: 767px) and (display-mode: browser) {
-    .tabbar {
-      padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safari-chrome, 0px));
-    }
-  }
+:root.vv-keyboard .tabbar {
+  padding-bottom: 0;
 }
 
 .tabbar a {
@@ -604,7 +600,7 @@ textarea:-webkit-autofill:focus {
   gap: 1rem;
   padding-top: max(1rem, env(safe-area-inset-top, 0px));
   padding-right: max(1rem, env(safe-area-inset-right, 0px));
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px), var(--safari-chrome, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
 }
 
@@ -776,7 +772,7 @@ textarea:-webkit-autofill:focus {
   position: fixed;
   z-index: 60;
   left: 50%;
-  bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(3.25rem + env(safe-area-inset-bottom, 0px));
   display: flex;
   width: min(calc(100% - 2rem), 24rem);
   flex-direction: column;
