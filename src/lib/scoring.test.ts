@@ -1,0 +1,48 @@
+import { describe, expect, it } from "vitest";
+import { currentStreak, statsDayStatus } from "@/lib/scoring";
+
+describe("statsDayStatus", () => {
+  it("counts an open perfect day as perfect", () => {
+    expect(
+      statsDayStatus({
+        status: "pending",
+        finalized_at: null,
+        diet_complete: true,
+        workout_1_complete: true,
+        workout_2_complete: true,
+        outdoor_complete: true,
+        water_complete: true,
+        bible_complete: true,
+      }),
+    ).toBe("perfect");
+  });
+
+  it("keeps finalized failed days as failed", () => {
+    expect(
+      statsDayStatus({
+        status: "failed",
+        finalized_at: "2026-09-21T21:59:59.000Z",
+        diet_complete: false,
+        workout_1_complete: true,
+        workout_2_complete: true,
+        outdoor_complete: true,
+        water_complete: true,
+        bible_complete: true,
+      }),
+    ).toBe("failed");
+  });
+});
+
+describe("currentStreak", () => {
+  it("includes today when today is an open perfect day", () => {
+    expect(
+      currentStreak(
+        [
+          { date: "2026-09-21", status: "perfect" },
+          { date: "2026-09-22", status: "perfect" },
+        ],
+        "2026-09-22",
+      ),
+    ).toBe(2);
+  });
+});

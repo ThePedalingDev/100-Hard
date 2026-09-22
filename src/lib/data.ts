@@ -9,6 +9,7 @@ import {
   completionPercent,
   currentStreak,
   longestStreak,
+  statsDayStatus,
   type CheckinFields,
 } from "@/lib/scoring";
 import type {
@@ -96,17 +97,18 @@ function spoonBalance(entries: SpoonEntry[], userId: string): number {
 
 function statsFor(userId: string, checkins: StatsCheckin[], spoons: SpoonEntry[], today: string) {
   const mine = checkins.filter((row) => row.user_id === userId);
-  const perfectDays = mine.filter((row) => row.status === "perfect").length;
+  const statuses = mine.map((row) => ({
+    date: row.challenge_date,
+    status: statsDayStatus(row),
+  }));
+  const perfectDays = statuses.filter((row) => row.status === "perfect").length;
   const completed = mine.reduce((sum, row) => sum + completedCategories(row), 0);
   const possible = mine.length * 4;
   return {
     perfectDays,
     completion: completionPercent(completed, possible),
-    streak: currentStreak(
-      mine.map((row) => ({ date: row.challenge_date, status: row.status })),
-      today,
-    ),
-    longest: longestStreak(mine.map((row) => ({ date: row.challenge_date, status: row.status }))),
+    streak: currentStreak(statuses, today),
+    longest: longestStreak(statuses),
     spoons: spoonBalance(spoons, userId),
   };
 }

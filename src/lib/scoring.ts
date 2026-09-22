@@ -61,6 +61,15 @@ export function deriveStatus(fields: CheckinFields, finalized: boolean): DayStat
   return isPerfect(fields) ? "perfect" : "failed";
 }
 
+/** Status used for perfect-day totals and streaks: open perfect days count immediately. */
+export function statsDayStatus(
+  row: CheckinFields & { status: DayStatus; finalized_at?: string | null },
+): DayStatus {
+  if (row.finalized_at) return row.status;
+  if (isPerfect(row)) return "perfect";
+  return "pending";
+}
+
 export type TodayDisplayStatus = "perfect" | "failed" | "pending" | "complete";
 
 export function todayDisplayStatus(
