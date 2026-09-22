@@ -1,0 +1,201 @@
+{
+  "title": "Choose the visual world",
+  "question": "The roll assigned Equipment Spec Plate. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Equipment Spec Plate",
+      "kicker": "THE ROLL",
+      "lineage": "Stamped capacity plates on strength machines",
+      "thesis": "Home is a load-rating plate for two athletes: perfect days are stamped capacity, spoons are brass proof marks, today is an inspection.",
+      "palette": ["#181A1B", "#25282A", "#F2F0EB", "#8B8F91", "#A47C48"],
+      "materials": ["knurled steel", "stamped data plate", "brass rivets"],
+      "viewport": "Serial header with countdown, two PFP load-pins on a rack to 31 Dec, then your inspection checklist stacked over the partner's.",
+      "risk": "Reads as an industrial admin panel if the stamps flatten into generic cards.",
+      "raised": [
+        {
+          "from": "tensegrity column",
+          "raise": "A failed day traces slack members: missed requirements are the only explanation of the spoon."
+        },
+        {
+          "from": "cyclorama dawn",
+          "raise": "PENDING, PERFECT, and FAILED are named plate ratings at full scale, never a colour wash."
+        },
+        {
+          "from": "cutting bench",
+          "raise": "Completion is a proof stamp, not a painted hue."
+        },
+        {
+          "from": "ticket wallet",
+          "raise": "Failed days cancel in place and stay readable; nothing is deleted."
+        },
+        {
+          "from": "botanical folio",
+          "raise": "Both athletes lock to one measurement scale so the race is comparable, not decorative."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.webp",
+      "wireframe": {
+        "cols": 12,
+        "rows": 16,
+        "regions": [
+          { "label": "plate serial + countdown", "x": 0, "y": 0, "w": 12, "h": 2 },
+          { "label": "two-pin race rack", "x": 0, "y": 2, "w": 12, "h": 4, "accent": true },
+          { "label": "own inspection", "x": 0, "y": 6, "w": 12, "h": 5 },
+          { "label": "partner plate", "x": 0, "y": 11, "w": 12, "h": 3 },
+          { "label": "nav", "x": 0, "y": 14, "w": 12, "h": 2 }
+        ]
+      }
+    },
+    {
+      "id": "model-pick",
+      "label": "Periodized Training Log",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Ring-bound programming sheets",
+      "thesis": "Every session is a dated log page: four checks in the margin, notes beside the work, the race as consecutive P marks.",
+      "palette": ["#F2F0EB", "#181A1B", "#59745B", "#8B4943", "#A47C48"],
+      "materials": ["rule-lined paper", "pencil ticks", "ring binder"],
+      "viewport": "Today's log page fills the screen: day number huge, four requirement rows, partner's page tabbed behind.",
+      "risk": "Also the direction most gym-accountability runs land on: familiar journal, easy to ship as a generic habit tracker.",
+      "comp": ".impeccable/mocks/decision/model-pick.webp",
+      "wireframe": {
+        "cols": 12,
+        "rows": 16,
+        "regions": [
+          { "label": "day number + remaining", "x": 0, "y": 0, "w": 12, "h": 3, "accent": true },
+          { "label": "four log rows", "x": 0, "y": 3, "w": 12, "h": 8 },
+          { "label": "partner tab", "x": 0, "y": 11, "w": 12, "h": 3 },
+          { "label": "nav", "x": 0, "y": 14, "w": 12, "h": 2 }
+        ]
+      }
+    },
+    {
+      "id": "operate-c-emission-line-rail",
+      "label": "Emission Line Rail",
+      "verdict": "competitive",
+      "lineage": "Glass spectrogram on a night viewing box",
+      "thesis": "The challenge is one calibrated rail of days; today blooms into a plate, perfect days double, pending days dash.",
+      "palette": ["#1a1c1e", "#c8c2b4", "#d4a017", "#8B8F91"],
+      "materials": ["charcoal continuum", "hairline marks", "bone legends"],
+      "viewport": "An off-centre rail of challenge days; today opens as a giant plate above it, partner marks sit on the same continuum.",
+      "case": "Beats the spec plate on race clarity: position is a measured mark. Loses identification: gym partners do not live in a lab spectrogram.",
+      "risk": "Reads as a science instrument and fights prominent stat numerals the product needs.",
+      "comp": ".impeccable/mocks/decision/challenger-emission-line-rail.webp",
+      "hero": "https://impeccable.style/worlds/cards/operate-c-emission-line-rail-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/operate-c-emission-line-rail.webp",
+      "wireframe": {
+        "cols": 12,
+        "rows": 16,
+        "regions": [
+          { "label": "today's bloomed plate", "x": 0, "y": 0, "w": 12, "h": 10, "accent": true },
+          { "label": "day rail", "x": 0, "y": 10, "w": 12, "h": 4 },
+          { "label": "nav", "x": 0, "y": 14, "w": 12, "h": 2 }
+        ]
+      }
+    },
+    {
+      "id": "kinetic-sculpture-automata-tensegrity-breathing-column",
+      "label": "Tensegrity Column",
+      "verdict": "declined",
+      "lineage": "Carbon rods and red tension cord",
+      "thesis": "Two athletes as opposing forces: complete days compress, missed work slacks the cord, the column rises only when both hold.",
+      "palette": ["#111111", "#e5e2dc", "#c0392b"],
+      "materials": ["matte carbon rods", "red cord", "pale concrete"],
+      "viewport": "A force diagram of today's four members; slack members name the spoon.",
+      "case": "Loses both axes: partners do not identify with kinetic sculpture, and red-cord drama fights honour-system checkboxes.",
+      "kept": "Trace every failure to its counterforce.",
+      "risk": "Sculpture first, task second.",
+      "hero": "https://impeccable.style/worlds/cards/kinetic-sculpture-automata-tensegrity-breathing-column-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/kinetic-sculpture-automata-tensegrity-breathing-column.webp"
+    },
+    {
+      "id": "stagecraft-theater-lighting-cyclorama-dawn",
+      "label": "Cyclorama Dawn",
+      "verdict": "declined",
+      "lineage": "Theatre cyc wall from night to day",
+      "thesis": "The day is a cue: black pending, first light as work lands, full day only when the plate is perfect.",
+      "palette": ["#050505", "#1e3a5f", "#c47a7a", "#f4f1ea"],
+      "materials": ["depthless cyc", "horizon bands", "cue stencil type"],
+      "viewport": "Atmosphere stacked in horizon bands with today's checklist as the actors on stage.",
+      "case": "Loses both: theatre lighting is not this audience, and colour-as-time buries the four scored checks.",
+      "kept": "Named phases at scale, colour never the sole signal.",
+      "risk": "Mood wash over a task surface.",
+      "hero": "https://impeccable.style/worlds/cards/stagecraft-theater-lighting-cyclorama-dawn-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/stagecraft-theater-lighting-cyclorama-dawn.webp"
+    },
+    {
+      "id": "operate-a-cutting-bench-select-rail",
+      "label": "Cutting Bench",
+      "verdict": "declined",
+      "lineage": "Film work print between bench pins",
+      "thesis": "Each day is a punched frame; grease-cross done, orange flag on today, failed frames hang in the bin.",
+      "palette": ["#000000", "#e07a2f", "#f4f4f0"],
+      "materials": ["film grain", "perforation", "grease pencil"],
+      "viewport": "A perforated strip of days with today flagged; the open frame is the checklist.",
+      "case": "Loses both: film-edit grammar is foreign, and orange occupying a third of the screen fights semantic colour.",
+      "kept": "State is a mark, not a hue.",
+      "risk": "Novelty rail that hides checkboxes.",
+      "hero": "https://impeccable.style/worlds/cards/operate-a-cutting-bench-select-rail-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/operate-a-cutting-bench-select-rail.webp"
+    },
+    {
+      "id": "vernacular-ephemera-jet-age-ticket-wallet",
+      "label": "Ticket Wallet",
+      "verdict": "declined",
+      "lineage": "Jet-age carbon-copy coupons",
+      "thesis": "The challenge is a coupon book to 31 Dec; each day tears off as validated or VOID.",
+      "palette": ["#0b1f3a", "#c4122f", "#ffffff", "#5b2a7a"],
+      "materials": ["coupon stock", "carbon numerals", "VOID stamp"],
+      "viewport": "Today's coupon filling the wallet; remaining days as a stub stack.",
+      "case": "Loses both: travel ephemera is not training, and a sequential wallet cannot stage a two-person race.",
+      "kept": "Nothing disappears; it cancels.",
+      "risk": "Airline souvenir instead of a gym journal.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-jet-age-ticket-wallet-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/vernacular-ephemera-jet-age-ticket-wallet.webp"
+    },
+    {
+      "id": "editorial-sequence-montage-botanical-folio-season",
+      "label": "Botanical Folio",
+      "verdict": "declined",
+      "lineage": "Season plates of one plant at fixed scale",
+      "thesis": "The challenge is five seasonal plates of two athletes, always compared at the same scale.",
+      "palette": ["#f3ead8", "#4a5c3a", "#8b1e1e", "#6b6358"],
+      "materials": ["cream plate", "sepia rules", "engraved labels"],
+      "viewport": "Side-by-side plates of both people on one baseline, today's work as a caption.",
+      "case": "Loses both: garden folio is the wrong culture, and cream-serif seasonal plates bury the daily loop.",
+      "kept": "Both athletes locked to one measurement scale.",
+      "risk": "Pretty comparison that cannot host a checkbox.",
+      "hero": "https://impeccable.style/worlds/cards/editorial-sequence-montage-botanical-folio-season-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/editorial-sequence-montage-botanical-folio-season.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "code",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "Premium habit-tracker dashboard",
+    "thesis": "What this category ships: countdown, two progress cards, streak stats, bottom nav, executed at full craft.",
+    "palette": ["#181A1B", "#F2F0EB", "#2563eb"],
+    "materials": ["clean card grid", "standard checkboxes", "app chrome"],
+    "viewport": "Header, race or progress bars, today's two cards, tab bar. The arrangement a visitor expects.",
+    "risk": "Indistinguishable from every other fitness-accountability app by design.",
+    "comp": ".impeccable/mocks/decision/canon.webp",
+    "wireframe": {
+      "cols": 12,
+      "rows": 16,
+      "regions": [
+        { "label": "app header", "x": 0, "y": 0, "w": 12, "h": 2 },
+        { "label": "stats row", "x": 0, "y": 2, "w": 12, "h": 3 },
+        { "label": "own card", "x": 0, "y": 5, "w": 12, "h": 5, "accent": true },
+        { "label": "partner card", "x": 0, "y": 10, "w": 12, "h": 4 },
+        { "label": "tab bar", "x": 0, "y": 14, "w": 12, "h": 2 }
+      ]
+    }
+  },
+  "steer": true
+}

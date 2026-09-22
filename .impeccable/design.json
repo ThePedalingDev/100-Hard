@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-22T10:27:00.000Z",
+  "title": "Design System: 100 Hard",
+  "extensions": {
+    "colorMeta": {
+      "brass": {
+        "role": "primary",
+        "displayName": "Proof Brass",
+        "canonical": "#a47c48",
+        "tonalRamp": [
+          "#2a1e12",
+          "#3f2d1a",
+          "#5c4226",
+          "#7a5833",
+          "#a47c48",
+          "#c49a66",
+          "#dcc09a",
+          "#f3e6d4"
+        ]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Capacity Green",
+        "canonical": "#59745b",
+        "tonalRamp": [
+          "#141c15",
+          "#243326",
+          "#354b38",
+          "#47604a",
+          "#59745b",
+          "#7a947c",
+          "#a4b8a6",
+          "#d5e0d6"
+        ]
+      },
+      "failure": {
+        "role": "tertiary",
+        "displayName": "Failed Iron-Red",
+        "canonical": "#8b4943",
+        "tonalRamp": [
+          "#1c1010",
+          "#331c1a",
+          "#4d2a27",
+          "#6a3a36",
+          "#8b4943",
+          "#b0706a",
+          "#d0a39e",
+          "#ecd9d7"
+        ]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite Ground",
+        "canonical": "#181a1b",
+        "tonalRamp": [
+          "#0c0d0e",
+          "#181a1b",
+          "#25282a",
+          "#3a3e41",
+          "#5c6164",
+          "#8b8f91",
+          "#c5c4bf",
+          "#f2f0eb"
+        ]
+      },
+      "iron": {
+        "role": "neutral",
+        "displayName": "Iron Plate",
+        "canonical": "#25282a",
+        "tonalRamp": [
+          "#101112",
+          "#181a1b",
+          "#25282a",
+          "#3a3e41",
+          "#5c6164",
+          "#8b8f91",
+          "#c5c4bf",
+          "#f2f0eb"
+        ]
+      },
+      "offwhite": {
+        "role": "neutral",
+        "displayName": "Stamp Off-White",
+        "canonical": "#f2f0eb",
+        "tonalRamp": [
+          "#181a1b",
+          "#3a3e41",
+          "#5c6164",
+          "#8b8f91",
+          "#b9b6af",
+          "#d4d1ca",
+          "#e6e3dc",
+          "#f2f0eb"
+        ]
+      },
+      "steel": {
+        "role": "neutral",
+        "displayName": "Steel Legend",
+        "canonical": "#8b8f91",
+        "tonalRamp": [
+          "#181a1b",
+          "#25282a",
+          "#3a3e41",
+          "#5c6164",
+          "#8b8f91",
+          "#b0b3b4",
+          "#d0d1d0",
+          "#f2f0eb"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Product and challenge names. Stamp, uppercase, 32px on login, 36px on in-app headers."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles on plates (Today, Ledger, Repayment)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card names and compact plate titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Helper copy, errors, notes. Geist 14px; field values 15px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Field labels, status words, buttons, nav. Stamp uppercase 10–13px."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "pin-slide",
+        "value": "300ms ease-out",
+        "purpose": "Head-to-head load-pin left position when perfect-day count changes."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "768px",
+        "purpose": "Plate padding 20px; nav becomes a top rule; in-app bottom padding drops from 96px to 40px."
+      }
+    ],
+    "focus": {
+      "outline": "2px solid #a47c48",
+      "offset": "3px"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Stamp action. Off-white plate legend; brass on hover.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">ENTER THE PLATE</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; padding: 0 16px; border: 0; border-radius: var(--radius-plate, 8px); background: var(--color-offwhite, #f2f0eb); color: var(--color-graphite, #181a1b); font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; } .ds-btn-primary:hover { background: var(--color-brass, #a47c48); color: var(--color-graphite, #181a1b); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-brass, #a47c48); outline-offset: 3px; } .ds-btn-primary:disabled { opacity: 0.5; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary stamp on a transparent plate.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\">CANCEL</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 1px solid color-mix(in srgb, var(--color-steel, #8b8f91) 50%, transparent); border-radius: var(--radius-plate, 8px); background: transparent; color: var(--color-offwhite, #f2f0eb); font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; } .ds-btn-ghost:hover { border-color: var(--color-offwhite, #f2f0eb); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--color-brass, #a47c48); outline-offset: 3px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Failed-ledger action. Stroke only until hover fills.",
+      "html": "<button class=\"ds-btn-danger\" type=\"button\">MARK FAILED</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 1px solid color-mix(in srgb, var(--color-failure, #8b4943) 70%, transparent); border-radius: var(--radius-plate, 8px); background: transparent; color: var(--color-failure, #8b4943); font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; } .ds-btn-danger:hover { background: var(--color-failure, #8b4943); color: var(--color-offwhite, #f2f0eb); } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-brass, #a47c48); outline-offset: 3px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Graphite well under a steel stamp label.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">EMAIL</span><input class=\"ds-input\" type=\"email\" value=\"markusfourie@icloud.com\" /></label>",
+      "css": ".ds-field { display: block; } .ds-field-label { display: block; margin-bottom: 8px; color: var(--color-steel, #8b8f91); font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; } .ds-input { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--color-steel, #8b8f91) 40%, transparent); border-radius: var(--radius-plate, 8px); background: var(--color-graphite, #181a1b); color: var(--color-offwhite, #f2f0eb); font-family: var(--font-body, Geist, ui-sans-serif, system-ui, sans-serif); font-size: 15px; caret-color: var(--color-brass, #a47c48); } .ds-input::placeholder { color: color-mix(in srgb, var(--color-steel, #8b8f91) 80%, transparent); } .ds-input:focus-visible { outline: 2px solid var(--color-brass, #a47c48); outline-offset: 3px; }"
+    },
+    {
+      "name": "Load-Rating Plate",
+      "kind": "card",
+      "refersTo": "plate",
+      "description": "Iron hatch plate with four brass rivets and stamp title.",
+      "html": "<section class=\"ds-plate\"><span class=\"ds-rivet ds-rivet-tl\" aria-hidden=\"true\"></span><span class=\"ds-rivet ds-rivet-tr\" aria-hidden=\"true\"></span><span class=\"ds-rivet ds-rivet-bl\" aria-hidden=\"true\"></span><span class=\"ds-rivet ds-rivet-br\" aria-hidden=\"true\"></span><div class=\"ds-plate-body\"><h1 class=\"ds-stamp\">100 HARD</h1><p class=\"ds-legend\">Sign in to the private two-person challenge. Ends <span class=\"ds-date\">31 DECEMBER 2026</span>.</p></div></section>",
+      "css": ".ds-plate { position: relative; max-width: 28rem; padding: 16px; border: 1px solid color-mix(in srgb, var(--color-steel, #8b8f91) 35%, transparent); border-radius: var(--radius-plate, 8px); background-color: var(--color-iron, #25282a); background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23181a1b' stroke-width='1' fill='none'/%3E%3C/svg%3E\"); color: var(--color-offwhite, #f2f0eb); } .ds-rivet { position: absolute; width: 10px; height: 10px; border-radius: 999px; border: 1px solid var(--color-brass, #a47c48); background: var(--color-graphite, #181a1b); } .ds-rivet::after { content: \"\"; position: absolute; inset: 3px; border-radius: 999px; background: var(--color-brass, #a47c48); } .ds-rivet-tl { top: 8px; left: 8px; } .ds-rivet-tr { top: 8px; right: 8px; } .ds-rivet-bl { bottom: 8px; left: 8px; } .ds-rivet-br { bottom: 8px; right: 8px; } .ds-plate-body { position: relative; } .ds-stamp { margin: 0; font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: 0.04em; text-transform: uppercase; } .ds-legend { margin: 8px 0 0; color: var(--color-steel, #8b8f91); font-family: var(--font-body, Geist, ui-sans-serif, system-ui, sans-serif); font-size: 14px; line-height: 1.5; } .ds-date { color: var(--color-offwhite, #f2f0eb); font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-variant-numeric: tabular-nums; letter-spacing: 0.04em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Error Banner",
+      "kind": "custom",
+      "refersTo": "error-banner",
+      "description": "Failed-ledger alert. Stroke and tint, off-white copy.",
+      "html": "<p class=\"ds-error\" role=\"alert\">Invalid email or password.</p>",
+      "css": ".ds-error { margin: 0; padding: 8px 12px; border: 1px solid color-mix(in srgb, var(--color-failure, #8b4943) 50%, transparent); border-radius: var(--radius-plate, 8px); background: color-mix(in srgb, var(--color-failure, #8b4943) 10%, transparent); color: var(--color-offwhite, #f2f0eb); font-family: var(--font-body, Geist, ui-sans-serif, system-ui, sans-serif); font-size: 14px; } .ds-error:focus-visible { outline: 2px solid var(--color-brass, #a47c48); outline-offset: 3px; }"
+    },
+    {
+      "name": "Challenge Nav",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Five stamp items. Steel idle, brass active, off-white hover.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Challenge\"><a class=\"ds-nav-item ds-nav-item-active\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z\" /></svg>HOME</a><a class=\"ds-nav-item\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15\" rx=\"1.5\" /><path d=\"M8 3.5v3M16 3.5v3M3.5 10h17\" /></svg>CALENDAR</a><a class=\"ds-nav-item\" href=\"#\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 6.5c0-2 1.6-3.5 3.6-3.5S15.2 4.5 15.2 6.5c0 1.5-1 2.6-2.2 3.1V21\" /><path d=\"M13 21H11\" /></svg>SPOONS</a></nav>",
+      "css": ".ds-nav { display: flex; justify-content: space-between; border-top: 1px solid color-mix(in srgb, var(--color-steel, #8b8f91) 30%, transparent); background: var(--color-graphite, #181a1b); } .ds-nav-item { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 56px; padding: 0 12px; color: var(--color-steel, #8b8f91); font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-decoration: none; text-transform: uppercase; } .ds-nav-item:hover { color: var(--color-offwhite, #f2f0eb); } .ds-nav-item:focus-visible { outline: 2px solid var(--color-brass, #a47c48); outline-offset: 3px; } .ds-nav-item-active { color: var(--color-brass, #a47c48); } .ds-nav-icon { width: 20px; height: 20px; }"
+    },
+    {
+      "name": "Status Mark",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Ledger stamp: word plus ✓ / ✕ / ○. Colour never stands alone.",
+      "html": "<span class=\"ds-status ds-status-perfect\"><span aria-hidden=\"true\">✓</span><span class=\"ds-status-word\">PERFECT</span></span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; gap: 4px; } .ds-status-word { font-family: var(--font-display, 'Barlow Condensed', 'Arial Narrow', sans-serif); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; } .ds-status-perfect { color: var(--color-success, #59745b); } .ds-status-failed { color: var(--color-failure, #8b4943); } .ds-status-pending { color: var(--color-steel, #8b8f91); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Load-Rating Plate",
+    "overview": "The UI is equipment, not a dashboard. Surfaces read as stamped iron plates on a graphite shop floor: off-white condensed type as the die-struck legend, steel as the 1px edge, brass as rivets and proof marks. Density is locker-room tight. Texture is a fine hatch, not a photograph, not a gradient.\n\nPersonality is industrial and inspectable. A screen should look like a rating plate you could bolt to a rack. Colour is semantic or structural, never festive. Interaction is a stamp or a pin slide, not a glow.\n\nConfirmed visual rejections: gradients, neon, glow, glassmorphism, soft ambient shadows, oversized radii, crypto/gaming chrome.",
+    "keyCharacteristics": [
+      "Graphite hatch ground with iron plate-metal fill",
+      "Off-white stamp type (Barlow Condensed, uppercase, 0.04em)",
+      "Geist for running copy and field values",
+      "8px corners and 1px steel edges on every plate, field, and control",
+      "Brass used as proof marks (rivets, focus, selection, hover, active nav), not as a fill language",
+      "Status as stamp words plus ✓ / ✕ / ○, never colour alone"
+    ],
+    "rules": [
+      {
+        "name": "The Proof-Mark Rule",
+        "body": "Brass is a mark, not a wash. If brass covers more than rivets, focus, a hover, or a small proof value, it is too much.",
+        "section": "colors"
+      },
+      {
+        "name": "The Semantic Ledger Rule",
+        "body": "Green and red only mean complete or failed. They do not decorate idle chrome.",
+        "section": "colors"
+      },
+      {
+        "name": "The Stamp Rule",
+        "body": "Anything that names, commands, or dates the plate is Barlow Condensed, uppercase, tracked. Geist never wears the stamp.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Count Rule",
+        "body": "Days remaining, perfect-day totals, and calendar numerals use tabular figures.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Glow Rule",
+        "body": "No gradients, neon, glow, glass, or offset shadows. Focus is a 2px brass outline, 3px offset, not a halo.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Eight-Pixel Plate Rule",
+        "body": "8px is the only container radius. Do not round the world into pills or leave plates square.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do set plates on the graphite hatch with iron fill, 8px corners, 1px steel edges, and brass rivets or dots.",
+      "Do stamp titles, labels, buttons, and dates in Barlow Condensed uppercase at 0.04em.",
+      "Do use Geist for helper copy and typed values.",
+      "Do keep brass on rivets, focus, selection, hover, active nav, and proof numerals.",
+      "Do pair status colour with Perfect / Failed / Pending (or Done / Missed) plus ✓ / ✕ / ○."
+    ],
+    "donts": [
+      "Don't use gradients, neon, glow, glass, or drop shadows.",
+      "Don't introduce a third display face or set body copy in Barlow Condensed.",
+      "Don't flood a screen with brass fills.",
+      "Don't use radii other than 8px on plates, fields, and buttons.",
+      "Don't communicate status with colour alone."
+    ]
+  }
+}

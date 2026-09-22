@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+:root {
+  --canvas: #1c1524;
+  --iron: #2b2233;
+  --well: #1c1524;
+  --ink: #f7f3ea;
+  --mute: #b3a8bc;
+  --proof: #f5c518;
+  --on-proof: #1c1524;
+  --club: #6d3d9a;
+  --success: #4f7a55;
+  --failure: #a04b45;
+  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%232b2233' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%231c1524' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+}
+
+[data-theme="light"] {
+  --canvas: #f6f2ea;
+  --iron: #ffffff;
+  --well: #efe8dc;
+  --ink: #1c1524;
+  --mute: #6d6574;
+  --proof: #d9a400;
+  --on-proof: #1c1524;
+  --club: #5a2d82;
+  --success: #3f6a46;
+  --failure: #8b3d38;
+  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%23e4dccf' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23efe8dc' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+}
+
+@theme inline {
+  --color-graphite: var(--well);
+  --color-iron: var(--iron);
+  --color-plate: var(--iron);
+  --color-offwhite: var(--ink);
+  --color-steel: var(--mute);
+  --color-brass: var(--proof);
+  --color-club: var(--club);
+  --color-onproof: var(--on-proof);
+  --color-success: var(--success);
+  --color-failure: var(--failure);
+  --font-display: var(--font-barlow), "Arial Narrow", sans-serif;
+  --font-body: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --radius-plate: 8px;
+}
+
+html {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+body {
+  min-height: 100dvh;
+  background-color: var(--canvas);
+  background-image: var(--hatch-ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-feature-settings: "ss01" on;
+}
+
+::selection {
+  background: var(--proof);
+  color: var(--on-proof);
+}
+
+:focus-visible {
+  outline: 2px solid var(--proof);
+  outline-offset: 3px;
+}
+
+input,
+textarea,
+button,
+select {
+  caret-color: var(--proof);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--success);
+}
+
+input[type="range"] {
+  accent-color: var(--proof);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--proof);
+  box-shadow: inset 0 0 0 1000px var(--well);
+  border-color: var(--mute);
+}
+
+.plate-metal {
+  background-color: var(--iron);
+  background-image: var(--hatch-plate);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mute);
+  border: 2px solid var(--canvas);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.stamp {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
