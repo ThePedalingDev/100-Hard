@@ -269,11 +269,11 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 - Perfect / Done: success + ✓
 - Failed / Missed: failure + ✕
 - Pending: steel + ○
-- Always word + mark. Calendar cells fill success/failure/pending and keep the glyph so status is never colour-only.
+- Always word + mark. Calendar cells fill success/failure/pending. Member faces carry a success, failure, or steel ring, and each face still names Perfect, Failed, or Pending in accessible text.
 
 ### Calendar
 - Seven-column month grid. In-range days are 76px min on small screens, 104px from `md`.
-- Cell fill reads status at a glance; ✓ / ✕ / ○ chips name each member.
+- Cell fill reads status at a glance. Each member appears as a 16px plate photo (20px from `md`) inside the day tile: success ring if they completed the day, failure ring if they missed it, steel ring while the day is still open.
 - Start, Day 25 / 50 / 75, and End are yellow-edged cells with brass labels.
 
 ### Head-to-head rack
