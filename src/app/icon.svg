@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
-  <rect width="48" height="48" rx="8" fill="#0A3058"/>
+  <rect width="48" height="48" rx="8" fill="#FFFFFF"/>
   <rect width="48" height="48" rx="8" fill="url(#hatch)"/>
-  <rect x="0.5" y="0.5" width="47" height="47" rx="8" stroke="#9BB0C4" stroke-opacity="0.5"/>
+  <rect x="0.5" y="0.5" width="47" height="47" rx="8" stroke="#3D5A73" stroke-opacity="0.5"/>
   <circle cx="7" cy="7" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
   <circle cx="7" cy="7" r="0.9" fill="#FF6B00"/>
   <circle cx="41" cy="7" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
@@ -10,10 +10,10 @@
   <circle cx="7" cy="41" r="0.9" fill="#FF6B00"/>
   <circle cx="41" cy="41" r="2.2" fill="#002040" stroke="#FF6B00" stroke-width="1"/>
   <circle cx="41" cy="41" r="0.9" fill="#FF6B00"/>
-  <text x="24" y="29" text-anchor="middle" fill="#FFFFFF" font-family="Arial Narrow, Helvetica Neue, sans-serif" font-size="16" font-weight="700" letter-spacing="0.04em">100</text>
+  <text x="24" y="29" text-anchor="middle" fill="#002040" font-family="Arial Narrow, Helvetica Neue, sans-serif" font-size="16" font-weight="700" letter-spacing="-0.03em">100</text>
   <defs>
     <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse">
-      <path d="M0 5h3M3 1h3" stroke="#002040" stroke-width="1" fill="none"/>
+      <path d="M0 5h3M3 1h3" stroke="#E6EDF3" stroke-width="1" fill="none"/>
     </pattern>
   </defs>
 </svg>

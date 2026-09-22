@@ -1,10 +1,10 @@
 export const PALETTE = {
-  canvas: "#002040",
-  iron: "#0A3058",
+  canvas: "#F4F7FA",
+  iron: "#FFFFFF",
   proof: "#FF6B00",
   signal: "#FFB600",
-  ink: "#FFFFFF",
-  steel: "#9BB0C4",
+  ink: "#002040",
+  steel: "#3D5A73",
   club: "#002040",
   onProof: "#002040",
 } as const;

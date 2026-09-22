@@ -1,13 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import {
-  CHALLENGE_END,
-  CHALLENGE_START,
-  addDays,
-  dateInChallengeTz,
-  daysRemaining,
-  isChallengeComplete,
-  raceLaneProgress,
-} from "@/lib/challenge";
+import { addDays, dateInChallengeTz, raceLaneProgress } from "@/lib/challenge";
+import { daysRemainingFor, isChallengeComplete } from "@/lib/challenge-dates";
 import {
   completedCategories,
   completionPercent,
@@ -17,6 +10,7 @@ import {
 } from "@/lib/scoring";
 import type {
   Challenge,
+  ChatMessage,
   DailyCheckin,
   DailyComment,
   DailyLike,
@@ -40,19 +34,24 @@ export type MemberView = {
   };
 };
 
+export type MembershipSummary = {
+  challenge: Challenge;
+  members: Array<{ profile: Profile; stats: MemberView["stats"] }>;
+};
+
 export type AppContext = {
   userId: string;
   email: string | undefined;
   profile: Profile | null;
   challenge: Challenge | null;
-  partner: Profile | null;
+  memberships: MembershipSummary[];
+  members: MemberView[];
   today: string;
   remaining: number;
   finished: boolean;
   schemaReady: boolean;
   loadError?: string;
   me: MemberView | null;
-  other: MemberView | null;
 };
 
 function emptyCheckin(challengeId: string, userId: string, date: string): DailyCheckin {
@@ -91,12 +90,7 @@ function spoonBalance(entries: SpoonEntry[], userId: string): number {
     }, 0);
 }
 
-function statsFor(
-  userId: string,
-  checkins: DailyCheckin[],
-  spoons: SpoonEntry[],
-  today: string,
-) {
+function statsFor(userId: string, checkins: DailyCheckin[], spoons: SpoonEntry[], today: string) {
   const mine = checkins.filter((row) => row.user_id === userId);
   const perfectDays = mine.filter((row) => row.status === "perfect").length;
   const completed = mine.reduce((sum, row) => sum + completedCategories(row), 0);
@@ -113,45 +107,34 @@ function statsFor(
   };
 }
 
+function baseContext(
+  userId: string,
+  email: string | undefined,
+  today: string,
+  extras: Partial<AppContext> = {},
+): AppContext {
+  return {
+    userId,
+    email,
+    profile: null,
+    challenge: null,
+    memberships: [],
+    members: [],
+    today,
+    remaining: 0,
+    finished: false,
+    schemaReady: true,
+    me: null,
+    ...extras,
+  };
+}
+
 export async function requireUser() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   return { supabase, user };
-}
-
-async function resolveChallengeId(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-): Promise<string | null> {
-  const loadMembership = () =>
-    supabase
-      .from("challenge_members")
-      .select("challenge_id")
-      .eq("user_id", userId)
-      .order("joined_at", { ascending: false })
-      .limit(1);
-
-  let { data: memberships } = await loadMembership();
-  let challengeId = memberships?.[0]?.challenge_id ?? null;
-
-  if (!challengeId) {
-    const { data: owned } = await supabase
-      .from("challenges")
-      .select("id")
-      .eq("created_by", userId)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    challengeId = owned?.[0]?.id ?? null;
-
-    if (!challengeId) {
-      ({ data: memberships } = await loadMembership());
-      challengeId = memberships?.[0]?.challenge_id ?? null;
-    }
-  }
-
-  return challengeId;
 }
 
 export async function loadAppContext(): Promise<AppContext | null> {
@@ -161,21 +144,7 @@ export async function loadAppContext(): Promise<AppContext | null> {
     const message = error instanceof Error ? error.message : "Could not load challenge data.";
     const { user } = await requireUser().catch(() => ({ user: null }));
     if (!user) return null;
-    const today = dateInChallengeTz();
-    return {
-      userId: user.id,
-      email: user.email,
-      profile: null,
-      challenge: null,
-      partner: null,
-      today,
-      remaining: daysRemaining(today),
-      finished: isChallengeComplete(today),
-      schemaReady: true,
-      loadError: message,
-      me: null,
-      other: null,
-    };
+    return baseContext(user.id, user.email, dateInChallengeTz(), { loadError: message });
   }
 }
 
@@ -184,8 +153,6 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   if (!user) return null;
 
   const today = dateInChallengeTz();
-  const remaining = daysRemaining(today);
-  const finished = isChallengeComplete(today);
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
@@ -194,71 +161,91 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     .maybeSingle();
 
   if (profileError && /could not find the table|schema cache/i.test(profileError.message)) {
-    return {
-      userId: user.id,
-      email: user.email,
-      profile: null,
-      challenge: null,
-      partner: null,
-      today,
-      remaining,
-      finished,
-      schemaReady: false,
-      me: null,
-      other: null,
-    };
+    return baseContext(user.id, user.email, today, { schemaReady: false });
   }
 
-  const resolvedChallengeId = await resolveChallengeId(supabase, user.id);
+  const typedProfile = (profile as Profile | null) ?? null;
 
-  if (!resolvedChallengeId) {
-    return {
-      userId: user.id,
-      email: user.email,
-      profile: profile as Profile | null,
-      challenge: null,
-      partner: null,
-      today,
-      remaining,
-      finished,
-      schemaReady: true,
-      me: null,
-      other: null,
-    };
+  const { data: myRows } = await supabase
+    .from("challenge_members")
+    .select("challenge_id, joined_at")
+    .eq("user_id", user.id)
+    .order("joined_at", { ascending: false });
+
+  const membershipRows = myRows ?? [];
+  const challengeIds = membershipRows.map((row) => row.challenge_id);
+
+  if (challengeIds.length === 0) {
+    return baseContext(user.id, user.email, today, { profile: typedProfile });
   }
 
-  const challengeId = resolvedChallengeId;
+  const { data: challengeRows } = await supabase.from("challenges").select("*").in("id", challengeIds);
+  const challenges = (challengeRows ?? []) as Challenge[];
+
+  let activeId = typedProfile?.active_challenge_id ?? null;
+  if (!activeId || !challengeIds.includes(activeId)) {
+    activeId = membershipRows[0]?.challenge_id ?? null;
+    if (activeId && activeId !== typedProfile?.active_challenge_id) {
+      await supabase.from("profiles").update({ active_challenge_id: activeId }).eq("id", user.id);
+    }
+  }
+
+  const { data: allMemberRows } = await supabase
+    .from("challenge_members")
+    .select("challenge_id, user_id")
+    .in("challenge_id", challengeIds);
+  const memberIds = [...new Set((allMemberRows ?? []).map((row) => row.user_id))];
+  const { data: profileRows } = await supabase.from("profiles").select("*").in("id", memberIds);
+  const profilesById = new Map(((profileRows ?? []) as Profile[]).map((row) => [row.id, row]));
+
+  const { data: allCheckins } = await supabase.from("daily_checkins").select("*").in("challenge_id", challengeIds);
+  const { data: allSpoons } = await supabase.from("spoon_entries").select("*").in("challenge_id", challengeIds);
+  const typedCheckins = (allCheckins ?? []) as DailyCheckin[];
+  const typedSpoons = (allSpoons ?? []) as SpoonEntry[];
+
+  const memberships: MembershipSummary[] = membershipRows.flatMap((row) => {
+    const challenge = challenges.find((item) => item.id === row.challenge_id);
+    if (!challenge) return [];
+    const ids = (allMemberRows ?? [])
+      .filter((item) => item.challenge_id === challenge.id)
+      .map((item) => item.user_id);
+    const checkins = typedCheckins.filter((item) => item.challenge_id === challenge.id);
+    const spoons = typedSpoons.filter((item) => item.challenge_id === challenge.id);
+    return [
+      {
+        challenge,
+        members: ids
+          .map((id) => profilesById.get(id))
+          .filter((item): item is Profile => Boolean(item))
+          .map((memberProfile) => ({
+            profile: memberProfile,
+            stats: statsFor(memberProfile.id, checkins, spoons, today),
+          })),
+      },
+    ];
+  });
+
+  const challenge = challenges.find((row) => row.id === activeId) ?? null;
+  if (!challenge) {
+    return baseContext(user.id, user.email, today, { profile: typedProfile, memberships });
+  }
 
   await supabase.rpc("finalize_challenge_day", { target_date: addDays(today, -1) });
 
-  const { data: challenge } = await supabase
-    .from("challenges")
-    .select("*")
-    .eq("id", challengeId)
-    .single();
+  const active = challenge;
+  const remaining = daysRemainingFor(active.start_date, active.end_date, today);
+  const finished = isChallengeComplete(active.end_date, today);
+  const startBound = active.start_date;
+  const endBound = today < active.end_date ? today : active.end_date;
 
-  const { data: members } = await supabase
-    .from("challenge_members")
-    .select("user_id")
-    .eq("challenge_id", challengeId);
-
-  const memberIds = (members ?? []).map((row) => row.user_id);
-  const { data: profiles } = await supabase.from("profiles").select("*").in("id", memberIds);
-  const partner = (profiles ?? []).find((row) => row.id !== user.id) as Profile | undefined;
-
-  const { data: checkins } = await supabase
-    .from("daily_checkins")
-    .select("*")
-    .eq("challenge_id", challengeId)
-    .gte("challenge_date", CHALLENGE_START)
-    .lte("challenge_date", today < CHALLENGE_END ? today : CHALLENGE_END);
-
-  const { data: spoons } = await supabase
-    .from("spoon_entries")
-    .select("*")
-    .eq("challenge_id", challengeId);
-
-  const todayCheckins = (checkins ?? []).filter((row) => row.challenge_date === today);
+  const activeCheckins = typedCheckins.filter(
+    (row) =>
+      row.challenge_id === active.id &&
+      row.challenge_date >= startBound &&
+      row.challenge_date <= endBound,
+  );
+  const activeSpoons = typedSpoons.filter((row) => row.challenge_id === active.id);
+  const todayCheckins = activeCheckins.filter((row) => row.challenge_date === today);
   const checkinIds = todayCheckins.map((row) => row.id);
 
   const { data: likes } = checkinIds.length
@@ -267,38 +254,43 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   const { data: comments } = checkinIds.length
     ? await supabase.from("daily_comments").select("*").in("daily_checkin_id", checkinIds)
     : { data: [] as DailyComment[] };
-
-  const typedCheckins = (checkins ?? []) as DailyCheckin[];
-  const typedSpoons = (spoons ?? []) as SpoonEntry[];
   const typedLikes = (likes ?? []) as DailyLike[];
   const typedComments = (comments ?? []) as DailyComment[];
 
+  const activeMemberIds = (allMemberRows ?? [])
+    .filter((row) => row.challenge_id === active.id)
+    .map((row) => row.user_id);
+
   function viewFor(profileRow: Profile): MemberView {
-    const existing = todayCheckins.find((row) => row.user_id === profileRow.id) as DailyCheckin | undefined;
-    const checkin = existing ?? emptyCheckin(challengeId, profileRow.id, today);
+    const existing = todayCheckins.find((row) => row.user_id === profileRow.id);
+    const checkin = existing ?? emptyCheckin(active.id, profileRow.id, today);
     return {
       profile: profileRow,
       checkin,
       likes: typedLikes.filter((like) => like.daily_checkin_id === checkin.id),
       comments: typedComments.filter((comment) => comment.daily_checkin_id === checkin.id),
-      stats: statsFor(profileRow.id, typedCheckins, typedSpoons, today),
+      stats: statsFor(profileRow.id, activeCheckins, activeSpoons, today),
     };
   }
 
-  const meProfile = (profiles ?? []).find((row) => row.id === user.id) as Profile | undefined;
+  const members = activeMemberIds
+    .map((id) => profilesById.get(id))
+    .filter((row): row is Profile => Boolean(row))
+    .map(viewFor);
+  const me = members.find((row) => row.profile.id === user.id) ?? null;
 
   return {
     userId: user.id,
     email: user.email,
-    profile: (profile as Profile | null) ?? meProfile ?? null,
-    challenge: challenge as Challenge | null,
-    partner: partner ?? null,
+    profile: typedProfile ?? me?.profile ?? null,
+    challenge,
+    memberships,
+    members,
     today,
     remaining,
     finished,
     schemaReady: true,
-    me: meProfile ? viewFor(meProfile) : null,
-    other: partner ? viewFor(partner) : null,
+    me,
   };
 }
 
@@ -379,15 +371,38 @@ export async function loadPhotos(challengeId: string) {
   return (data ?? []) as ProgressPhoto[];
 }
 
+export async function loadChat(challengeId: string) {
+  const supabase = await createClient();
+  const { data: messages } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("challenge_id", challengeId)
+    .order("created_at", { ascending: true });
+  const rows = (messages ?? []) as ChatMessage[];
+  const authorIds = [...new Set(rows.map((row) => row.user_id))];
+  const { data: authors } = authorIds.length
+    ? await supabase.from("profiles").select("*").in("id", authorIds)
+    : { data: [] as Profile[] };
+  const byId = new Map(((authors ?? []) as Profile[]).map((row) => [row.id, row]));
+  return rows.map((row) => ({ ...row, author: byId.get(row.user_id) }));
+}
+
 export async function loadCheckin(id: string) {
   const supabase = await createClient();
   const { data } = await supabase.from("daily_checkins").select("*").eq("id", id).maybeSingle();
   return (data as DailyCheckin | null) ?? null;
 }
 
-export async function signedUrl(path: string | null, bucket: "avatars" | "progress") {
+export function mediaSrc(path: string | null, bucket: "avatars" | "progress") {
   if (!path) return null;
-  const supabase = await createClient();
-  const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 3600);
-  return data?.signedUrl ?? null;
+  const safe = path
+    .split("/")
+    .filter(Boolean)
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+  return `/api/media/${bucket}/${safe}`;
+}
+
+export async function signedUrl(path: string | null, bucket: "avatars" | "progress") {
+  return mediaSrc(path, bucket);
 }

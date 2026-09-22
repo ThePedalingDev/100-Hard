@@ -80,10 +80,10 @@ export function PlateMark({ size = 48 }: { size?: number }) {
         y="29"
         textAnchor="middle"
         fill="var(--ink)"
-        fontFamily="var(--font-barlow), 'Arial Narrow', sans-serif"
+        fontFamily="var(--font-display-face), 'Atkinson Hyperlegible Next', system-ui, sans-serif"
         fontSize="16"
         fontWeight="700"
-        letterSpacing="0.04em"
+        letterSpacing="-0.03em"
       >
         100
       </text>

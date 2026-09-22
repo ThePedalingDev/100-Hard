@@ -5,6 +5,7 @@ type PlateProps = {
   children: ReactNode;
   className?: string;
   as?: "section" | "article" | "div";
+  id?: string;
 };
 
 export function PageHeader({
@@ -19,7 +20,7 @@ export function PageHeader({
   return (
     <header className="flex items-end justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="stamp text-[36px] leading-none">{title}</h1>
+        <h1 className="text-[36px] leading-none">{title}</h1>
         {kicker ? <div className="mt-2 text-sm leading-6 text-steel">{kicker}</div> : null}
       </div>
       {action}
@@ -27,9 +28,10 @@ export function PageHeader({
   );
 }
 
-export function Plate({ children, className = "", as: Tag = "section" }: PlateProps) {
+export function Plate({ children, className = "", as: Tag = "section", id }: PlateProps) {
   return (
     <Tag
+      id={id}
       className={`plate-metal relative rounded-plate border border-steel/35 bg-iron px-4 py-4 md:px-5 md:py-5 ${className}`}
     >
       <Rivet className="left-2 top-2" />
@@ -104,7 +106,7 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`w-full rounded-plate border border-steel/40 bg-graphite px-3 py-2.5 text-[15px] text-offwhite placeholder:text-steel/80 ${props.className ?? ""}`}
+      className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${props.className ?? ""}`}
     />
   );
 }
@@ -113,7 +115,7 @@ export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className={`w-full rounded-plate border border-steel/40 bg-graphite px-3 py-2.5 text-[15px] text-offwhite placeholder:text-steel/80 ${props.className ?? ""}`}
+      className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${props.className ?? ""}`}
     />
   );
 }
@@ -132,8 +134,8 @@ export function Button({
 }) {
   const styles = {
     primary: "bg-brass text-onproof hover:bg-actionhover hover:text-onactionhover",
-    ghost: "border border-steel/50 bg-transparent text-offwhite hover:border-offwhite",
-    danger: "border border-failure/70 bg-transparent text-failure hover:bg-failure hover:text-offwhite",
+    ghost: "border border-steel/50 bg-transparent text-offwhite hover:border-club",
+    danger: "border border-failure/70 bg-transparent text-failure hover:bg-failure hover:text-canvas",
   } as const;
   const busy = pending || Boolean(disabled);
 
@@ -150,7 +152,7 @@ export function Button({
         }
         onClick?.(event);
       }}
-      className={`stamp stamp-press inline-flex min-h-11 items-center justify-center gap-2 rounded-plate px-4 text-[13px] disabled:pointer-events-none disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`stamp-press inline-flex min-h-12 items-center justify-center gap-2 rounded-plate px-5 text-[15px] font-bold tracking-[-0.01em] disabled:pointer-events-none disabled:opacity-50 ${styles[variant]} ${className}`}
     >
       {pending ? <StampLoader /> : null}
       {children}

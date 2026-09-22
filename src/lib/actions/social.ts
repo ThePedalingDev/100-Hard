@@ -18,7 +18,7 @@ export async function toggleLikeAction(checkinId: string): Promise<ActionResult>
     .single();
 
   if (!checkin || checkin.user_id === user.id) {
-    return { ok: false, error: "You can only like your partner's day.", code: "LIKE_OWN_CARD" };
+    return { ok: false, error: "You can only like another member's day.", code: "LIKE_OWN_CARD" };
   }
 
   const { data: existing } = await supabase
@@ -59,7 +59,7 @@ export async function addCommentAction(checkinId: string, body: string): Promise
     .eq("id", checkinId)
     .single();
   if (!checkin || checkin.user_id === user.id) {
-    return { ok: false, error: "Comment on your partner's card.", code: "COMMENT_OWN_CARD" };
+    return { ok: false, error: "Comment on another member's card.", code: "COMMENT_OWN_CARD" };
   }
 
   const { error } = await supabase.from("daily_comments").insert({

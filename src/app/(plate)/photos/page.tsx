@@ -11,6 +11,7 @@ export default async function PhotosPage() {
   if (!context.challenge) redirect("/onboarding/challenge");
 
   const photos = await loadPhotos(context.challenge.id);
+  const nameById = new Map(context.members.map((member) => [member.profile.id, member.profile.display_name]));
 
   return (
     <div className="flex flex-col gap-6">
@@ -34,14 +35,18 @@ export default async function PhotosPage() {
             const owner =
               photo.user_id === context.userId
                 ? context.profile?.display_name
-                : context.partner?.display_name;
+                : nameById.get(photo.user_id);
             return (
               <Plate key={photo.id} as="article">
-                <p className="stamp text-[16px] leading-none">{monthLabel(photo.month)}</p>
+                <p className="text-[16px] leading-none font-semibold tracking-[-0.03em]">{monthLabel(photo.month)}</p>
                 <p className="mt-2 text-sm leading-6 text-steel">{owner}</p>
                 {url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={url} alt="" className="mt-4 w-full rounded-plate border border-steel/30 object-cover" />
+                  <img
+                    src={url}
+                    alt=""
+                    className="mt-4 aspect-[4/3] w-full rounded-plate border border-steel/30 object-cover"
+                  />
                 ) : (
                   <p className="mt-3 text-sm text-failure">Could not open this photo.</p>
                 )}

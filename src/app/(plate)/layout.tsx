@@ -11,12 +11,12 @@ export default async function PlateLayout({ children }: { children: React.ReactN
   if (!context) redirect("/login");
 
   return (
-    <div className="mx-auto min-h-dvh max-w-3xl px-4 pb-24 pt-6 md:pb-10">
+    <div className="content-shell min-h-dvh pb-24 pt-6 md:pb-10">
       <AppNav />
       <RealtimeRefresh challengeId={context.challenge?.id} />
       {context.loadError ? (
         <Plate>
-          <h1 className="stamp text-[32px] leading-none">Could not load the plate</h1>
+          <h1 className="text-[32px] leading-none">Could not load the plate</h1>
           <p className="mt-2 text-sm leading-6 text-steel">
             The challenge data did not load. Sign out and back in, or try again.
           </p>

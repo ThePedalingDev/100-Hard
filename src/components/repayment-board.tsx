@@ -8,14 +8,12 @@ import type { SpoonRepayment } from "@/lib/supabase/types";
 export function RepaymentBoard({
   finished,
   userId,
-  partnerId,
-  partnerName,
+  debtors,
   repayments,
 }: {
   finished: boolean;
   userId: string;
-  partnerId: string | null;
-  partnerName: string;
+  debtors: Array<{ id: string; name: string; spoons: number }>;
   repayments: SpoonRepayment[];
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -23,15 +21,15 @@ export function RepaymentBoard({
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="stamp text-[18px] leading-none">Repayment</h2>
+      <h2 className="text-[18px] leading-none">Repayment</h2>
       {!finished ? (
         <Plate>
-          <p className="text-sm text-steel">Repayment opens after 31 December. Until then the ledger only records the debt.</p>
+          <p className="text-sm text-steel">Repayment opens after the challenge ends. Until then the ledger only records the debt.</p>
         </Plate>
       ) : (
         <Plate>
           <p className="stamp text-[14px]">Time to pay the spoons</p>
-          {partnerId ? (
+          {debtors.length > 0 ? (
             <form
               className="mt-4 space-y-3"
               aria-busy={pending}
@@ -46,8 +44,22 @@ export function RepaymentBoard({
                 });
               }}
             >
-              <input type="hidden" name="debtor_user_id" value={partnerId} />
-              <Field label={`Ask ${partnerName} to repay`} htmlFor="title">
+              <Field label="Ask a member to repay" htmlFor="debtor_user_id">
+                <select
+                  id="debtor_user_id"
+                  name="debtor_user_id"
+                  required
+                  className="min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite"
+                  defaultValue={debtors[0]?.id}
+                >
+                  {debtors.map((debtor) => (
+                    <option key={debtor.id} value={debtor.id}>
+                      {debtor.name} ({debtor.spoons})
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Title" htmlFor="title">
                 <TextInput id="title" name="title" required placeholder="Make breakfast" />
               </Field>
               <Field label="Description" htmlFor="description">
@@ -61,7 +73,7 @@ export function RepaymentBoard({
               </Button>
             </form>
           ) : (
-            <p className="mt-2 text-sm text-steel">Need a partner to request repayment.</p>
+            <p className="mt-2 text-sm text-steel">Nobody owes spoons yet.</p>
           )}
         </Plate>
       )}

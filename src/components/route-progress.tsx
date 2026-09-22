@@ -78,12 +78,12 @@ export function RouteProgress() {
 
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] bg-steel/30"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[2px] bg-club/10"
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
-      <span className="route-progress-bar block h-full bg-brass" />
+      <span className="route-progress-bar block h-full bg-signal" />
       <span className="sr-only">Working</span>
     </div>
   );

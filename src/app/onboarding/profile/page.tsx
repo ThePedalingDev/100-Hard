@@ -6,7 +6,6 @@ import { saveProfileAction, uploadAvatarAction } from "@/lib/actions/profile";
 import { AvatarCropper } from "@/components/avatar-cropper";
 import { Button, ErrorBanner, Field, Plate, TextArea, TextInput } from "@/components/plate";
 import { usePlatePending } from "@/components/route-progress";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function OnboardingProfilePage() {
   const router = useRouter();
@@ -17,10 +16,7 @@ export default function OnboardingProfilePage() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg items-center px-4 py-10">
       <Plate className="w-full">
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <h1 className="stamp text-[32px] leading-none">Stamp your plate</h1>
-          <ThemeToggle />
-        </div>
+          <h1 className="text-[32px] leading-none">Stamp your plate</h1>
         <p className="mt-2 text-sm text-steel">
           Display name, picture, and the diet you will be judged against.
         </p>

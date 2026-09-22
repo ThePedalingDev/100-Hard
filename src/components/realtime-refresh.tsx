@@ -17,6 +17,7 @@ export function RealtimeRefresh({ challengeId }: { challengeId?: string }) {
       .on("postgres_changes", { event: "*", schema: "public", table: "daily_comments" }, () => router.refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "spoon_entries" }, () => router.refresh())
       .on("postgres_changes", { event: "*", schema: "public", table: "spoon_repayments" }, () => router.refresh())
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "chat_messages" }, () => router.refresh())
       .subscribe();
 
     return () => {
