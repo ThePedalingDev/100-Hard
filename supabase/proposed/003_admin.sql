@@ -63,3 +63,10 @@ drop policy if exists profiles_admin_select on public.profiles;
 create policy profiles_admin_select on public.profiles
   for select to authenticated
   using (private.is_admin());
+
+-- Admin can list every account, including people outside the admin's challenges.
+-- Avatar files stayed owner-or-teammate only, so those photos 404'd on Admin.
+drop policy if exists avatars_admin_read on storage.objects;
+create policy avatars_admin_read on storage.objects
+  for select to authenticated
+  using (bucket_id = 'avatars' and private.is_admin());
