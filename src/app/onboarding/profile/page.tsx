@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveProfileAction, uploadAvatarAction } from "@/lib/actions/profile";
 import { AvatarCropper } from "@/components/avatar-cropper";
 import { Button, ErrorBanner, Field, Plate, TextArea, TextInput } from "@/components/plate";
+import { usePlatePending } from "@/components/route-progress";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function OnboardingProfilePage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+  const { pending, start, leave } = usePlatePending();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   return (
@@ -25,8 +26,10 @@ export default function OnboardingProfilePage() {
         </p>
         <form
           className="mt-6 space-y-4"
+          aria-busy={pending}
           onSubmit={(event) => {
             event.preventDefault();
+            if (pending) return;
             const form = event.currentTarget;
             const formData = textFieldsOnly(new FormData(form));
             start(async () => {
@@ -45,7 +48,7 @@ export default function OnboardingProfilePage() {
                   return;
                 }
               }
-              router.push("/onboarding/challenge");
+              leave("/onboarding/challenge", router);
             });
           }}
         >
@@ -66,7 +69,7 @@ export default function OnboardingProfilePage() {
             <AvatarCropper id="avatar" onFile={setAvatarFile} />
           </div>
           {error ? <ErrorBanner message={error} /> : null}
-          <Button type="submit" disabled={pending} className="w-full">
+          <Button type="submit" pending={pending} className="w-full">
             Continue
           </Button>
         </form>

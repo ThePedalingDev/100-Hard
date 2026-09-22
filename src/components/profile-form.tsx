@@ -22,8 +22,10 @@ export function ProfileForm({
     <Plate>
       <form
         className="space-y-4"
+        aria-busy={pending}
         onSubmit={(event) => {
           event.preventDefault();
+          if (pending) return;
           const formData = textFieldsOnly(new FormData(event.currentTarget));
           start(async () => {
             setError(null);
@@ -52,7 +54,7 @@ export function ProfileForm({
           <AvatarCropper id="avatar" existingUrl={avatarUrl} onFile={setAvatarFile} />
         </div>
         {error ? <ErrorBanner message={error} /> : null}
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" pending={pending}>
           Save plate
         </Button>
       </form>

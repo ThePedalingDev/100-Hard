@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/lib/actions/auth";
 import { ProfileForm } from "@/components/profile-form";
-import { Button, Plate } from "@/components/plate";
+import { Plate } from "@/components/plate";
+import { SubmitButton } from "@/components/submit-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { loadAppContext, signedUrl } from "@/lib/data";
 
@@ -35,9 +36,7 @@ export default async function ProfilePage() {
         avatarUrl={avatarUrl}
       />
       <form action={logoutAction}>
-        <Button type="submit" variant="ghost">
-          Sign out
-        </Button>
+        <SubmitButton variant="ghost">Sign out</SubmitButton>
       </form>
     </div>
   );

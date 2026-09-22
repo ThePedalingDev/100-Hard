@@ -12,8 +12,10 @@ export function PhotoUpload({ month }: { month: string }) {
     <Plate>
       <form
         className="space-y-4"
+        aria-busy={pending}
         onSubmit={(event) => {
           event.preventDefault();
+          if (pending) return;
           const formData = new FormData(event.currentTarget);
           start(async () => {
             setError(null);
@@ -30,7 +32,7 @@ export function PhotoUpload({ month }: { month: string }) {
           <TextInput id="caption" name="caption" maxLength={120} />
         </Field>
         {error ? <ErrorBanner message={error} /> : null}
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" pending={pending}>
           Stamp this month
         </Button>
       </form>

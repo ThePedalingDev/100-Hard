@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createChallengeAction, joinChallengeAction } from "@/lib/actions/challenge";
 import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
+import { usePlatePending } from "@/components/route-progress";
 
 export default function OnboardingChallengePage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+  const { pending, start, leave } = usePlatePending();
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center gap-5 px-4 py-10">
@@ -19,8 +20,10 @@ export default function OnboardingChallengePage() {
         </p>
         <form
           className="mt-5 space-y-4"
+          aria-busy={pending}
           onSubmit={(event) => {
             event.preventDefault();
+            if (pending) return;
             const formData = new FormData(event.currentTarget);
             start(async () => {
               setError(null);
@@ -29,10 +32,7 @@ export default function OnboardingChallengePage() {
                 setError(result.error);
                 return;
               }
-              if (result.next) {
-                router.push(result.next);
-                router.refresh();
-              }
+              leave(result.next ?? "/dashboard", router);
             });
           }}
         >
@@ -40,7 +40,7 @@ export default function OnboardingChallengePage() {
             <TextInput id="name" name="name" defaultValue="100 Hard" />
           </Field>
           <p className="text-sm text-steel">22 September 2026 — 31 December 2026 · Africa/Johannesburg</p>
-          <Button type="submit" disabled={pending} className="w-full">
+          <Button type="submit" pending={pending} className="w-full">
             Create challenge
           </Button>
         </form>
@@ -49,8 +49,10 @@ export default function OnboardingChallengePage() {
         <h2 className="stamp text-[22px]">Join with a code</h2>
         <form
           className="mt-4 space-y-4"
+          aria-busy={pending}
           onSubmit={(event) => {
             event.preventDefault();
+            if (pending) return;
             const formData = new FormData(event.currentTarget);
             start(async () => {
               setError(null);
@@ -59,17 +61,14 @@ export default function OnboardingChallengePage() {
                 setError(result.error);
                 return;
               }
-              if (result.next) {
-                router.push(result.next);
-                router.refresh();
-              }
+              leave(result.next ?? "/dashboard", router);
             });
           }}
         >
           <Field label="Invite code" htmlFor="invite_code">
             <TextInput id="invite_code" name="invite_code" required />
           </Field>
-          <Button type="submit" variant="ghost" disabled={pending} className="w-full">
+          <Button type="submit" variant="ghost" pending={pending} className="w-full">
             Join
           </Button>
         </form>

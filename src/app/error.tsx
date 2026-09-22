@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { Button, Plate } from "@/components/plate";
 
 export default function ErrorPage({
@@ -8,6 +9,8 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [pending, start] = useTransition();
+
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg items-center px-4 py-10">
       <Plate className="w-full">
@@ -15,7 +18,12 @@ export default function ErrorPage({
         <p className="mt-2 text-sm text-steel">
           The server failed while rendering this screen. Try again.
         </p>
-        <Button type="button" className="mt-6 w-full" onClick={() => reset()}>
+        <Button
+          type="button"
+          className="mt-6 w-full"
+          pending={pending}
+          onClick={() => start(() => reset())}
+        >
           Try again
         </Button>
       </Plate>

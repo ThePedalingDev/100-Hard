@@ -1,15 +1,16 @@
 "use client";
 
-import { use, useState, useTransition } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { joinChallengeAction } from "@/lib/actions/challenge";
 import { Button, ErrorBanner, Plate } from "@/components/plate";
+import { usePlatePending } from "@/components/route-progress";
 
 export default function JoinPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+  const { pending, start, leave } = usePlatePending();
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg items-center px-4 py-10">
@@ -18,8 +19,9 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
         <p className="mt-2 text-sm text-steel">Invite code {code}</p>
         <Button
           className="mt-6 w-full"
-          disabled={pending}
+          pending={pending}
           onClick={() => {
+            if (pending) return;
             const formData = new FormData();
             formData.set("invite_code", code);
             start(async () => {
@@ -28,10 +30,7 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
                 setError(result.error);
                 return;
               }
-              if (result.next) {
-                router.push(result.next);
-                router.refresh();
-              }
+              leave(result.next ?? "/dashboard", router);
             });
           }}
         >

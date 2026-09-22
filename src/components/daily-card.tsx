@@ -4,6 +4,7 @@ import { useOptimistic, useState, useTransition, type ReactNode } from "react";
 import { toggleCheckAction, saveNoteAction } from "@/lib/actions/checkin";
 import { addCommentAction, toggleLikeAction } from "@/lib/actions/social";
 import { CommentIcon, HeartIcon } from "@/components/icons";
+import { StampLoader } from "@/components/loader";
 import { Button, ErrorBanner, StatusMark, TextArea } from "@/components/plate";
 import { completedCategories, isWorkoutComplete, missedCategories } from "@/lib/scoring";
 import type { DailyCheckin, DailyComment, Profile } from "@/lib/supabase/types";
@@ -45,7 +46,7 @@ export function DailyCard({
   const status = state.finalized_at ? state.status : "pending";
 
   function toggle(key: CheckKey) {
-    if (locked) return;
+    if (locked || pending) return;
     const next = !state[key];
     start(async () => {
       setError(null);
@@ -59,6 +60,7 @@ export function DailyCard({
   }
 
   function saveNote(key: "diet_note" | "workout_note" | "water_note" | "bible_note" | "bible_reference" | "day_note" | "failure_reason", value: string) {
+    if (pending) return;
     start(async () => {
       setError(null);
       setState({ [key]: value });
@@ -68,7 +70,11 @@ export function DailyCard({
   }
 
   return (
-    <article className="relative border border-steel/35 bg-iron px-4 py-4" style={{ borderRadius: 8 }}>
+    <article
+      className="relative border border-steel/35 bg-iron px-4 py-4"
+      style={{ borderRadius: 8 }}
+      aria-busy={pending || undefined}
+    >
       <span className="pointer-events-none absolute left-2 top-2 size-1.5 rounded-full bg-brass" />
       <span className="pointer-events-none absolute right-2 top-2 size-1.5 rounded-full bg-brass" />
       <header className="mb-4 flex items-center gap-3">
@@ -105,9 +111,9 @@ export function DailyCard({
           <p className="stamp text-[12px] text-steel">Workout</p>
           <StatusMark status={isWorkoutComplete(state) ? "complete" : state.finalized_at ? "incomplete" : "pending"} />
         </div>
-        <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked} onToggle={() => toggle("workout_1_complete")} />
-        <StampCheck label="Workout 2 — 45 min" checked={state.workout_2_complete} locked={locked} onToggle={() => toggle("workout_2_complete")} />
-        <StampCheck label="At least one outdoors" checked={state.outdoor_complete} locked={locked} onToggle={() => toggle("outdoor_complete")} />
+        <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_1_complete")} />
+        <StampCheck label="Workout 2 — 45 min" checked={state.workout_2_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_2_complete")} />
+        <StampCheck label="At least one outdoors" checked={state.outdoor_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("outdoor_complete")} />
         <NoteField value={state.workout_note ?? ""} locked={locked} onSave={(value) => saveNote("workout_note", value)} />
       </div>
       <Requirement
@@ -199,7 +205,7 @@ function Requirement({
 }) {
   return (
     <div className="mt-3 border-t border-steel/20 pt-3 first:mt-0 first:border-t-0 first:pt-0">
-      <StampCheck label={label} checked={done} locked={locked || pending} onToggle={onToggle} />
+      <StampCheck label={label} checked={done} locked={locked || pending} busy={pending} onToggle={onToggle} />
       {extra}
       <NoteField value={note ?? ""} locked={locked} onSave={onNote} />
     </div>
@@ -210,23 +216,29 @@ function StampCheck({
   label,
   checked,
   locked,
+  busy = false,
   onToggle,
 }: {
   label: string;
   checked: boolean;
   locked: boolean;
+  busy?: boolean;
   onToggle: () => void;
 }) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3">
+    <label className={`flex min-h-11 items-center justify-between gap-3 ${locked ? "" : "cursor-pointer"}`}>
       <span className="text-[15px]">{label}</span>
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={locked}
-        onChange={onToggle}
-        className="size-5 border-steel"
-      />
+      <span className="inline-flex items-center gap-2">
+        {busy ? <StampLoader className="size-4 text-brass" /> : null}
+        <input
+          type="checkbox"
+          checked={checked}
+          disabled={locked}
+          onChange={onToggle}
+          aria-busy={busy || undefined}
+          className="size-5 border-steel"
+        />
+      </span>
     </label>
   );
 }
@@ -293,16 +305,19 @@ function SocialBar({
       <div className="flex items-center gap-3">
         <button
           type="button"
-          className={`stamp inline-flex min-h-10 items-center gap-2 text-[12px] ${liked ? "text-brass" : "text-steel"}`}
-          onClick={() =>
+          disabled={pending}
+          aria-busy={pending || undefined}
+          className={`stamp inline-flex min-h-10 items-center gap-2 text-[12px] disabled:pointer-events-none disabled:opacity-50 ${liked ? "text-brass" : "text-steel"}`}
+          onClick={() => {
+            if (pending) return;
             start(async () => {
               setError(null);
               const result = await toggleLikeAction(checkinId);
               if (!result.ok) setError(result.error);
-            })
-          }
+            });
+          }}
         >
-          <HeartIcon className="size-4" />
+          {pending ? <StampLoader className="size-4" /> : <HeartIcon className="size-4" />}
           {likeCount}
         </button>
         <span className="stamp inline-flex items-center gap-2 text-[12px] text-steel">
@@ -320,8 +335,10 @@ function SocialBar({
       </ul>
       <form
         className="mt-3 flex gap-2"
+        aria-busy={pending}
         onSubmit={(event) => {
           event.preventDefault();
+          if (pending || !body.trim()) return;
           start(async () => {
             setError(null);
             const result = await addCommentAction(checkinId, body);
@@ -336,7 +353,7 @@ function SocialBar({
           placeholder="Acknowledge the work"
           onChange={(event) => setBody(event.target.value)}
         />
-        <Button type="submit" disabled={pending || !body.trim()}>
+        <Button type="submit" pending={pending} disabled={!body.trim()}>
           Send
         </Button>
       </form>

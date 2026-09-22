@@ -34,8 +34,10 @@ export function RepaymentBoard({
           {partnerId ? (
             <form
               className="mt-4 space-y-3"
+              aria-busy={pending}
               onSubmit={(event) => {
                 event.preventDefault();
+                if (pending) return;
                 const formData = new FormData(event.currentTarget);
                 start(async () => {
                   setError(null);
@@ -54,7 +56,7 @@ export function RepaymentBoard({
               <Field label="Spoon cost" htmlFor="spoon_cost">
                 <TextInput id="spoon_cost" name="spoon_cost" type="number" min={1} defaultValue={1} required />
               </Field>
-              <Button type="submit" disabled={pending}>
+              <Button type="submit" pending={pending}>
                 Request repayment
               </Button>
             </form>
@@ -73,36 +75,42 @@ export function RepaymentBoard({
           <div className="mt-3 flex flex-wrap gap-2">
             {row.status === "requested" && row.debtor_user_id === userId ? (
               <Button
-                onClick={() =>
+                pending={pending}
+                onClick={() => {
+                  if (pending) return;
                   start(async () => {
                     const result = await advanceRepaymentAction(row.id, "accepted");
                     if (!result.ok) setError(result.error);
-                  })
-                }
+                  });
+                }}
               >
                 Accept
               </Button>
             ) : null}
             {row.status === "accepted" && row.debtor_user_id === userId ? (
               <Button
-                onClick={() =>
+                pending={pending}
+                onClick={() => {
+                  if (pending) return;
                   start(async () => {
                     const result = await advanceRepaymentAction(row.id, "completed");
                     if (!result.ok) setError(result.error);
-                  })
-                }
+                  });
+                }}
               >
                 Mark done
               </Button>
             ) : null}
             {row.status === "completed" && row.requested_by_user_id === userId ? (
               <Button
-                onClick={() =>
+                pending={pending}
+                onClick={() => {
+                  if (pending) return;
                   start(async () => {
                     const result = await advanceRepaymentAction(row.id, "confirmed");
                     if (!result.ok) setError(result.error);
-                  })
-                }
+                  });
+                }}
               >
                 Confirm
               </Button>

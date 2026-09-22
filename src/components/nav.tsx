@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarIcon, HomeIcon, PhotoIcon, ProfileIcon, SpoonIcon } from "@/components/icons";
+import { StampLoader } from "@/components/loader";
 
 const items = [
   { href: "/dashboard", label: "Home", icon: HomeIcon },
@@ -32,7 +33,10 @@ export function AppNav() {
                   active ? "text-brass" : "text-steel hover:text-offwhite"
                 }`}
               >
-                <Icon className="size-5" />
+                <span className="relative inline-flex size-5 items-center justify-center">
+                  <Icon className="size-5" />
+                  <NavPendingHint />
+                </span>
                 {item.label}
               </Link>
             </li>
@@ -40,5 +44,15 @@ export function AppNav() {
         })}
       </ul>
     </nav>
+  );
+}
+
+function NavPendingHint() {
+  const { pending } = useLinkStatus();
+  if (!pending) return null;
+  return (
+    <span className="absolute inset-0 grid place-items-center bg-graphite" aria-hidden="true">
+      <StampLoader className="size-4 text-brass" />
+    </span>
   );
 }

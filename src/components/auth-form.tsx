@@ -2,16 +2,17 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { loginAction, registerAction, resetPasswordAction } from "@/lib/actions/auth";
 import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
+import { usePlatePending } from "@/components/route-progress";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [pending, start] = useTransition();
+  const { pending, start, leave } = usePlatePending();
 
   return (
     <Plate className="mx-auto w-full max-w-md">
@@ -29,8 +30,10 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
       </p>
       <form
         className="mt-6 space-y-4"
+        aria-busy={pending}
         onSubmit={(event) => {
           event.preventDefault();
+          if (pending) return;
           const formData = new FormData(event.currentTarget);
           start(async () => {
             setError(null);
@@ -46,8 +49,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
               return;
             }
             if (result.next) {
-              router.push(result.next);
-              router.refresh();
+              leave(result.next, router);
               return;
             }
             if (mode === "forgot") setNotice("If that email exists, a reset link is on its way.");
@@ -71,7 +73,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
         ) : null}
         {error ? <ErrorBanner message={error} /> : null}
         {notice ? <p className="text-sm text-success">{notice}</p> : null}
-        <Button type="submit" disabled={pending} className="w-full">
+        <Button type="submit" pending={pending} className="w-full">
           {mode === "login" ? "Enter the plate" : mode === "register" ? "Register" : "Send reset link"}
         </Button>
       </form>
