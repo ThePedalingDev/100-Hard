@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import {
   CHALLENGE_END,
   CHALLENGE_NAME,
@@ -48,7 +49,9 @@ export async function createChallengeAction(formData: FormData): Promise<ActionR
   }
 
   revalidatePath("/", "layout");
-  return { ok: true, data: undefined, next: "/dashboard" };
+  revalidatePath("/dashboard");
+  revalidatePath("/onboarding/challenge");
+  redirect("/dashboard");
 }
 
 export async function joinChallengeAction(formData: FormData): Promise<ActionResult> {
@@ -96,5 +99,7 @@ export async function joinChallengeAction(formData: FormData): Promise<ActionRes
   await supabase.from("challenges").update({ status: "active" }).eq("id", challenge.id);
 
   revalidatePath("/", "layout");
-  return { ok: true, data: undefined, next: "/dashboard" };
+  revalidatePath("/dashboard");
+  revalidatePath("/onboarding/challenge");
+  redirect("/dashboard");
 }

@@ -121,6 +121,39 @@ export async function requireUser() {
   return { supabase, user };
 }
 
+async function resolveChallengeId(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<string | null> {
+  const loadMembership = () =>
+    supabase
+      .from("challenge_members")
+      .select("challenge_id")
+      .eq("user_id", userId)
+      .order("joined_at", { ascending: false })
+      .limit(1);
+
+  let { data: memberships } = await loadMembership();
+  let challengeId = memberships?.[0]?.challenge_id ?? null;
+
+  if (!challengeId) {
+    const { data: owned } = await supabase
+      .from("challenges")
+      .select("id")
+      .eq("created_by", userId)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    challengeId = owned?.[0]?.id ?? null;
+
+    if (!challengeId) {
+      ({ data: memberships } = await loadMembership());
+      challengeId = memberships?.[0]?.challenge_id ?? null;
+    }
+  }
+
+  return challengeId;
+}
+
 export async function loadAppContext(): Promise<AppContext | null> {
   try {
     return await loadAppContextInner();
@@ -176,13 +209,9 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     };
   }
 
-  const { data: membership } = await supabase
-    .from("challenge_members")
-    .select("challenge_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const resolvedChallengeId = await resolveChallengeId(supabase, user.id);
 
-  if (!membership) {
+  if (!resolvedChallengeId) {
     return {
       userId: user.id,
       email: user.email,
@@ -198,18 +227,20 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     };
   }
 
+  const challengeId = resolvedChallengeId;
+
   await supabase.rpc("finalize_challenge_day", { target_date: addDays(today, -1) });
 
   const { data: challenge } = await supabase
     .from("challenges")
     .select("*")
-    .eq("id", membership.challenge_id)
+    .eq("id", challengeId)
     .single();
 
   const { data: members } = await supabase
     .from("challenge_members")
     .select("user_id")
-    .eq("challenge_id", membership.challenge_id);
+    .eq("challenge_id", challengeId);
 
   const memberIds = (members ?? []).map((row) => row.user_id);
   const { data: profiles } = await supabase.from("profiles").select("*").in("id", memberIds);
@@ -218,14 +249,14 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   const { data: checkins } = await supabase
     .from("daily_checkins")
     .select("*")
-    .eq("challenge_id", membership.challenge_id)
+    .eq("challenge_id", challengeId)
     .gte("challenge_date", CHALLENGE_START)
     .lte("challenge_date", today < CHALLENGE_END ? today : CHALLENGE_END);
 
   const { data: spoons } = await supabase
     .from("spoon_entries")
     .select("*")
-    .eq("challenge_id", membership.challenge_id);
+    .eq("challenge_id", challengeId);
 
   const todayCheckins = (checkins ?? []).filter((row) => row.challenge_date === today);
   const checkinIds = todayCheckins.map((row) => row.id);
@@ -241,8 +272,6 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   const typedSpoons = (spoons ?? []) as SpoonEntry[];
   const typedLikes = (likes ?? []) as DailyLike[];
   const typedComments = (comments ?? []) as DailyComment[];
-
-  const challengeId = membership.challenge_id;
 
   function viewFor(profileRow: Profile): MemberView {
     const existing = todayCheckins.find((row) => row.user_id === profileRow.id) as DailyCheckin | undefined;
