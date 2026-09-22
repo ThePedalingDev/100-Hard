@@ -11,7 +11,7 @@ import {
   weekdayIndexMonday,
 } from "@/lib/challenge";
 import { challengeMilestones, clampToChallengeRange } from "@/lib/challenge-dates";
-import { loadAppContext, loadMonth } from "@/lib/data";
+import { loadAppContext, loadMonth, signedUrl } from "@/lib/data";
 
 export default async function CalendarPage({
   searchParams,
@@ -33,6 +33,14 @@ export default async function CalendarPage({
   const lead = weekdayIndexMonday(first);
   const count = daysInMonth(year, monthIndex);
   const rows = await loadMonth(context.challenge.id, month);
+  const avatars = new Map(
+    await Promise.all(
+      context.members.map(async (member) => [
+        member.profile.id,
+        await signedUrl(member.profile.avatar_path, "avatars"),
+      ] as const),
+    ),
+  );
   const prev = addDays(first, -1);
   const next = addDays(`${month.slice(0, 7)}-${String(count).padStart(2, "0")}`, 1);
   const marks = challengeMilestones(start, end);
@@ -71,7 +79,11 @@ export default async function CalendarPage({
           today={today}
           start={start}
           end={end}
-          people={context.members.map((member) => ({ id: member.profile.id, profile: member.profile }))}
+          people={context.members.map((member) => ({
+            id: member.profile.id,
+            profile: member.profile,
+            avatarUrl: avatars.get(member.profile.id) ?? null,
+          }))}
           rows={rows}
         />
       </Plate>
