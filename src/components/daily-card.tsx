@@ -274,7 +274,7 @@ function Requirement({
       </div>
       {noteOpen || note ? (
         <div className="mt-3">
-          <NoteField value={note ?? ""} locked={locked} onSave={onNote} />
+          <NoteField startOpen value={note ?? ""} locked={locked} onSave={onNote} />
         </div>
       ) : null}
     </RequirementPlate>
@@ -384,6 +384,7 @@ function NoteField({
   locked,
   max,
   className = "",
+  startOpen = false,
   onSave,
 }: {
   label?: string;
@@ -391,10 +392,23 @@ function NoteField({
   locked: boolean;
   max?: number;
   className?: string;
+  startOpen?: boolean;
   onSave: (value: string) => void;
 }) {
-  const [open, setOpen] = useState(Boolean(value));
+  const [open, setOpen] = useState(Boolean(value) || startOpen);
   const [draft, setDraft] = useState(value);
+  const fieldRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => {
+      fieldRef.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
+    });
+  }, [open]);
 
   if (!open && !value) {
     if (locked) return null;
@@ -412,7 +426,7 @@ function NoteField({
   }
 
   return (
-    <div className={`w-full ${className}`.trim()}>
+    <div ref={fieldRef} className={`w-full ${className}`.trim()}>
       <p className="stamp mb-1 text-[11px] text-steel">{label}</p>
       <TextArea
         value={draft}
@@ -420,6 +434,11 @@ function NoteField({
         readOnly={locked}
         rows={2}
         onChange={(event) => setDraft(event.target.value)}
+        onFocus={(event) => {
+          requestAnimationFrame(() => {
+            event.currentTarget.scrollIntoView({ block: "center", behavior: "auto" });
+          });
+        }}
         onBlur={() => {
           if (draft !== value) onSave(draft);
         }}

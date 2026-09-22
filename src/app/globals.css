@@ -306,6 +306,11 @@ textarea:-webkit-autofill:focus {
   background: transparent;
   padding-top: max(1.5rem, env(safe-area-inset-top, 0px));
   padding-bottom: 1rem;
+  scroll-padding-bottom: 6rem;
+}
+
+.plate-scroll textarea {
+  scroll-margin: 1rem 0 6rem;
 }
 
 .plate-scroll > .content-shell {

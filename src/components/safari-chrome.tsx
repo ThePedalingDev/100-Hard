@@ -2,24 +2,36 @@
 
 import { useEffect } from "react";
 
+let shellHeight = 0;
+
 function syncVisualViewport() {
   const root = document.documentElement;
   const viewport = window.visualViewport;
 
   if (!viewport) {
     root.style.removeProperty("--vv-height");
+    root.style.removeProperty("--vv-shell-height");
     root.style.removeProperty("--vv-offset-top");
     root.classList.remove("vv-keyboard");
+    shellHeight = 0;
     return;
   }
 
-  const height = Math.round(viewport.height);
-  const offsetTop = Math.round(viewport.offsetTop);
-  const keyboard = height < window.innerHeight * 0.75;
+  const keyboard = viewport.height < window.innerHeight * 0.75;
 
-  root.style.setProperty("--vv-height", `${height}px`);
-  root.style.setProperty("--vv-offset-top", `${offsetTop}px`);
   root.classList.toggle("vv-keyboard", keyboard);
+  root.style.setProperty("--vv-offset-top", `${Math.round(viewport.offsetTop)}px`);
+
+  if (!keyboard) {
+    shellHeight = Math.round(viewport.height);
+    root.style.setProperty("--vv-height", `${shellHeight}px`);
+    root.style.setProperty("--vv-shell-height", `${shellHeight}px`);
+    return;
+  }
+
+  const frozen = shellHeight || Math.round(window.innerHeight);
+  root.style.setProperty("--vv-height", `${frozen}px`);
+  root.style.setProperty("--vv-shell-height", `${frozen}px`);
 }
 
 export function SafariChrome() {
