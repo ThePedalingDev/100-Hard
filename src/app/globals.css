@@ -53,6 +53,24 @@ html {
   text-size-adjust: 100%;
 }
 
+@media (max-width: 767px) {
+  html:has(.plate-frame) {
+    height: 100svh;
+    height: var(--vv-height, 100svh);
+    max-height: 100svh;
+    max-height: var(--vv-height, 100svh);
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  html:has(.plate-frame) body {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+}
+
 body {
   min-width: 20rem;
   min-height: 100%;
@@ -159,13 +177,8 @@ textarea:-webkit-autofill:focus {
   display: flex;
   flex-direction: column-reverse;
   width: 100%;
-  min-height: 100vh;
-  height: 100vh;
-  height: 100dvh;
-  height: 100svh;
-  height: min(100svh, var(--vv-height, 100svh));
-  max-height: 100svh;
-  max-height: min(100svh, var(--vv-height, 100svh));
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
@@ -188,7 +201,15 @@ textarea:-webkit-autofill:focus {
   z-index: 20;
   border-top: 1px solid color-mix(in oklch, var(--mute) 30%, transparent);
   background: var(--canvas);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safari-chrome, 0px));
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 767px) and (display-mode: browser) {
+    .tabbar {
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safari-chrome, 5rem));
+    }
+  }
 }
 
 .tabbar a {
@@ -231,7 +252,7 @@ textarea:-webkit-autofill:focus {
   gap: 1rem;
   padding-top: max(1rem, env(safe-area-inset-top, 0px));
   padding-right: max(1rem, env(safe-area-inset-right, 0px));
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px), var(--safari-chrome, 0px));
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
 }
 

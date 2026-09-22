@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Atkinson_Hyperlegible_Next } from "next/font/google";
 import { PageEnter } from "@/components/page-enter";
 import { RouteProgress } from "@/components/route-progress";
+import { SafariChrome } from "@/components/safari-chrome";
 import "./globals.css";
 
 const display = localFont({
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
+        <SafariChrome />
         <RouteProgress />
         <div id="main-content" tabIndex={-1} className="focus:outline-none">
           <PageEnter isolate>{children}</PageEnter>
