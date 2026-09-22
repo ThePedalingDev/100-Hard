@@ -207,7 +207,7 @@ South African Planet Fitness local brand: navy `#002040`, orange `#FF6B00`, yell
 
 ## Layout
 
-Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: 100svh on small screens so Safari’s bottom URL bar never covers the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`), with `env(safe-area-inset-bottom)` padding. `content-shell` is 48rem on small screens, 56rem from 640px, 80rem from 1024px, with 16/24/32px gutters. From `md` the frame unlocks and the tab bar becomes a top plate.
+Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: locked to the visual viewport on small screens, with the document scroll disabled so Safari cannot hide the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`). Padding is `max(safe-area-inset-bottom, --safari-chrome)` because latest iOS Safari overlays a bottom URL bar that `svh` does not exclude. `content-shell` is 48rem on small screens, 56rem from 640px, 80rem from 1024px, with 16/24/32px gutters. From `md` the frame unlocks and the tab bar becomes a top plate.
 
 Rhythm is 8 / 16 / 24. Plate padding is 20px, 24px from `md`. Form stacks are 16px gaps; field label-to-control is 8px. Inspection pages stack plates at 24px. Dashboard uses a two-column board from `lg`: pin rack leading, stats plate supporting.
 
@@ -261,7 +261,7 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 - **Error:** Failure-stroked banner, failure/10 fill, navy body copy.
 
 ### Navigation
-- Paper in-flow tab bar, 1px steel/30 rule on small screens, padded with `env(safe-area-inset-bottom)` so iOS Safari chrome cannot cover it; plate-metal hatch and 8px corners from `md`.
+- Paper in-flow tab bar, 1px steel/30 rule on small screens, padded by `max(safe-area-inset-bottom, --safari-chrome)` so the latest iOS Safari overlay URL bar cannot cover labels; plate-metal hatch and 8px corners from `md`.
 - Mixed-case labels, 20px stroke icons, min-height 56px (48px row on `md`).
 - Idle: steel. Hover: navy. Active: proof orange plus a 2px orange underline.
 

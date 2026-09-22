@@ -2,7 +2,6 @@
 
 import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 import { CalendarIcon, ChatIcon, HomeIcon, PhotoIcon, ProfileIcon, SpoonIcon } from "@/components/icons";
 import { StampLoader } from "@/components/loader";
 
@@ -17,25 +16,6 @@ const items = [
 
 export function AppNav() {
   const pathname = usePathname();
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const viewport = window.visualViewport;
-    function sync() {
-      const height = viewport?.height ?? window.innerHeight;
-      root.style.setProperty("--vv-height", `${Math.round(height)}px`);
-    }
-    sync();
-    viewport?.addEventListener("resize", sync);
-    viewport?.addEventListener("scroll", sync);
-    window.addEventListener("orientationchange", sync);
-    return () => {
-      viewport?.removeEventListener("resize", sync);
-      viewport?.removeEventListener("scroll", sync);
-      window.removeEventListener("orientationchange", sync);
-      root.style.removeProperty("--vv-height");
-    };
-  }, []);
 
   return (
     <nav aria-label="Challenge" className="tabbar">

@@ -39,24 +39,6 @@ export function ImageCropper({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const root = document.documentElement;
-    const viewport = window.visualViewport;
-    function sync() {
-      const height = viewport?.height ?? window.innerHeight;
-      root.style.setProperty("--vv-height", `${Math.round(height)}px`);
-    }
-    sync();
-    viewport?.addEventListener("resize", sync);
-    viewport?.addEventListener("scroll", sync);
-    window.addEventListener("orientationchange", sync);
-    return () => {
-      viewport?.removeEventListener("resize", sync);
-      viewport?.removeEventListener("scroll", sync);
-      window.removeEventListener("orientationchange", sync);
-    };
-  }, []);
-
-  useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (draft && !dialog.open) dialog.showModal();
