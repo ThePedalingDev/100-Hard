@@ -15,6 +15,13 @@ function isStandalone() {
   );
 }
 
+const OVERLAY_CHROME = 44;
+const MAX_CHROME = 52;
+
+function clampChrome(value: number) {
+  return Math.min(MAX_CHROME, Math.max(0, value));
+}
+
 function applySafariChrome() {
   const root = document.documentElement;
   const viewport = window.visualViewport;
@@ -24,9 +31,10 @@ function applySafariChrome() {
   const keyboard = viewport ? viewport.height < inner * 0.66 : false;
   const overlay =
     !keyboard && measured < 24 && isIOS() && !isStandalone() && window.matchMedia("(max-width: 767px)").matches;
+  const chrome = keyboard ? 0 : clampChrome(overlay ? OVERLAY_CHROME : measured);
 
   root.style.setProperty("--vv-height", `${Math.round(viewport?.height ?? inner)}px`);
-  root.style.setProperty("--safari-chrome", `${keyboard ? 0 : overlay ? 80 : measured}px`);
+  root.style.setProperty("--safari-chrome", `${chrome}px`);
 }
 
 export function SafariChrome() {
