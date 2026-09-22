@@ -2,38 +2,41 @@
 
 :root {
   color-scheme: dark;
-  --canvas: #3b0054;
-  --iron: #4a1466;
-  --well: #3b0054;
+  --canvas: #002040;
+  --iron: #0a3058;
+  --well: #002040;
   --ink: #ffffff;
-  --mute: #d0c0dc;
-  --proof: #007afa;
-  --on-proof: #1a0030;
-  --action-hover: #ffffff;
-  --on-action-hover: #3b0054;
-  --club: #3b0054;
+  --mute: #9bb0c4;
+  --proof: #ff6b00;
+  --on-proof: #002040;
+  --action-hover: #ffb600;
+  --on-action-hover: #002040;
+  --club: #002040;
+  --signal: #ffb600;
   --success: #8fb892;
   --failure: #e8958e;
-  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%234A1466' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%233B0054' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --ease-stamp: cubic-bezier(0.16, 1, 0.3, 1);
+  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%230A3058' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23002040' stroke-width='1' fill='none'/%3E%3C/svg%3E");
 }
 
 [data-theme="light"] {
   color-scheme: light;
   --canvas: #ffffff;
-  --iron: #f7f2fa;
-  --well: #f0e6f5;
-  --ink: #3b0054;
-  --mute: #5c3e6a;
-  --proof: #007afa;
-  --on-proof: #1a0030;
-  --action-hover: #3b0054;
+  --iron: #f3f6f9;
+  --well: #e6edf3;
+  --ink: #002040;
+  --mute: #3d5a73;
+  --proof: #ff6b00;
+  --on-proof: #002040;
+  --action-hover: #002040;
   --on-action-hover: #ffffff;
-  --club: #3b0054;
+  --club: #002040;
+  --signal: #ffb600;
   --success: #3f6a46;
   --failure: #8b3d38;
-  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%23E8DCF0' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23EDE4F4' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%23D5DEE6' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23E6EDF3' stroke-width='1' fill='none'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -47,6 +50,7 @@
   --color-onproof: var(--on-proof);
   --color-actionhover: var(--action-hover);
   --color-onactionhover: var(--on-action-hover);
+  --color-signal: var(--signal);
   --color-success: var(--success);
   --color-failure: var(--failure);
   --font-display: var(--font-barlow), "Arial Narrow", sans-serif;
@@ -82,12 +86,22 @@ body {
 input,
 textarea,
 button,
-select {
+select,
+a {
   caret-color: var(--proof);
+  transition:
+    color 150ms var(--ease-stamp),
+    background-color 150ms var(--ease-stamp),
+    border-color 150ms var(--ease-stamp);
 }
 
 input[type="checkbox"] {
   accent-color: var(--success);
+  transform-origin: center;
+}
+
+input[type="checkbox"]:checked {
+  animation: stamp-hit 280ms var(--ease-stamp);
 }
 
 input[type="range"] {
@@ -109,6 +123,22 @@ textarea:-webkit-autofill:focus {
 .plate-metal {
   background-color: var(--iron);
   background-image: var(--hatch-plate);
+}
+
+.stamp-press {
+  transition:
+    transform 120ms var(--ease-stamp),
+    color 150ms var(--ease-stamp),
+    background-color 150ms var(--ease-stamp),
+    border-color 150ms var(--ease-stamp);
+}
+
+.stamp-press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.pin-slide {
+  transition: left 280ms var(--ease-stamp);
 }
 
 ::-webkit-scrollbar {
@@ -146,6 +176,15 @@ textarea:-webkit-autofill:focus {
   }
 }
 
+@keyframes stamp-hit {
+  0% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .route-progress-bar {
   width: 100%;
   transform-origin: left center;
@@ -161,5 +200,27 @@ textarea:-webkit-autofill:focus {
   }
   100% {
     transform: scaleX(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input,
+  textarea,
+  button,
+  select,
+  a,
+  .stamp-press,
+  .pin-slide {
+    transition: none;
+  }
+
+  .stamp-press:active:not(:disabled) {
+    transform: none;
+  }
+
+  input[type="checkbox"]:checked,
+  .stamp-spin,
+  .route-progress-bar {
+    animation: none;
   }
 }

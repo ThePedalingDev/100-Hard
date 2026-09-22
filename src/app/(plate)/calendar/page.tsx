@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plate, StatusMark } from "@/components/plate";
+import { PageHeader, Plate, StatusMark } from "@/components/plate";
 import {
   CHALLENGE_END,
   CHALLENGE_START,
@@ -37,31 +37,39 @@ export default async function CalendarPage({
   const next = addDays(`${month.slice(0, 7)}-${String(count).padStart(2, "0")}`, 1);
 
   return (
-    <div className="space-y-5">
-      <header className="flex items-end justify-between">
-        <h1 className="stamp text-[32px] leading-none">{monthLabel(month)}</h1>
-        <div className="flex gap-3 text-sm">
-          {prev >= CHALLENGE_START ? (
-            <Link className="text-steel hover:text-offwhite" href={`/calendar?month=${monthKey(prev)}`}>
-              Previous
-            </Link>
-          ) : null}
-          {next <= CHALLENGE_END ? (
-            <Link className="text-steel hover:text-offwhite" href={`/calendar?month=${monthKey(next)}`}>
-              Next
-            </Link>
-          ) : null}
-        </div>
-      </header>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={monthLabel(month)}
+        action={
+          <div className="flex gap-2">
+            {prev >= CHALLENGE_START ? (
+              <Link
+                className="stamp stamp-press inline-flex min-h-11 items-center rounded-plate border border-steel/40 px-3 text-[11px] text-steel hover:border-offwhite hover:text-offwhite"
+                href={`/calendar?month=${monthKey(prev)}`}
+              >
+                Previous
+              </Link>
+            ) : null}
+            {next <= CHALLENGE_END ? (
+              <Link
+                className="stamp stamp-press inline-flex min-h-11 items-center rounded-plate border border-steel/40 px-3 text-[11px] text-steel hover:border-offwhite hover:text-offwhite"
+                href={`/calendar?month=${monthKey(next)}`}
+              >
+                Next
+              </Link>
+            ) : null}
+          </div>
+        }
+      />
       <Plate>
-        <div className="mb-3 grid grid-cols-7 gap-1">
+        <div className="mb-4 grid grid-cols-7 gap-2">
           {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-            <p key={day} className="stamp text-center text-[10px] text-steel">
+            <p key={day} className="stamp text-center text-[11px] text-steel">
               {day}
             </p>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-2">
           {Array.from({ length: lead }, (_, index) => (
             <div key={`lead-${index}`} />
           ))}
@@ -74,16 +82,15 @@ export default async function CalendarPage({
               <Link
                 key={iso}
                 href={inChallenge ? `/calendar/${iso}` : "/calendar"}
-                className={`min-h-16 border border-steel/20 p-1 ${iso === today ? "border-brass" : ""} ${
-                  inChallenge ? "hover:border-offwhite" : "opacity-40"
-                }`}
-                style={{ borderRadius: 8 }}
+                className={`flex min-h-18 flex-col gap-1 rounded-plate border p-2 ${
+                  iso === today ? "border-brass" : "border-steel/20"
+                } ${inChallenge ? "hover:border-offwhite" : "opacity-40"}`}
               >
-                <p className="stamp text-[11px]">{index + 1}</p>
+                <p className="stamp tabular text-[11px]">{index + 1}</p>
                 {inChallenge ? (
-                  <div className="mt-1 space-y-1">
-                    <StatusMark status={mine?.status ?? (iso > today ? "pending" : "pending")} />
-                    {context.partner ? <StatusMark status={theirs?.status ?? "pending"} /> : null}
+                  <div className="flex gap-1">
+                    <StatusMark compact status={mine?.status ?? "pending"} />
+                    {context.partner ? <StatusMark compact status={theirs?.status ?? "pending"} /> : null}
                   </div>
                 ) : null}
               </Link>

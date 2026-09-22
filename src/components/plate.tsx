@@ -7,11 +7,30 @@ type PlateProps = {
   as?: "section" | "article" | "div";
 };
 
+export function PageHeader({
+  title,
+  kicker,
+  action,
+}: {
+  title: string;
+  kicker?: ReactNode;
+  action?: ReactNode;
+}) {
+  return (
+    <header className="flex items-end justify-between gap-4">
+      <div className="min-w-0">
+        <h1 className="stamp text-[36px] leading-none">{title}</h1>
+        {kicker ? <div className="mt-2 text-sm leading-6 text-steel">{kicker}</div> : null}
+      </div>
+      {action}
+    </header>
+  );
+}
+
 export function Plate({ children, className = "", as: Tag = "section" }: PlateProps) {
   return (
     <Tag
-      className={`plate-metal relative border border-steel/35 bg-iron px-4 py-4 md:px-5 md:py-5 ${className}`}
-      style={{ borderRadius: 8 }}
+      className={`plate-metal relative rounded-plate border border-steel/35 bg-iron px-4 py-4 md:px-5 md:py-5 ${className}`}
     >
       <Rivet className="left-2 top-2" />
       <Rivet className="right-2 top-2" />
@@ -25,7 +44,7 @@ export function Plate({ children, className = "", as: Tag = "section" }: PlatePr
 function Rivet({ className }: { className: string }) {
   return (
     <span className={`pointer-events-none absolute size-2.5 ${className}`} aria-hidden="true">
-      <span className="absolute inset-0 rounded-full border border-brass bg-graphite" />
+      <span className="absolute inset-0 rounded-full border border-brass bg-club" />
       <span className="absolute inset-[3px] rounded-full bg-brass" />
     </span>
   );
@@ -33,29 +52,33 @@ function Rivet({ className }: { className: string }) {
 
 export function StatusMark({
   status,
+  compact = false,
 }: {
   status: "perfect" | "failed" | "pending" | "complete" | "incomplete";
+  compact?: boolean;
 }) {
-  if (status === "perfect" || status === "complete") {
-    return (
-      <span className="inline-flex items-center gap-1 text-success">
-        <span aria-hidden="true">✓</span>
-        <span className="stamp text-[11px]">{status === "perfect" ? "Perfect" : "Done"}</span>
-      </span>
-    );
-  }
-  if (status === "failed" || status === "incomplete") {
-    return (
-      <span className="inline-flex items-center gap-1 text-failure">
-        <span aria-hidden="true">✕</span>
-        <span className="stamp text-[11px]">{status === "failed" ? "Failed" : "Missed"}</span>
-      </span>
-    );
-  }
+  const word =
+    status === "perfect"
+      ? "Perfect"
+      : status === "complete"
+        ? "Done"
+        : status === "failed"
+          ? "Failed"
+          : status === "incomplete"
+            ? "Missed"
+            : "Pending";
+  const mark = status === "perfect" || status === "complete" ? "✓" : status === "failed" || status === "incomplete" ? "✕" : "○";
+  const tone =
+    status === "perfect" || status === "complete"
+      ? "text-success"
+      : status === "failed" || status === "incomplete"
+        ? "text-failure"
+        : "text-steel";
+
   return (
-    <span className="inline-flex items-center gap-1 text-steel">
-      <span aria-hidden="true">○</span>
-      <span className="stamp text-[11px]">Pending</span>
+    <span className={`inline-flex items-center gap-1 ${tone}`}>
+      <span aria-hidden="true">{mark}</span>
+      <span className={compact ? "sr-only" : "stamp text-[11px]"}>{word}</span>
     </span>
   );
 }
@@ -81,8 +104,7 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`w-full border border-steel/40 bg-graphite px-3 py-2.5 text-[15px] text-offwhite placeholder:text-steel/80 ${props.className ?? ""}`}
-      style={{ borderRadius: 8 }}
+      className={`w-full rounded-plate border border-steel/40 bg-graphite px-3 py-2.5 text-[15px] text-offwhite placeholder:text-steel/80 ${props.className ?? ""}`}
     />
   );
 }
@@ -91,8 +113,7 @@ export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...props}
-      className={`w-full border border-steel/40 bg-graphite px-3 py-2.5 text-[15px] text-offwhite placeholder:text-steel/80 ${props.className ?? ""}`}
-      style={{ borderRadius: 8 }}
+      className={`w-full rounded-plate border border-steel/40 bg-graphite px-3 py-2.5 text-[15px] text-offwhite placeholder:text-steel/80 ${props.className ?? ""}`}
     />
   );
 }
@@ -129,8 +150,7 @@ export function Button({
         }
         onClick?.(event);
       }}
-      className={`stamp inline-flex min-h-11 items-center justify-center gap-2 px-4 text-[13px] disabled:pointer-events-none disabled:opacity-50 ${styles[variant]} ${className}`}
-      style={{ borderRadius: 8 }}
+      className={`stamp stamp-press inline-flex min-h-11 items-center justify-center gap-2 rounded-plate px-4 text-[13px] disabled:pointer-events-none disabled:opacity-50 ${styles[variant]} ${className}`}
     >
       {pending ? <StampLoader /> : null}
       {children}
@@ -142,8 +162,7 @@ export function ErrorBanner({ message }: { message: string }) {
   return (
     <p
       role="alert"
-      className="border border-failure/50 bg-failure/10 px-3 py-2 text-sm text-offwhite"
-      style={{ borderRadius: 8 }}
+      className="rounded-plate border border-failure/50 bg-failure/10 px-3 py-2 text-sm leading-6 text-offwhite"
     >
       {message}
     </p>

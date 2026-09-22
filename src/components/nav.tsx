@@ -19,7 +19,7 @@ export function AppNav() {
   return (
     <nav
       aria-label="Challenge"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-steel/30 bg-graphite md:static md:border-t-0 md:border-b"
+      className="fixed inset-x-0 bottom-0 z-20 border-t border-steel/30 bg-graphite md:static md:mb-6 md:border-t-0 md:border-b"
     >
       <ul className="mx-auto flex max-w-3xl items-stretch justify-between px-2 md:justify-start md:gap-1 md:px-0">
         {items.map((item) => {
@@ -29,7 +29,7 @@ export function AppNav() {
             <li key={item.href} className="flex-1 md:flex-none">
               <Link
                 href={item.href}
-                className={`stamp flex min-h-14 flex-col items-center justify-center gap-1 px-3 text-[10px] md:min-h-12 md:flex-row md:text-[12px] ${
+                className={`stamp flex min-h-14 flex-col items-center justify-center gap-1 px-3 text-[11px] md:min-h-12 md:flex-row ${
                   active ? "text-brass" : "text-steel hover:text-offwhite"
                 }`}
               >

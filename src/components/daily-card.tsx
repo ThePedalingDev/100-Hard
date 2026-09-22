@@ -3,6 +3,7 @@
 import { useOptimistic, useState, useTransition, type ReactNode } from "react";
 import { toggleCheckAction, saveNoteAction } from "@/lib/actions/checkin";
 import { addCommentAction, toggleLikeAction } from "@/lib/actions/social";
+import { CategoryStamp, type StampKind } from "@/components/art";
 import { CommentIcon, HeartIcon } from "@/components/icons";
 import { StampLoader } from "@/components/loader";
 import { Button, ErrorBanner, StatusMark, TextArea } from "@/components/plate";
@@ -71,14 +72,13 @@ export function DailyCard({
 
   return (
     <article
-      className="relative border border-steel/35 bg-iron px-4 py-4"
-      style={{ borderRadius: 8 }}
+      className="relative rounded-plate border border-steel/35 bg-iron px-4 py-4 md:px-5 md:py-5"
       aria-busy={pending || undefined}
     >
       <span className="pointer-events-none absolute left-2 top-2 size-1.5 rounded-full bg-brass" />
       <span className="pointer-events-none absolute right-2 top-2 size-1.5 rounded-full bg-brass" />
       <header className="mb-4 flex items-center gap-3">
-        <div className="size-11 overflow-hidden border border-brass/70 bg-graphite" style={{ borderRadius: 8 }}>
+        <div className="size-11 overflow-hidden rounded-plate border border-brass/70 bg-graphite">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="" className="size-full object-cover" />
@@ -89,16 +89,18 @@ export function DailyCard({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="stamp truncate text-[16px]">{owner.display_name}</h3>
-          <p className="text-sm text-steel">{complete} / 4 complete</p>
+          <h3 className="stamp truncate text-[16px] leading-none">{owner.display_name}</h3>
+          <p className="mt-1 text-sm text-steel">{complete} / 4 complete</p>
         </div>
         <StatusMark status={status} />
       </header>
 
       {error ? <div className="mb-3"><ErrorBanner message={error} /></div> : null}
 
+      <div className="divide-y divide-steel/20">
       <Requirement
         label="Diet"
+        stamp="diet"
         done={state.diet_complete}
         locked={locked}
         pending={pending}
@@ -106,9 +108,12 @@ export function DailyCard({
         onToggle={() => toggle("diet_complete")}
         onNote={(value) => saveNote("diet_note", value)}
       />
-      <div className="mt-3 border-t border-steel/20 pt-3">
+      <div className="py-3">
         <div className="mb-2 flex items-center justify-between">
-          <p className="stamp text-[12px] text-steel">Workout</p>
+          <p className="stamp flex items-center gap-2 text-[11px] text-steel">
+            <CategoryStamp kind="workout" />
+            Workout
+          </p>
           <StatusMark status={isWorkoutComplete(state) ? "complete" : state.finalized_at ? "incomplete" : "pending"} />
         </div>
         <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_1_complete")} />
@@ -118,6 +123,7 @@ export function DailyCard({
       </div>
       <Requirement
         label="Water — 3.8 L"
+        stamp="water"
         done={state.water_complete}
         locked={locked}
         pending={pending}
@@ -127,6 +133,7 @@ export function DailyCard({
       />
       <Requirement
         label="Bible — 10 pages"
+        stamp="bible"
         done={state.bible_complete}
         locked={locked}
         pending={pending}
@@ -142,6 +149,7 @@ export function DailyCard({
         onToggle={() => toggle("bible_complete")}
         onNote={(value) => saveNote("bible_note", value)}
       />
+      </div>
 
       <NoteField
         label="Day note"
@@ -152,8 +160,8 @@ export function DailyCard({
       />
 
       {state.status === "failed" || missedCategories(state).length ? (
-        <div className="mt-3 border-t border-steel/20 pt-3">
-          <p className="stamp text-[12px] text-brass">Wooden spoon</p>
+        <div className="mt-4 border-t border-steel/20 pt-3">
+          <p className="stamp text-[11px] text-brass">Wooden spoon</p>
           {state.finalized_at && state.status === "failed" ? (
             <p className="mt-1 text-sm text-steel">
               Missed: {missedCategories(state).join(", ") || "requirements"}
@@ -186,6 +194,7 @@ export function DailyCard({
 
 function Requirement({
   label,
+  stamp,
   done,
   locked,
   pending,
@@ -195,6 +204,7 @@ function Requirement({
   onNote,
 }: {
   label: string;
+  stamp?: StampKind;
   done: boolean;
   locked: boolean;
   pending: boolean;
@@ -204,8 +214,8 @@ function Requirement({
   onNote: (value: string) => void;
 }) {
   return (
-    <div className="mt-3 border-t border-steel/20 pt-3 first:mt-0 first:border-t-0 first:pt-0">
-      <StampCheck label={label} checked={done} locked={locked || pending} busy={pending} onToggle={onToggle} />
+    <div className="py-3 first:pt-0 last:pb-0">
+      <StampCheck label={label} stamp={stamp} checked={done} locked={locked || pending} busy={pending} onToggle={onToggle} />
       {extra}
       <NoteField value={note ?? ""} locked={locked} onSave={onNote} />
     </div>
@@ -214,12 +224,14 @@ function Requirement({
 
 function StampCheck({
   label,
+  stamp,
   checked,
   locked,
   busy = false,
   onToggle,
 }: {
   label: string;
+  stamp?: StampKind;
   checked: boolean;
   locked: boolean;
   busy?: boolean;
@@ -227,7 +239,10 @@ function StampCheck({
 }) {
   return (
     <label className={`flex min-h-11 items-center justify-between gap-3 ${locked ? "" : "cursor-pointer"}`}>
-      <span className="text-[15px]">{label}</span>
+      <span className="flex min-w-0 items-center gap-2 text-[15px] leading-6">
+        {stamp ? <CategoryStamp kind={stamp} /> : null}
+        {label}
+      </span>
       <span className="inline-flex items-center gap-2">
         {busy ? <StampLoader className="size-4 text-brass" /> : null}
         <input
@@ -270,7 +285,7 @@ function NoteField({
 
   return (
     <div className="mt-2">
-      <p className="stamp mb-1 text-[10px] text-steel">{label}</p>
+      <p className="stamp mb-1 text-[11px] text-steel">{label}</p>
       <TextArea
         value={draft}
         maxLength={max}
@@ -307,7 +322,7 @@ function SocialBar({
           type="button"
           disabled={pending}
           aria-busy={pending || undefined}
-          className={`stamp inline-flex min-h-10 items-center gap-2 text-[12px] disabled:pointer-events-none disabled:opacity-50 ${liked ? "text-brass" : "text-steel"}`}
+          className={`stamp stamp-press inline-flex min-h-10 items-center gap-2 text-[11px] disabled:pointer-events-none disabled:opacity-50 ${liked ? "text-brass" : "text-steel"}`}
           onClick={() => {
             if (pending) return;
             start(async () => {
@@ -320,7 +335,7 @@ function SocialBar({
           {pending ? <StampLoader className="size-4" /> : <HeartIcon className="size-4" />}
           {likeCount}
         </button>
-        <span className="stamp inline-flex items-center gap-2 text-[12px] text-steel">
+        <span className="stamp inline-flex items-center gap-2 text-[11px] text-steel">
           <CommentIcon className="size-4" />
           {comments.length}
         </span>

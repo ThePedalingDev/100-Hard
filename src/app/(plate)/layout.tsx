@@ -16,8 +16,8 @@ export default async function PlateLayout({ children }: { children: React.ReactN
       <RealtimeRefresh challengeId={context.challenge?.id} />
       {context.loadError ? (
         <Plate>
-          <h1 className="stamp text-[28px]">Could not load the plate</h1>
-          <p className="mt-2 text-sm text-steel">
+          <h1 className="stamp text-[32px] leading-none">Could not load the plate</h1>
+          <p className="mt-2 text-sm leading-6 text-steel">
             The challenge data did not load. Sign out and back in, or try again.
           </p>
         </Plate>

@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/lib/actions/auth";
+import { InviteShare } from "@/components/invite-share";
 import { ProfileForm } from "@/components/profile-form";
-import { Plate } from "@/components/plate";
+import { PageHeader, Plate } from "@/components/plate";
 import { SubmitButton } from "@/components/submit-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { loadAppContext, signedUrl } from "@/lib/data";
@@ -13,23 +14,24 @@ export default async function ProfilePage() {
   const avatarUrl = await signedUrl(context.profile?.avatar_path ?? null, "avatars");
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-start justify-between gap-3">
-        <h1 className="stamp text-[32px] leading-none">Profile</h1>
-        <ThemeToggle />
-      </div>
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Profile" action={<ThemeToggle />} />
       <Plate>
-        <p className="text-sm text-steel">{context.email}</p>
-        {context.challenge ? (
-          <p className="mt-2 text-sm">
-            Invite code <span className="stamp text-brass">{context.challenge.invite_code}</span>
-          </p>
-        ) : null}
+        <p className="text-sm leading-6 text-steel">{context.email}</p>
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={avatarUrl} alt="" className="mt-4 size-20 border border-brass object-cover" style={{ borderRadius: 8 }} />
+          <img
+            src={avatarUrl}
+            alt=""
+            className="mt-4 size-20 rounded-plate border border-brass object-cover"
+          />
         ) : null}
       </Plate>
+      {context.challenge ? (
+        <Plate>
+          <InviteShare code={context.challenge.invite_code} />
+        </Plate>
+      ) : null}
       <ProfileForm
         displayName={context.profile?.display_name ?? ""}
         dietCommitment={context.profile?.diet_commitment ?? ""}

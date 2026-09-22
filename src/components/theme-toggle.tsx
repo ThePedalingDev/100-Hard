@@ -26,8 +26,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
   return (
     <button
       type="button"
-      className={`stamp inline-flex min-h-10 items-center gap-2 border border-steel/40 px-3 text-[11px] text-offwhite hover:border-brass ${className}`}
-      style={{ borderRadius: 8 }}
+      className={`stamp stamp-press inline-flex min-h-10 items-center gap-2 rounded-plate border border-steel/40 px-3 text-[11px] text-offwhite hover:border-brass ${className}`}
       aria-pressed={theme === "light"}
       onClick={() => {
         setTheme(next);

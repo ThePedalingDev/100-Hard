@@ -22,8 +22,8 @@ export function RepaymentBoard({
   const [pending, start] = useTransition();
 
   return (
-    <section className="space-y-3">
-      <h2 className="stamp text-[18px]">Repayment</h2>
+    <section className="flex flex-col gap-4">
+      <h2 className="stamp text-[18px] leading-none">Repayment</h2>
       {!finished ? (
         <Plate>
           <p className="text-sm text-steel">Repayment opens after 31 December. Until then the ledger only records the debt.</p>

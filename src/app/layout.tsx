@@ -31,8 +31,8 @@ export const metadata: Metadata = {
 
 function DirectionContract() {
   const text = `
-THESIS: Home is a load-rating plate for two athletes, not a habit-tracker dashboard. Perfect days are stamped capacity; spoons are blue proof marks; today is an inspection.
-OWN-WORLD: SA Planet Fitness deep-purple shop floor, iron plates, vibrant blue proof marks, white stamp type. Light and dark remap the same plate language. 8px corners, 1px edges.
+THESIS: Home is a load-rating plate for two athletes, not a habit-tracker dashboard. Perfect days are stamped capacity; spoons are orange proof marks; today is an inspection.
+OWN-WORLD: Midnight-navy shop floor, iron plates, SA Planet Fitness orange proof marks and yellow hover, white stamp type. Light and dark remap the same plate language. 8px corners, 1px edges. No gradients. No purple.
 STORY: Open to the race rack and today's inspection. Stamp your work. See why the other person is ahead or owes a spoon.
 FIRST VIEWPORT: Serial header with countdown, two PFP load-pins on a rack to 31 Dec, own inspection plate, partner plate, bottom nav.
 FORM: Equipment Spec Plate, grounded list position 7, seed cd602eee. Signature: a check lands as a stamp; a new perfect day slides the PFP pin 280ms ease-out.
