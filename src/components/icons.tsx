@@ -45,8 +45,10 @@ export function PhotoIcon(props: IconProps) {
 export function SpoonIcon(props: IconProps) {
   return (
     <svg {...base(props)}>
-      <path d="M8 6.5c0-2 1.6-3.5 3.6-3.5S15.2 4.5 15.2 6.5c0 1.5-1 2.6-2.2 3.1V21" />
-      <path d="M13 21H11" />
+      <ellipse cx="12" cy="6.6" rx="4.4" ry="5.2" />
+      <ellipse cx="12" cy="6.2" rx="1.9" ry="2.8" />
+      <path d="M12 11.8v7.4" strokeWidth={1.9} />
+      <path d="M10.4 19.8c.4 1.1 1.1 1.6 1.6 1.6s1.2-.5 1.6-1.6" />
     </svg>
   );
 }

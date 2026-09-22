@@ -32,7 +32,7 @@ export function Plate({ children, className = "", as: Tag = "section", id }: Pla
   return (
     <Tag
       id={id}
-      className={`plate-metal relative rounded-plate border border-steel/35 bg-iron px-4 py-4 md:px-5 md:py-5 ${className}`}
+      className={`plate-metal relative rounded-plate border border-steel/45 bg-iron px-5 py-5 md:px-6 md:py-6 ${className}`}
     >
       <Rivet className="left-2 top-2" />
       <Rivet className="right-2 top-2" />
@@ -45,7 +45,7 @@ export function Plate({ children, className = "", as: Tag = "section", id }: Pla
 
 function Rivet({ className }: { className: string }) {
   return (
-    <span className={`pointer-events-none absolute size-2.5 ${className}`} aria-hidden="true">
+    <span className={`pointer-events-none absolute size-3 ${className}`} aria-hidden="true">
       <span className="absolute inset-0 rounded-full border border-brass bg-club" />
       <span className="absolute inset-[3px] rounded-full bg-brass" />
     </span>

@@ -135,7 +135,7 @@ components:
 
 **Creative North Star: "The Load-Rating Plate"**
 
-The UI is equipment, not a dashboard. Surfaces read as stamped inspection plates on locker-room paper: navy Bricolage as the die-struck legend, steel as the 1px edge, orange as rivets and proof marks, yellow as focus and hover. Density is locker-room tight. Texture is a fine hatch, not a photograph, not a gradient. Purple is not in the system. There is no dark theme.
+The UI is equipment, not a dashboard. Surfaces read as stamped inspection plates on locker-room paper: navy Bricolage as the die-struck legend, steel as the 1px edge, orange as rivets and proof marks, yellow as focus and hover. Density is locker-room tight. Texture is graph-paper hatch, not a photograph, not a gradient. Purple is not in the system. There is no dark theme.
 
 Personality is industrial and inspectable under daylight. A screen should look like a rating plate on a clipboard in a well-lit gym. Colour is semantic or structural, never festive. Interaction is a stamp, a two-pixel lift, or a pin slide.
 
@@ -143,7 +143,7 @@ Confirmed visual rejections: gradients, neon, glow, glassmorphism, oversized rad
 
 **Key Characteristics:**
 
-- Cool locker-paper hatch with white plate-metal fill
+- Cool locker-paper graph hatch with white plate-metal fill
 - Bricolage Grotesque for titles, tightly tracked, mixed case
 - Atkinson Hyperlegible Next for running copy, fields, and actions
 - 8px corners and 1px steel edges on every plate, field, and control
@@ -207,15 +207,15 @@ South African Planet Fitness local brand: navy `#002040`, orange `#FF6B00`, yell
 
 ## Layout
 
-Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is a 48rem column (`content-shell`), 16px gutters, 24px top padding, 96px bottom padding on small screens to clear the fixed nav.
+Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: 100svh on small screens so Safari’s bottom URL bar never covers the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`), with `env(safe-area-inset-bottom)` padding. `content-shell` is 48rem on small screens, 56rem from 640px, 80rem from 1024px, with 16/24/32px gutters. From `md` the frame unlocks and the tab bar becomes a top plate.
 
-Rhythm is 8 / 16 / 24. Plate padding is 16px, 20px from `md`. Form stacks are 16px gaps; field label-to-control is 8px. Inspection pages stack plates at 24px.
+Rhythm is 8 / 16 / 24. Plate padding is 20px, 24px from `md`. Form stacks are 16px gaps; field label-to-control is 8px. Inspection pages stack plates at 24px. Dashboard uses a two-column board from `lg`: pin rack leading, stats plate supporting.
 
-Mobile is the primary density. Desktop login is the same plate, not a split marketing layout. Nav is a six-item bottom bar on small screens and a top steel rule from `md`.
+Mobile is the primary density. Desktop login is the same plate, not a split marketing layout. Nav is a six-item bottom bar on small screens and a top plate from `md`, with an orange underline on the active item.
 
 ## Elevation & Depth
 
-Flat. Depth is tonal: paper floor, white plate, pale wells. No drop shadows on plates. The only shadows are an inset autofill fill and a 2px yellow focus ring. Texture is two hatches.
+Flat. Depth is tonal: paper floor, white plate, pale wells. No drop shadows on plates. The only shadows are an inset autofill fill and a 2px yellow focus ring. Texture is two hatches: 32px graph paper on the floor, 16px plate-metal on cards.
 
 ### Shadow Vocabulary
 None on content plates. Focus is a 3px signal-yellow outline, 3px offset.
@@ -225,9 +225,9 @@ None on content plates. Focus is a 3px signal-yellow outline, 3px offset.
 
 ## Shapes
 
-Every plate, field, button, banner, and avatar well uses an 8px corner. Edges are 1px steel (often at 35–50% opacity). Rivets are 10px circles: navy cup, orange ring, orange pin. Daily cards may use 6px orange dots instead of full rivets.
+Every plate, field, button, banner, and avatar well uses an 8px corner. Edges are 1px steel (often at 35–50% opacity). Rivets are 12px circles: navy cup, orange ring, orange pin. Daily cards use the same four corner rivets.
 
-Hairline dividers inside cards are steel at 20% opacity. Head-to-head pins are 36px squares with an 8px corner, orange stroke, sliding on a 1px steel rail.
+Hairline dividers inside cards are steel at 20% opacity. Race pins are 36px squares with an 8px corner, orange stroke on the viewer, sliding on a 1px steel rail with yellow ticks at Start, every 25 days, and End.
 
 ### Named Rules
 **The Eight-Pixel Plate Rule.** 8px is the only container radius.
@@ -250,8 +250,8 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 - **Background:** White iron with plate-metal hatch
 - **Shadow Strategy:** None
 - **Border:** 1px steel at 35% opacity
-- **Internal Padding:** 16px (20px from `md`)
-- **Signature:** Four corner rivets on `Plate`.
+- **Internal Padding:** 20px (24px from `md`)
+- **Signature:** Four corner rivets on `Plate` and daily cards.
 
 ### Inputs / Fields
 - **Style:** Pale well, 1px steel/40 stroke, 8px corners, 48px minimum height, 16px Atkinson navy.
@@ -261,23 +261,35 @@ Operate motion is feedback, not choreography. Shared ease is exponential out (`c
 - **Error:** Failure-stroked banner, failure/10 fill, navy body copy.
 
 ### Navigation
-- Paper bar, 1px steel/30 rule.
+- Paper in-flow tab bar, 1px steel/30 rule on small screens, padded with `env(safe-area-inset-bottom)` so iOS Safari chrome cannot cover it; plate-metal hatch and 8px corners from `md`.
 - Mixed-case labels, 20px stroke icons, min-height 56px (48px row on `md`).
-- Idle: steel. Hover: navy. Active: proof orange.
+- Idle: steel. Hover: navy. Active: proof orange plus a 2px orange underline.
 
 ### Status marks
 - Perfect / Done: success + ✓
 - Failed / Missed: failure + ✕
 - Pending: steel + ○
-- Always word + mark.
+- Always word + mark. Calendar cells fill success/failure/pending and keep the glyph so status is never colour-only.
+
+### Calendar
+- Seven-column month grid. In-range days are 76px min on small screens, 104px from `md`.
+- Cell fill reads status at a glance; ✓ / ✕ / ○ chips name each member.
+- Start, Day 25 / 50 / 75, and End are yellow-edged cells with brass labels.
 
 ### Head-to-head rack
-- Pale track, 1px steel/30, 40px tall.
-- Pins 36px, proof-orange border, 280ms ease-out on `left`.
+- Pale track, 1px steel/35, 44px tall, yellow ticks at 25-day intervals.
+- Pins 36px, proof-orange border on the viewer, 280ms ease-out on `left`.
 
 ### Invite share
 - Code as a 32px tabular display numeral.
 - Copy code and copy join link are the actions.
+
+### Cropper
+- After Choose photo, crop opens as a `dialog` on the top layer so Safari transform/scroll cannot steal the gesture.
+- Mobile sheet is 100svh, padded with safe-area insets, sitting above the Safari URL bar.
+- Frame is square for avatars and 4:3 for monthly plates, 8px corners, 1px orange edge, as large as the remaining viewport.
+- Pan with one finger, pinch or a 48px zoom slider with minus/plus. Offset is clamped so the photo always covers the plate.
+- Use this photo writes WebP; Choose another and Cancel stay in the sheet.
 
 ## Do's and Don'ts
 

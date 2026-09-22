@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PageHeader, Plate, StatusMark } from "@/components/plate";
+import { CalendarMonth } from "@/components/calendar-month";
+import { PageHeader, Plate } from "@/components/plate";
 import {
   addDays,
   dateInChallengeTz,
@@ -9,7 +10,7 @@ import {
   monthLabel,
   weekdayIndexMonday,
 } from "@/lib/challenge";
-import { clampToChallengeRange } from "@/lib/challenge-dates";
+import { challengeMilestones, clampToChallengeRange } from "@/lib/challenge-dates";
 import { loadAppContext, loadMonth } from "@/lib/data";
 
 export default async function CalendarPage({
@@ -32,15 +33,15 @@ export default async function CalendarPage({
   const lead = weekdayIndexMonday(first);
   const count = daysInMonth(year, monthIndex);
   const rows = await loadMonth(context.challenge.id, month);
-  const memberIds = context.members.map((member) => member.profile.id);
-
   const prev = addDays(first, -1);
   const next = addDays(`${month.slice(0, 7)}-${String(count).padStart(2, "0")}`, 1);
+  const marks = challengeMilestones(start, end);
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title={monthLabel(month)}
+        kicker={marks.map((item) => item.label).join(" · ")}
         action={
           <div className="flex gap-2">
             {prev >= start ? (
@@ -63,41 +64,16 @@ export default async function CalendarPage({
         }
       />
       <Plate>
-        <div className="mb-4 grid grid-cols-7 gap-2">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-            <p key={day} className="stamp text-center text-[11px] text-steel">
-              {day}
-            </p>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 gap-2">
-          {Array.from({ length: lead }, (_, index) => (
-            <div key={`lead-${index}`} />
-          ))}
-          {Array.from({ length: count }, (_, index) => {
-            const iso = `${month.slice(0, 7)}-${String(index + 1).padStart(2, "0")}`;
-            const inChallenge = iso >= start && iso <= end;
-            return (
-              <Link
-                key={iso}
-                href={inChallenge ? `/calendar/${iso}` : "/calendar"}
-                className={`flex min-h-18 flex-col gap-1 rounded-plate border p-2 ${
-                  iso === today ? "border-brass" : "border-steel/20"
-                } ${inChallenge ? "hover:border-offwhite" : "opacity-40"}`}
-              >
-                <p className="stamp tabular text-[11px]">{index + 1}</p>
-                {inChallenge ? (
-                  <div className="flex flex-wrap gap-1">
-                    {memberIds.map((id) => {
-                      const row = rows.find((item) => item.user_id === id && item.challenge_date === iso);
-                      return <StatusMark key={id} compact status={row?.status ?? "pending"} />;
-                    })}
-                  </div>
-                ) : null}
-              </Link>
-            );
-          })}
-        </div>
+        <CalendarMonth
+          month={month}
+          lead={lead}
+          count={count}
+          today={today}
+          start={start}
+          end={end}
+          people={context.members.map((member) => ({ id: member.profile.id, profile: member.profile }))}
+          rows={rows}
+        />
       </Plate>
     </div>
   );

@@ -6,7 +6,7 @@ import { Leaderboard } from "@/components/leaderboard";
 import { PageHeader, Plate } from "@/components/plate";
 import { SpoonIcon } from "@/components/icons";
 import { formatStampDate } from "@/lib/challenge";
-import { MAX_CHALLENGE_MEMBERS } from "@/lib/challenge-dates";
+import { MAX_CHALLENGE_MEMBERS, challengeLength } from "@/lib/challenge-dates";
 import { loadAppContext, signedUrl } from "@/lib/data";
 
 export default async function DashboardPage() {
@@ -78,20 +78,27 @@ export default async function DashboardPage() {
         action={<p className="stamp text-[11px] text-steel">SAST</p>}
       />
 
-      {context.members.length > 0 ? (
-        <Leaderboard members={context.members} userId={context.userId} />
-      ) : null}
+      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:items-start">
+        {context.members.length > 0 ? (
+          <Leaderboard
+            members={context.members}
+            userId={context.userId}
+            totalDays={challengeLength(context.challenge.start_date, context.challenge.end_date)}
+            avatars={avatars}
+          />
+        ) : null}
 
-      {context.me ? (
-        <Plate>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-4">
-            <Stat value={context.me.stats.perfectDays} label="Perfect days" />
-            <Stat value={`${context.me.stats.completion}%`} label="Completion" />
-            <Stat value={context.me.stats.streak} label="Current streak" />
-            <Stat value={context.me.stats.spoons} label="Spoons" icon />
-          </div>
-        </Plate>
-      ) : null}
+        {context.me ? (
+          <Plate>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+              <Stat value={context.me.stats.perfectDays} label="Perfect days" />
+              <Stat value={`${context.me.stats.completion}%`} label="Completion" />
+              <Stat value={context.me.stats.streak} label="Current streak" />
+              <Stat value={context.me.stats.spoons} label="Spoons" icon />
+            </div>
+          </Plate>
+        ) : null}
+      </div>
 
       <section className="flex flex-col gap-4">
         <h2 className="text-[18px] leading-none">Today</h2>

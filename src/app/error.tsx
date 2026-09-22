@@ -12,7 +12,7 @@ export default function ErrorPage({
   const [pending, start] = useTransition();
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-lg items-center px-4 py-10">
+    <main className="auth-shell mx-auto flex max-w-lg items-center">
       <Plate className="w-full">
         <h1 className="text-[32px] leading-none">Could not load the plate</h1>
         <p className="mt-2 text-sm text-steel">

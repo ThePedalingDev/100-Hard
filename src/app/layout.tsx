@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Atkinson_Hyperlegible_Next } from "next/font/google";
 import { PageEnter } from "@/components/page-enter";
@@ -17,6 +17,14 @@ const body = Atkinson_Hyperlegible_Next({
   variable: "--font-body-face",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#F4F7FA",
+  interactiveWidget: "resizes-content",
+};
 
 export const metadata: Metadata = {
   title: "100 Hard",
@@ -62,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <RouteProgress />
         <div id="main-content" tabIndex={-1} className="focus:outline-none">
-          <PageEnter>{children}</PageEnter>
+          <PageEnter isolate>{children}</PageEnter>
         </div>
       </body>
     </html>
