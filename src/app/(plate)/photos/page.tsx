@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
+import { EmptyPlate } from "@/components/art";
 import { PhotoUpload } from "@/components/photo-upload";
-import { Plate } from "@/components/plate";
+import { PageHeader, Plate } from "@/components/plate";
 import { monthLabel } from "@/lib/challenge";
 import { loadAppContext, loadPhotos, signedUrl } from "@/lib/data";
 
@@ -12,17 +13,20 @@ export default async function PhotosPage() {
   const photos = await loadPhotos(context.challenge.id);
 
   return (
-    <div className="space-y-5">
-      <header>
-        <h1 className="stamp text-[32px] leading-none">Progress plates</h1>
-        <p className="mt-2 text-sm text-steel">Optional. Private. One official photo each calendar month.</p>
-      </header>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Progress plates"
+        kicker="Optional. Private. One official photo each calendar month."
+      />
       <PhotoUpload month={context.today} />
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         {photos.length === 0 ? (
-          <Plate>
-            <p className="text-sm text-steel">No monthly plates yet. Upload when you want a record, not a score.</p>
-          </Plate>
+          <figure className="flex flex-col items-center">
+            <EmptyPlate />
+            <figcaption className="mt-3 text-center text-sm leading-6 text-steel">
+              No monthly plates yet. Upload when you want a record, not a score.
+            </figcaption>
+          </figure>
         ) : null}
         {await Promise.all(
           photos.map(async (photo) => {
@@ -33,11 +37,11 @@ export default async function PhotosPage() {
                 : context.partner?.display_name;
             return (
               <Plate key={photo.id} as="article">
-                <p className="stamp text-[14px]">{monthLabel(photo.month)}</p>
-                <p className="mt-1 text-sm text-steel">{owner}</p>
+                <p className="stamp text-[16px] leading-none">{monthLabel(photo.month)}</p>
+                <p className="mt-2 text-sm leading-6 text-steel">{owner}</p>
                 {url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={url} alt="" className="mt-3 w-full border border-steel/30 object-cover" />
+                  <img src={url} alt="" className="mt-4 w-full rounded-plate border border-steel/30 object-cover" />
                 ) : (
                   <p className="mt-3 text-sm text-failure">Could not open this photo.</p>
                 )}

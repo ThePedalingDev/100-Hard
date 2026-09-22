@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DailyCard } from "@/components/daily-card";
 import { HeadToHead } from "@/components/head-to-head";
-import { Plate } from "@/components/plate";
+import { InviteShare } from "@/components/invite-share";
+import { PageHeader, Plate } from "@/components/plate";
 import { SpoonIcon } from "@/components/icons";
 import { loadAppContext, signedUrl } from "@/lib/data";
 
@@ -12,8 +13,8 @@ export default async function DashboardPage() {
   if (!context.schemaReady) {
     return (
       <Plate>
-        <h1 className="stamp text-[28px]">Schema not applied</h1>
-        <p className="mt-2 text-sm text-steel">
+        <h1 className="stamp text-[32px] leading-none">Schema not applied</h1>
+        <p className="mt-2 text-sm leading-6 text-steel">
           The 100-Hard Supabase project is empty. Approve the proposed schema in
           `supabase/proposed/001_mvp.sql` and I will apply it.
         </p>
@@ -32,11 +33,11 @@ export default async function DashboardPage() {
 
   if (context.finished) {
     return (
-      <div className="space-y-5">
-        <header>
-          <h1 className="stamp text-[36px] leading-none">{context.challenge.name}</h1>
-          <p className="mt-2 text-steel">The plate is closed. Time to pay the spoons.</p>
-        </header>
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          title={context.challenge.name}
+          kicker="The plate is closed. Time to pay the spoons."
+        />
         <Plate>
           <div className="grid grid-cols-2 gap-4">
             <FinalColumn title={context.me?.profile.display_name ?? "You"} stats={context.me?.stats} />
@@ -51,14 +52,16 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="space-y-5">
-      <header className="flex items-end justify-between gap-4">
-        <div>
-          <h1 className="stamp text-[36px] leading-none">{context.challenge.name}</h1>
-          <p className="mt-2 text-sm text-steel">Ends 31 December · {context.remaining} days remaining</p>
-        </div>
-        <p className="stamp text-[11px] text-steel">SAST</p>
-      </header>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={context.challenge.name}
+        kicker={
+          <>
+            Ends 31 December · <span className="stamp tabular text-offwhite">{context.remaining}</span> days remaining
+          </>
+        }
+        action={<p className="stamp text-[11px] text-steel">SAST</p>}
+      />
 
       {context.me ? (
         <HeadToHead
@@ -70,7 +73,7 @@ export default async function DashboardPage() {
 
       {context.me ? (
         <Plate>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-4">
             <Stat value={context.me.stats.perfectDays} label="Perfect days" />
             <Stat value={`${context.me.stats.completion}%`} label="Completion" />
             <Stat value={context.me.stats.streak} label="Current streak" />
@@ -79,8 +82,8 @@ export default async function DashboardPage() {
         </Plate>
       ) : null}
 
-      <section className="space-y-4">
-        <h2 className="stamp text-[18px]">Today</h2>
+      <section className="flex flex-col gap-4">
+        <h2 className="stamp text-[18px] leading-none">Today</h2>
         {context.me ? (
           <DailyCard
             checkin={context.me.checkin!}
@@ -104,10 +107,7 @@ export default async function DashboardPage() {
           />
         ) : (
           <Plate>
-            <p className="stamp text-[14px]">Waiting for partner</p>
-            <p className="mt-2 text-sm text-steel">
-              Invite code {context.challenge.invite_code}. Share /join/{context.challenge.invite_code}
-            </p>
+            <InviteShare waiting code={context.challenge.invite_code} />
           </Plate>
         )}
       </section>
@@ -118,11 +118,11 @@ export default async function DashboardPage() {
 function Stat({ value, label, icon }: { value: string | number; label: string; icon?: boolean }) {
   return (
     <div>
-      <p className="stamp flex items-center gap-1 text-[28px] leading-none tabular">
+      <p className="stamp flex items-center gap-1 text-[32px] leading-none tabular">
         {icon ? <SpoonIcon className="size-5 text-brass" /> : null}
         {value}
       </p>
-      <p className="stamp mt-1 text-[11px] text-steel">{label}</p>
+      <p className="stamp mt-2 text-[11px] text-steel">{label}</p>
     </div>
   );
 }
@@ -136,8 +136,8 @@ function FinalColumn({
 }) {
   return (
     <div>
-      <h2 className="stamp text-[16px]">{title}</h2>
-      <ul className="mt-3 space-y-1 text-sm text-steel">
+      <h2 className="stamp text-[16px] leading-none">{title}</h2>
+      <ul className="mt-3 space-y-2 text-sm leading-6 text-steel">
         <li>Perfect days {stats?.perfectDays ?? 0}</li>
         <li>Completion {stats?.completion ?? 0}%</li>
         <li>Longest streak {stats?.longest ?? 0}</li>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { loginAction, registerAction, resetPasswordAction } from "@/lib/actions/auth";
+import { PlateMark } from "@/components/art";
 import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
 import { usePlatePending } from "@/components/route-progress";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -17,7 +18,10 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
   return (
     <Plate className="mx-auto w-full max-w-md">
       <div className="mb-1 flex items-start justify-between gap-3">
-        <h1 className="stamp text-[32px] leading-none">100 Hard</h1>
+        <div className="flex min-w-0 items-center gap-3">
+          <PlateMark size={48} />
+          <h1 className="stamp text-[32px] leading-none">100 Hard</h1>
+        </div>
         <ThemeToggle />
       </div>
       <p className="mt-2 text-sm text-steel">

@@ -51,7 +51,7 @@ Open: magic-link login only if it stays simple; whether reminders exist is post-
 
 Product name: **100 Hard**.
 
-Binding from the owner PRD: the product must feel like a premium gym / performance journal / training locker room. It must not feel like crypto, gaming, AI SaaS, futuristic neon, or a generic habit tracker. Formal UI constraints: no gradients, no neon, no glow, no glassmorphism, no excessive rounded containers, semantic colour only, strong typography and spacing hierarchy, restrained interactions. Suggested materials/palette in the PRD (graphite, iron, warm off-white, steel grey, success green, failure red, spoon brass) are binding direction, not optional mood. Impeccable is a formal implementation requirement; `PRODUCT.md` and `DESIGN.md` must exist in the repo.
+Binding from the owner PRD: the product must feel like a premium gym / performance journal / training locker room. It must not feel like crypto, gaming, AI SaaS, futuristic neon, or a generic habit tracker. Formal UI constraints: no gradients, no neon, no glow, no glassmorphism, no excessive rounded containers, semantic colour only, strong typography and spacing hierarchy, restrained interactions. Plate materials stay industrial (graphite/iron/steel). Colour overlay is South African Planet Fitness club brand: navy `#002040` as ground and light-mode text, orange `#FF6B00` as proof/CTA, yellow `#FFB600` as hover/signal. Club purple is not in the system. Impeccable is a formal implementation requirement; `PRODUCT.md` and `DESIGN.md` must exist in the repo.
 
 ## Evidence on Hand
 

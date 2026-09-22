@@ -19,8 +19,8 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
   const theirs = day.checkins.find((row) => row.user_id !== context.userId);
 
   return (
-    <div className="space-y-5">
-      <h1 className="stamp text-[32px] leading-none">{formatStampDate(date)}</h1>
+    <div className="flex flex-col gap-6">
+      <h1 className="stamp text-[36px] leading-none">{formatStampDate(date)}</h1>
       {context.me && mine ? (
         <DailyCard
           checkin={mine}

@@ -100,6 +100,15 @@ export function CommentIcon(props: IconProps) {
   );
 }
 
+export function CopyIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <rect x="8" y="8" width="11" height="13" rx="1.5" />
+      <path d="M16 8V6.5A1.5 1.5 0 0 0 14.5 5h-9A1.5 1.5 0 0 0 4 6.5v13A1.5 1.5 0 0 0 5.5 21H8" />
+    </svg>
+  );
+}
+
 export function LogoutIcon(props: IconProps) {
   return (
     <svg {...base(props)}>
