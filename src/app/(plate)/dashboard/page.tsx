@@ -27,7 +27,34 @@ export default async function DashboardPage() {
     redirect("/onboarding/profile");
   }
   if (!context.challenge) {
-    redirect("/onboarding/challenge");
+    return (
+      <div className="flex flex-col gap-6">
+        <PageHeader title="Home" />
+        <Plate>
+          <h2 className="text-[18px] leading-none">You have no active challenge at the moment.</h2>
+          <p className="mt-2 text-sm leading-6 text-steel">
+            Create a challenge or join with a code to start today&apos;s inspection.
+            {context.memberships.length > 0
+              ? " You already belong to a challenge — switch to it from Profile."
+              : ""}
+          </p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/onboarding/challenge"
+              className="stamp-press inline-flex min-h-12 items-center justify-center rounded-plate bg-brass px-4 text-[15px] font-bold tracking-[-0.01em] text-onproof"
+            >
+              Create challenge
+            </Link>
+            <Link
+              href="/onboarding/challenge#join"
+              className="stamp-press inline-flex min-h-12 items-center justify-center rounded-plate border border-steel/50 px-4 text-[15px] font-bold tracking-[-0.01em]"
+            >
+              Join with a code
+            </Link>
+          </div>
+        </Plate>
+      </div>
+    );
   }
 
   const avatars = new Map(

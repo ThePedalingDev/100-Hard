@@ -60,6 +60,20 @@ export default async function ProfilePage() {
           </Link>
         </Plate>
       ) : null}
+      {context.challenge ? (
+        <Plate>
+          <h2 className="text-[18px] leading-none">Members</h2>
+          <p className="mt-2 text-sm leading-6 text-steel">
+            Inspection plates for everyone on this challenge: stats for the race, and a way onto their days.
+          </p>
+          <Link
+            href="/profile/members"
+            className="stamp-press mt-4 inline-flex min-h-12 items-center rounded-plate bg-brass px-4 text-[15px] font-bold tracking-[-0.01em] text-onproof"
+          >
+            View participating members
+          </Link>
+        </Plate>
+      ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href="/onboarding/challenge"

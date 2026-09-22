@@ -388,7 +388,13 @@ on conflict (id) do nothing;
 
 create policy avatars_read on storage.objects
   for select to authenticated
-  using (bucket_id = 'avatars' and private.shares_challenge((storage.foldername(name))[1]::uuid));
+  using (
+    bucket_id = 'avatars'
+    and (
+      (storage.foldername(name))[1] = (select auth.uid())::text
+      or private.shares_challenge(((storage.foldername(name))[1])::uuid)
+    )
+  );
 
 create policy avatars_write on storage.objects
   for insert to authenticated

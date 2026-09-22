@@ -12,7 +12,10 @@ export type AdminAccount = {
   email: string | null;
   display_name: string | null;
   created_at: string;
+  avatarUrl: string | null;
+  diet_commitment: string | null;
   active_challenge_id: string | null;
+  challenges: Array<{ id: string; name: string; active: boolean }>;
 };
 
 export function AdminDesk({
@@ -30,26 +33,69 @@ export function AdminDesk({
   return (
     <div className="flex flex-col gap-6">
       {error ? <ErrorBanner message={error} /> : null}
-      <Plate>
+      <div className="flex flex-col gap-4">
         <h2 className="text-[18px] leading-none">Accounts</h2>
         {accounts.length === 0 ? (
-          <p className="mt-3 text-sm leading-6 text-steel">No accounts yet.</p>
+          <Plate>
+            <p className="text-sm leading-6 text-steel">No accounts yet.</p>
+          </Plate>
         ) : (
-          <ul className="mt-4 space-y-4">
-            {accounts.map((account) => (
-              <li key={account.id} className="border-t border-steel/20 pt-4 first:border-t-0 first:pt-0">
-                <p className="text-[16px] leading-none font-semibold tracking-[-0.03em]">
-                  {account.display_name ?? "No display name"}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-steel">{account.email ?? "No email"}</p>
-                <p className="stamp mt-1 text-[11px] text-steel">
-                  {new Date(account.created_at).toISOString().slice(0, 10)}
-                </p>
-              </li>
-            ))}
-          </ul>
+          accounts.map((account) => (
+            <Plate key={account.id} as="article">
+              <div className="flex items-start gap-4">
+                <div className="size-20 shrink-0 overflow-hidden rounded-plate border border-steel/40 bg-graphite">
+                  {account.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={account.avatarUrl}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <span className="stamp flex size-full items-center justify-center text-[18px] text-brass">
+                      {(account.display_name ?? "?").slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate text-[18px] leading-none">
+                    {account.display_name ?? "No display name"}
+                  </h3>
+                  <p className="mt-2 break-all text-sm leading-6 text-steel">{account.email ?? "No email"}</p>
+                  <p className="stamp mt-1 text-[11px] text-steel">
+                    Joined {account.created_at.slice(0, 10)}
+                  </p>
+                </div>
+              </div>
+              {account.diet_commitment ? (
+                <p className="mt-5 text-sm leading-6">{account.diet_commitment}</p>
+              ) : (
+                <p className="mt-5 text-sm leading-6 text-steel">No diet commitment yet.</p>
+              )}
+              {account.challenges.length > 0 ? (
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {account.challenges.map((challenge) => (
+                    <li
+                      key={challenge.id}
+                      className={`stamp rounded-plate border px-2 py-1 text-[11px] ${
+                        challenge.active
+                          ? "border-brass text-brass"
+                          : "border-steel/30 text-steel"
+                      }`}
+                    >
+                      {challenge.name}
+                      {challenge.active ? " · Active" : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="stamp mt-4 text-[11px] text-steel">No challenge</p>
+              )}
+              <p className="stamp mt-4 break-all text-[11px] text-steel">{account.id}</p>
+            </Plate>
+          ))
         )}
-      </Plate>
+      </div>
       {challenges.length === 0 ? (
         <Plate>
           <p className="text-sm leading-6 text-steel">No challenges in the ledger.</p>
