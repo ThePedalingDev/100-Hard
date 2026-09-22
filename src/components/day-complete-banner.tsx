@@ -37,7 +37,7 @@ export function DayCompleteBanner({ active }: { active: boolean }) {
         </div>
         <button
           type="button"
-          className="stamp text-[11px] text-steel hover:text-offwhite"
+          className="tap-target stamp shrink-0 text-[11px] text-steel hover:text-offwhite"
           onClick={() => setVisible(false)}
         >
           Dismiss

@@ -202,23 +202,20 @@ async function loadAppContextInner(): Promise<AppContext | null> {
 
   const today = dateInChallengeTz();
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  const [{ data: profile, error: profileError }, { data: myRows }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("challenge_members")
+      .select("challenge_id, joined_at")
+      .eq("user_id", user.id)
+      .order("joined_at", { ascending: false }),
+  ]);
 
   if (profileError && /could not find the table|schema cache/i.test(profileError.message)) {
     return baseContext(user.id, user.email, today, { schemaReady: false });
   }
 
   const typedProfile = (profile as Profile | null) ?? null;
-
-  const { data: myRows } = await supabase
-    .from("challenge_members")
-    .select("challenge_id, joined_at")
-    .eq("user_id", user.id)
-    .order("joined_at", { ascending: false });
 
   const membershipRows = myRows ?? [];
   const challengeIds = membershipRows.map((row) => row.challenge_id);
@@ -227,33 +224,35 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     return baseContext(user.id, user.email, today, { profile: typedProfile });
   }
 
-  const { data: challengeRows } = await supabase.from("challenges").select("*").in("id", challengeIds);
+  const [
+    { data: challengeRows },
+    { data: allMemberRows },
+    { data: allCheckins },
+    { data: allSpoons },
+  ] = await Promise.all([
+    supabase.from("challenges").select("*").in("id", challengeIds),
+    supabase.from("challenge_members").select("challenge_id, user_id").in("challenge_id", challengeIds),
+    supabase.from("daily_checkins").select(CHECKIN_STATS).in("challenge_id", challengeIds),
+    supabase
+      .from("spoon_entries")
+      .select("id, challenge_id, user_id, type, quantity, daily_checkin_id, created_at")
+      .in("challenge_id", challengeIds),
+  ]);
   const challenges = (challengeRows ?? []) as Challenge[];
 
   let activeId = typedProfile?.active_challenge_id ?? null;
   if (!activeId || !challengeIds.includes(activeId)) {
     activeId = membershipRows[0]?.challenge_id ?? null;
     if (activeId && activeId !== typedProfile?.active_challenge_id) {
-      await supabase.from("profiles").update({ active_challenge_id: activeId }).eq("id", user.id);
+      void supabase.from("profiles").update({ active_challenge_id: activeId }).eq("id", user.id);
     }
   }
 
-  const { data: allMemberRows } = await supabase
-    .from("challenge_members")
-    .select("challenge_id, user_id")
-    .in("challenge_id", challengeIds);
   const memberIds = [...new Set((allMemberRows ?? []).map((row) => row.user_id))];
-  const { data: profileRows } = await supabase.from("profiles").select("*").in("id", memberIds);
+  const { data: profileRows } = memberIds.length
+    ? await supabase.from("profiles").select("*").in("id", memberIds)
+    : { data: [] as Profile[] };
   const profilesById = new Map(((profileRows ?? []) as Profile[]).map((row) => [row.id, row]));
-
-  const { data: allCheckins } = await supabase
-    .from("daily_checkins")
-    .select(CHECKIN_STATS)
-    .in("challenge_id", challengeIds);
-  const { data: allSpoons } = await supabase
-    .from("spoon_entries")
-    .select("id, challenge_id, user_id, type, quantity, daily_checkin_id, created_at")
-    .in("challenge_id", challengeIds);
   const typedCheckins = (allCheckins ?? []) as StatsCheckin[];
   const typedSpoons = (allSpoons ?? []) as SpoonEntry[];
 
@@ -289,7 +288,7 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     .filter((row) => row.challenge_id === active.id)
     .map((row) => row.user_id);
 
-  await maybeFinalizeYesterday(supabase, active, activeMemberIds, today);
+  void maybeFinalizeYesterday(supabase, active, activeMemberIds, today);
 
   const remaining = daysRemainingFor(active.start_date, active.end_date, today);
   const finished = isChallengeComplete(active.end_date, today);
@@ -312,12 +311,12 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   const todayCheckins = (todayFullRows ?? []) as DailyCheckin[];
   const checkinIds = todayCheckins.map((row) => row.id);
 
-  const { data: likes } = checkinIds.length
-    ? await supabase.from("daily_likes").select("*").in("daily_checkin_id", checkinIds)
-    : { data: [] as DailyLike[] };
-  const { data: comments } = checkinIds.length
-    ? await supabase.from("daily_comments").select("*").in("daily_checkin_id", checkinIds)
-    : { data: [] as DailyComment[] };
+  const [{ data: likes }, { data: comments }] = checkinIds.length
+    ? await Promise.all([
+        supabase.from("daily_likes").select("*").in("daily_checkin_id", checkinIds),
+        supabase.from("daily_comments").select("*").in("daily_checkin_id", checkinIds),
+      ])
+    : [{ data: [] as DailyLike[] }, { data: [] as DailyComment[] }];
   const typedLikes = (likes ?? []) as DailyLike[];
   const typedComments = (comments ?? []) as DailyComment[];
 

@@ -77,17 +77,26 @@ export function AuthForm({ mode }: { mode: "login" | "register" | "forgot" }) {
       <div className="mt-5 space-y-2 text-sm text-steel">
         {mode !== "login" ? (
           <p>
-            Already in? <Link className="text-offwhite underline underline-offset-4" href="/login">Sign in</Link>
+            Already in?{" "}
+            <Link className="inline-flex min-h-11 items-center py-1 text-offwhite underline underline-offset-4" href="/login">
+              Sign in
+            </Link>
           </p>
         ) : null}
         {mode !== "register" ? (
           <p>
-            New here? <Link className="text-offwhite underline underline-offset-4" href="/register">Create an account</Link>
+            New here?{" "}
+            <Link className="inline-flex min-h-11 items-center py-1 text-offwhite underline underline-offset-4" href="/register">
+              Create an account
+            </Link>
           </p>
         ) : null}
         {mode !== "forgot" ? (
           <p>
-            Forgot password? <Link className="text-offwhite underline underline-offset-4" href="/forgot-password">Reset it</Link>
+            Forgot password?{" "}
+            <Link className="inline-flex min-h-11 items-center py-1 text-offwhite underline underline-offset-4" href="/forgot-password">
+              Reset it
+            </Link>
           </p>
         ) : null}
       </div>

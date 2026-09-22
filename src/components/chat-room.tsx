@@ -50,7 +50,7 @@ export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: st
                       </div>
                       <button
                         type="button"
-                        className="stamp shrink-0 text-[11px] text-steel hover:text-offwhite"
+                        className="tap-target stamp shrink-0 text-[11px] text-steel hover:text-offwhite"
                         onClick={() => dismiss(row.id)}
                       >
                         Clear

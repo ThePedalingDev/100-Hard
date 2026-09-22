@@ -14,7 +14,7 @@ export default function OnboardingProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   return (
-    <main className="auth-shell mx-auto flex max-w-lg items-center">
+    <main className="auth-shell mx-auto flex w-full max-w-lg flex-col items-stretch justify-start">
       <Plate className="w-full">
           <h1 className="text-[32px] leading-none">Stamp your plate</h1>
         <p className="mt-2 text-sm text-steel">

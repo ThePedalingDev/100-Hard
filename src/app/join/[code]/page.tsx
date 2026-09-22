@@ -13,7 +13,7 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
   const { pending, start, leave } = usePlatePending();
 
   return (
-    <main className="auth-shell mx-auto flex max-w-lg items-center">
+    <main className="auth-shell mx-auto flex w-full max-w-lg flex-col items-stretch justify-start">
       <Plate className="w-full">
         <h1 className="text-[32px] leading-none">Join 100 Hard</h1>
         <p className="mt-2 text-sm text-steel">Invite code {code}</p>

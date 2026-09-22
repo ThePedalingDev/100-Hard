@@ -29,6 +29,7 @@ export function AppNav() {
             <li key={item.href} className="min-w-0 flex-1 md:flex-none">
               <Link
                 href={item.href}
+                prefetch
                 className={`relative flex min-h-11 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[11px] font-bold tracking-[-0.01em] md:min-h-11 md:flex-row md:gap-2 md:rounded-plate md:px-4 md:py-2 md:text-[13px] md:hover:bg-graphite/70 ${
                   active ? "text-mark md:bg-graphite/50" : "text-steel hover:text-offwhite"
                 }`}

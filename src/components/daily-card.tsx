@@ -9,6 +9,7 @@ import { AcknowledgeIcon, CommentIcon } from "@/components/icons";
 import { StampLoader } from "@/components/loader";
 import { Button, StatusMark, TextArea } from "@/components/plate";
 import { useToast } from "@/components/toast";
+import { scrollFieldIntoView } from "@/lib/mobile-focus";
 import { completedCategories, isPerfect, isWorkoutComplete, missedCategories } from "@/lib/scoring";
 import type { DailyCheckin, DailyComment, Profile } from "@/lib/supabase/types";
 
@@ -136,9 +137,11 @@ export function DailyCard({
           <p className="requirement-title">Workout</p>
           <LiveStatus status={isWorkoutComplete(state) ? "complete" : state.finalized_at ? "incomplete" : "pending"} />
         </div>
-        <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_1_complete")} />
-        <StampCheck label="Workout 2 — 45 min" checked={state.workout_2_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_2_complete")} />
-        <StampCheck label="At least one outdoors" checked={state.outdoor_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("outdoor_complete")} />
+        <div className="space-y-3">
+          <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_1_complete")} />
+          <StampCheck label="Workout 2 — 45 min" checked={state.workout_2_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_2_complete")} />
+          <StampCheck label="At least one outdoors" checked={state.outdoor_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("outdoor_complete")} />
+        </div>
         <NoteField
           className="mt-2"
           value={state.workout_note ?? ""}
@@ -267,7 +270,14 @@ function Requirement({
                 Add note
               </Button>
             ) : null}
-            <StampPad checked={done} locked={locked || pending} busy={pending} onToggle={onToggle} />
+            <StampPad
+              checked={done}
+              locked={locked || pending}
+              busy={pending}
+              onToggle={onToggle}
+              label={label}
+              inline
+            />
           </div>
         </div>
         {extra ? <div className="requirement-extra">{extra}</div> : null}
@@ -320,18 +330,20 @@ function StampPad({
   busy = false,
   onToggle,
   label,
+  inline = false,
 }: {
   checked: boolean;
   locked: boolean;
   busy?: boolean;
   onToggle: () => void;
   label?: string;
+  inline?: boolean;
 }) {
   const { hit, clearHit } = useStampHit(checked);
 
   return (
     <label
-      className={`inline-flex min-h-11 items-center gap-2 ${locked ? "" : "cursor-pointer"}`}
+      className={`inline-flex items-center gap-2 ${inline ? "" : "min-h-11"} ${locked ? "" : "cursor-pointer"}`}
       aria-label={label}
     >
       {busy ? <StampLoader className="size-4 text-mark" /> : null}
@@ -372,8 +384,8 @@ function StampCheck({
 }) {
   return (
     <label className={`flex min-h-11 items-center justify-between gap-3 ${locked ? "" : "cursor-pointer"}`}>
-      <span className="min-w-0 text-[15px] leading-6">{label}</span>
-      <StampPad checked={checked} locked={locked} busy={busy} onToggle={onToggle} label={label} />
+      <span className="requirement-check-label">{label}</span>
+      <StampPad checked={checked} locked={locked} busy={busy} onToggle={onToggle} label={label} inline />
     </label>
   );
 }
@@ -404,10 +416,8 @@ function NoteField({
   }, [value]);
 
   useEffect(() => {
-    if (!open) return;
-    requestAnimationFrame(() => {
-      fieldRef.current?.scrollIntoView({ block: "nearest", behavior: "auto" });
-    });
+    if (!open || !fieldRef.current) return;
+    scrollFieldIntoView(fieldRef.current);
   }, [open]);
 
   if (!open && !value) {
@@ -434,11 +444,7 @@ function NoteField({
         readOnly={locked}
         rows={2}
         onChange={(event) => setDraft(event.target.value)}
-        onFocus={(event) => {
-          requestAnimationFrame(() => {
-            event.currentTarget.scrollIntoView({ block: "center", behavior: "auto" });
-          });
-        }}
+        onFocus={(event) => scrollFieldIntoView(event.currentTarget)}
         onBlur={() => {
           if (draft !== value) onSave(draft);
         }}
@@ -486,7 +492,7 @@ function SocialBar({
           disabled={!canInteract || pending}
           aria-busy={pending || undefined}
           aria-label={likeLabel}
-          className={`stamp stamp-press inline-flex min-h-10 items-center gap-2 text-[11px] disabled:pointer-events-none ${
+          className={`stamp stamp-press inline-flex min-h-11 items-center gap-2 px-3 text-[11px] disabled:pointer-events-none ${
             social.liked ? "text-mark" : "text-steel"
           } ${canInteract ? "" : "disabled:opacity-100"}`}
           onClick={() => {
@@ -511,7 +517,7 @@ function SocialBar({
           type="button"
           aria-label={commentLabel}
           aria-expanded={composerOpen}
-          className="stamp stamp-press inline-flex min-h-10 items-center gap-2 text-[11px] text-steel"
+          className="stamp stamp-press inline-flex min-h-11 items-center gap-2 px-3 text-[11px] text-steel"
           onClick={openComposer}
         >
           <CommentIcon className="size-4" />
@@ -532,7 +538,7 @@ function SocialBar({
       ) : null}
       {canInteract && composerOpen ? (
         <form
-          className="mt-3 flex gap-2"
+          className="mt-3 flex flex-col gap-2 sm:flex-row"
           aria-busy={pending}
           onSubmit={(event) => {
             event.preventDefault();
@@ -555,7 +561,7 @@ function SocialBar({
             placeholder="Acknowledge the work"
             onChange={(event) => setBody(event.target.value)}
           />
-          <Button type="submit" pending={pending} disabled={!body.trim()}>
+          <Button type="submit" className="w-full sm:w-auto" pending={pending} disabled={!body.trim()}>
             Send
           </Button>
         </form>

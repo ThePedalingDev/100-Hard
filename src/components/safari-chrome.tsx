@@ -29,9 +29,10 @@ function syncVisualViewport() {
     return;
   }
 
-  const frozen = shellHeight || Math.round(window.innerHeight);
-  root.style.setProperty("--vv-height", `${frozen}px`);
-  root.style.setProperty("--vv-shell-height", `${frozen}px`);
+  const visibleHeight = Math.round(viewport.height);
+  const fullShellHeight = shellHeight || Math.round(window.innerHeight);
+  root.style.setProperty("--vv-height", `${visibleHeight}px`);
+  root.style.setProperty("--vv-shell-height", `${fullShellHeight}px`);
 }
 
 export function SafariChrome() {

@@ -5,8 +5,8 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { LoadingBreadcrumb } from "@/components/loader";
 
 const EVENT = "100hard:route-pending";
-const FADE_MS = 340;
-const MIN_VISIBLE_MS = 360;
+const FADE_MS = 180;
+const MIN_VISIBLE_MS = 80;
 
 function cx(...parts: Array<string | false | undefined | null>) {
   return parts.filter(Boolean).join(" ");
@@ -125,7 +125,7 @@ export function RouteProgress() {
   return (
     <div
       className={cx(
-        "route-progress-overlay fixed inset-0 z-50 grid place-items-center bg-canvas/72",
+        "route-progress-overlay pointer-events-none fixed inset-0 z-50 grid place-items-center bg-canvas/45",
         active && "is-active",
       )}
       role="status"

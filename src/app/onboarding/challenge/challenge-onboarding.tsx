@@ -12,7 +12,7 @@ export function ChallengeOnboarding({ today }: { today: string }) {
   const { pending, start, leave } = usePlatePending();
 
   return (
-    <main className="auth-shell mx-auto flex max-w-lg flex-col justify-center gap-5">
+    <main className="auth-shell mx-auto flex w-full max-w-lg flex-col justify-start gap-5">
       <Plate>
         <h1 className="text-[32px] leading-none">Open the challenge</h1>
         <p className="mt-2 text-sm text-steel">

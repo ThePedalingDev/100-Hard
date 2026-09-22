@@ -2,7 +2,7 @@ import { AuthForm } from "@/components/auth-form";
 
 export default function LoginPage() {
   return (
-    <main className="auth-shell mx-auto flex max-w-lg items-center">
+    <main className="auth-shell mx-auto flex w-full max-w-lg flex-col items-stretch justify-start">
       <AuthForm mode="login" />
     </main>
   );

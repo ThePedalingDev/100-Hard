@@ -1,5 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { StampLoader } from "@/components/loader";
+import { scrollFieldIntoView } from "@/lib/mobile-focus";
 
 type PlateTone = "iron" | "club" | "well";
 
@@ -28,12 +29,12 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="flex items-end justify-between gap-4">
+    <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div className="min-w-0">
         <h1 className="text-[36px] leading-none">{title}</h1>
         {kicker ? <div className="mt-2 text-sm leading-6 text-steel">{kicker}</div> : null}
       </div>
-      {action}
+      {action ? <div className="w-full shrink-0 md:w-auto">{action}</div> : null}
     </header>
   );
 }
@@ -130,21 +131,29 @@ export function Field({
   );
 }
 
-export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
+export function TextInput({ className = "", onFocus, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${props.className ?? ""}`}
+      onFocus={(event) => {
+        scrollFieldIntoView(event.currentTarget);
+        onFocus?.(event);
+      }}
+      className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
     />
   );
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  function TextArea({ className = "", ...props }, ref) {
+  function TextArea({ className = "", onFocus, ...props }, ref) {
     return (
       <textarea
         ref={ref}
         {...props}
+        onFocus={(event) => {
+          scrollFieldIntoView(event.currentTarget);
+          onFocus?.(event);
+        }}
         className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
       />
     );
@@ -174,7 +183,7 @@ export function Button({
   } as const;
   const sizes = {
     default: "min-h-12 px-5 text-[15px] tracking-[-0.01em]",
-    compact: "min-h-10 px-4 text-[13px] stamp",
+    compact: "min-h-11 px-4 text-[13px] stamp",
   } as const;
   const busy = pending || Boolean(disabled);
 

@@ -37,7 +37,7 @@ export default async function CalendarPage({
   const today = dateInChallengeTz();
   const start = context.challenge.start_date;
   const end = context.challenge.end_date;
-  const view: CalendarView = params.view === "week" ? "week" : "month";
+  const view: CalendarView = params.view === "month" ? "month" : "week";
 
   const month = monthKey(clampToChallengeRange(monthKey(params.month ?? today), start, end));
   const weekAnchor = clampToChallengeRange(params.week ?? today, start, end);
@@ -124,7 +124,7 @@ export default async function CalendarPage({
             <div className="flex gap-2">
               {prevHref ? (
                 <Link
-                  className="stamp-press inline-flex min-h-10 flex-1 items-center justify-center rounded-plate border border-steel/40 px-4 text-[13px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite sm:min-h-12 sm:flex-none sm:text-[15px]"
+                  className="stamp-press inline-flex min-h-11 flex-1 items-center justify-center rounded-plate border border-steel/40 px-4 text-[13px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite sm:min-h-12 sm:flex-none sm:text-[15px]"
                   href={prevHref}
                 >
                   Previous
@@ -132,7 +132,7 @@ export default async function CalendarPage({
               ) : null}
               {nextHref ? (
                 <Link
-                  className="stamp-press inline-flex min-h-10 flex-1 items-center justify-center rounded-plate border border-steel/40 px-4 text-[13px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite sm:min-h-12 sm:flex-none sm:text-[15px]"
+                  className="stamp-press inline-flex min-h-11 flex-1 items-center justify-center rounded-plate border border-steel/40 px-4 text-[13px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite sm:min-h-12 sm:flex-none sm:text-[15px]"
                   href={nextHref}
                 >
                   Next

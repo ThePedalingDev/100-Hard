@@ -48,7 +48,7 @@ export function CalendarMonth({
           </p>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1 md:gap-2">
+      <div className="calendar-month-grid grid grid-cols-7 gap-1 md:gap-2">
         {Array.from({ length: lead }, (_, index) => (
           <div key={`lead-${index}`} />
         ))}
