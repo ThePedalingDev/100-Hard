@@ -1,33 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #1c1524;
-  --iron: #2b2233;
-  --well: #1c1524;
-  --ink: #f7f3ea;
-  --mute: #b3a8bc;
-  --proof: #f5c518;
-  --on-proof: #1c1524;
-  --club: #6d3d9a;
-  --success: #4f7a55;
-  --failure: #a04b45;
-  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%232b2233' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%231c1524' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  color-scheme: dark;
+  --canvas: #3b0054;
+  --iron: #4a1466;
+  --well: #3b0054;
+  --ink: #ffffff;
+  --mute: #d0c0dc;
+  --proof: #007afa;
+  --on-proof: #1a0030;
+  --action-hover: #ffffff;
+  --on-action-hover: #3b0054;
+  --club: #3b0054;
+  --success: #8fb892;
+  --failure: #e8958e;
+  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%234A1466' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%233B0054' stroke-width='1' fill='none'/%3E%3C/svg%3E");
 }
 
 [data-theme="light"] {
-  --canvas: #f6f2ea;
-  --iron: #ffffff;
-  --well: #efe8dc;
-  --ink: #1c1524;
-  --mute: #6d6574;
-  --proof: #d9a400;
-  --on-proof: #1c1524;
-  --club: #5a2d82;
+  color-scheme: light;
+  --canvas: #ffffff;
+  --iron: #f7f2fa;
+  --well: #f0e6f5;
+  --ink: #3b0054;
+  --mute: #5c3e6a;
+  --proof: #007afa;
+  --on-proof: #1a0030;
+  --action-hover: #3b0054;
+  --on-action-hover: #ffffff;
+  --club: #3b0054;
   --success: #3f6a46;
   --failure: #8b3d38;
-  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%23e4dccf' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23efe8dc' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-ground: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7h2M6 1h2' stroke='%23E8DCF0' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  --hatch-plate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Cpath d='M0 5h3M3 1h3' stroke='%23EDE4F4' stroke-width='1' fill='none'/%3E%3C/svg%3E");
 }
 
 @theme inline {
@@ -39,6 +45,8 @@
   --color-brass: var(--proof);
   --color-club: var(--club);
   --color-onproof: var(--on-proof);
+  --color-actionhover: var(--action-hover);
+  --color-onactionhover: var(--on-action-hover);
   --color-success: var(--success);
   --color-failure: var(--failure);
   --font-display: var(--font-barlow), "Arial Narrow", sans-serif;
@@ -49,6 +57,7 @@
 html {
   background: var(--canvas);
   color: var(--ink);
+  scrollbar-color: var(--mute) var(--canvas);
 }
 
 body {
@@ -124,4 +133,33 @@ textarea:-webkit-autofill:focus {
   font-family: var(--font-display);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.stamp-spin {
+  animation: stamp-spin 0.8s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes stamp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.route-progress-bar {
+  width: 100%;
+  transform-origin: left center;
+  animation: route-progress-run 1.1s ease-in-out infinite;
+}
+
+@keyframes route-progress-run {
+  0% {
+    transform: scaleX(0.08);
+  }
+  55% {
+    transform: scaleX(0.72);
+  }
+  100% {
+    transform: scaleX(0.92);
+  }
 }

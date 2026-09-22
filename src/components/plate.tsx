@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
+import { StampLoader } from "@/components/loader";
 
 type PlateProps = {
   children: ReactNode;
@@ -99,22 +100,39 @@ export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
 export function Button({
   children,
   variant = "primary",
+  pending = false,
+  disabled,
+  className = "",
+  onClick,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "ghost" | "danger";
+  pending?: boolean;
 }) {
   const styles = {
-    primary: "bg-brass text-onproof hover:bg-club hover:text-offwhite",
+    primary: "bg-brass text-onproof hover:bg-actionhover hover:text-onactionhover",
     ghost: "border border-steel/50 bg-transparent text-offwhite hover:border-offwhite",
     danger: "border border-failure/70 bg-transparent text-failure hover:bg-failure hover:text-offwhite",
   } as const;
+  const busy = pending || Boolean(disabled);
 
   return (
     <button
       {...props}
-      className={`stamp inline-flex min-h-11 items-center justify-center px-4 text-[13px] disabled:opacity-50 ${styles[variant]} ${props.className ?? ""}`}
+      disabled={busy}
+      aria-busy={pending || undefined}
+      aria-live={pending ? "polite" : undefined}
+      onClick={(event) => {
+        if (busy) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.(event);
+      }}
+      className={`stamp inline-flex min-h-11 items-center justify-center gap-2 px-4 text-[13px] disabled:pointer-events-none disabled:opacity-50 ${styles[variant]} ${className}`}
       style={{ borderRadius: 8 }}
     >
+      {pending ? <StampLoader /> : null}
       {children}
     </button>
   );

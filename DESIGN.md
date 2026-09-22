@@ -1,19 +1,23 @@
 ---
 name: 100 Hard
-description: Industrial load-rating plates, colorized with Planet Fitness yellow proof marks and club purple.
+description: Industrial load-rating plates, colorized with South African Planet Fitness blue proof marks and deep purple.
 colors:
-  brass: "#f5c518"
-  club: "#6d3d9a"
-  success: "#4f7a55"
-  failure: "#a04b45"
-  graphite: "#1c1524"
-  iron: "#2b2233"
-  offwhite: "#f7f3ea"
-  steel: "#b3a8bc"
-  lightCanvas: "#f6f2ea"
-  lightIron: "#ffffff"
-  lightProof: "#d9a400"
-  lightClub: "#5a2d82"
+  brass: "#007AFA"
+  club: "#3B0054"
+  success: "#8FB892"
+  failure: "#E8958E"
+  graphite: "#3B0054"
+  iron: "#4A1466"
+  offwhite: "#FFFFFF"
+  steel: "#D0C0DC"
+  onProof: "#1A0030"
+  lightCanvas: "#FFFFFF"
+  lightIron: "#F7F2FA"
+  lightProof: "#007AFA"
+  lightClub: "#3B0054"
+  lightSuccess: "#3F6A46"
+  lightFailure: "#8B3D38"
+  lightSteel: "#5C3E6A"
 typography:
   display:
     fontFamily: "Barlow Condensed, Arial Narrow, sans-serif"
@@ -53,15 +57,15 @@ spacing:
   lg: "24px"
 components:
   button-primary:
-    backgroundColor: "{colors.offwhite}"
-    textColor: "{colors.graphite}"
+    backgroundColor: "{colors.brass}"
+    textColor: "{colors.onProof}"
     typography: "{typography.label}"
     rounded: "{rounded.plate}"
     padding: "0 16px"
     height: "44px"
   button-primary-hover:
-    backgroundColor: "{colors.brass}"
-    textColor: "{colors.graphite}"
+    backgroundColor: "{colors.offwhite}"
+    textColor: "{colors.club}"
     typography: "{typography.label}"
     rounded: "{rounded.plate}"
     padding: "0 16px"
@@ -118,7 +122,7 @@ components:
 
 **Creative North Star: "The Load-Rating Plate"**
 
-The UI is equipment, not a dashboard. Surfaces read as stamped iron plates on a graphite shop floor: off-white condensed type as the die-struck legend, steel as the 1px edge, brass as rivets and proof marks. Density is locker-room tight. Texture is a fine hatch, not a photograph, not a gradient.
+The UI is equipment, not a dashboard. Surfaces read as stamped iron plates on a deep-purple shop floor: white condensed type as the die-struck legend, steel as the 1px edge, vibrant blue as rivets and proof marks. Density is locker-room tight. Texture is a fine hatch, not a photograph, not a gradient.
 
 Personality is industrial and inspectable. A screen should look like a rating plate you could bolt to a rack. Colour is semantic or structural, never festive. Interaction is a stamp or a pin slide, not a glow.
 
@@ -126,36 +130,37 @@ Confirmed visual rejections: gradients, neon, glow, glassmorphism, soft ambient 
 
 **Key Characteristics:**
 
-- Graphite hatch ground with iron plate-metal fill
-- Off-white stamp type (Barlow Condensed, uppercase, 0.04em)
+- Deep-purple hatch ground with lifted-iron plate-metal fill
+- White stamp type (Barlow Condensed, uppercase, 0.04em)
 - Geist for running copy and field values
 - 8px corners and 1px steel edges on every plate, field, and control
-- Brass used as proof marks (rivets, focus, selection, hover, active nav), not as a fill language
+- Vibrant blue used as proof marks (rivets, focus, selection, primary action, active nav), not as a wash
 - Status as stamp words plus ✓ / ✕ / ○, never colour alone
 
 ## Colors
 
-A dark iron shop: one warm proof-mark metal, two ledger greens/reds, four neutrals. No extra hues.
+South African Planet Fitness local brand: vibrant blue, deep purple, white. Two ledger greens/reds. Light and dark are composed, not inverted. Tailwind `brass` maps to proof blue.
 
 ### Primary
-- **Proof Brass** (`{colors.brass}`): Rivets, caret, text selection, 2px focus ring, primary-button hover, active nav, spoon counts, invite codes, liked state. Sparse on purpose.
+- **Proof Blue** (`{colors.brass}` / `#007AFA`): Rivets, caret, text selection, 2px focus ring, primary-button fill, active nav, spoon counts, invite codes, liked state. Sparse on purpose.
 
 ### Secondary
-- **Capacity Green** (`{colors.success}`): Perfect / Done marks and success notices. Ledger complete, not brand chrome.
+- **Capacity Green** (`{colors.success}`): Perfect / Done marks and success notices. Ledger complete, not brand chrome. Dark uses a lifted green so 11px stamps pass on purple; light uses `{colors.lightSuccess}`.
 
 ### Tertiary
-- **Failed Iron-Red** (`{colors.failure}`): Failed / Missed marks, danger buttons, error-banner stroke. Ledger incomplete, not alarm decoration.
+- **Failed Iron-Red** (`{colors.failure}`): Failed / Missed marks, danger buttons, error-banner stroke. Ledger incomplete, not alarm decoration. Dark uses a lifted red for AA; light uses `{colors.lightFailure}`.
 
 ### Neutral
-- **Graphite Ground** (`{colors.graphite}`): Page background, hatch field, input wells, nav bar, rivet cups, autofill fill.
-- **Iron Plate** (`{colors.iron}`): Plate and inspection-card fill, with a tighter hatch overlay.
-- **Stamp Off-White** (`{colors.offwhite}`): Body text, titles, primary button fill, in-copy links, selected-date numerals.
-- **Steel Legend** (`{colors.steel}`): Helper copy, field labels, 1px borders (typically `/35`–`/50`), scrollbar thumb, pending marks.
+- **Club Purple Ground** (`{colors.graphite}` / `#3B0054`): Dark canvas, input wells, nav bar, rivet cups, autofill fill. Brand contrast background.
+- **Iron Plate** (`{colors.iron}`): Dark plate fill, a lifted purple derived from `#3B0054`. Light plates are `{colors.lightIron}` on a white canvas.
+- **Stamp White** (`{colors.offwhite}` / `#FFFFFF`): Dark body text, titles, in-copy links. Light canvas. Light wordmarks and running text use `{colors.club}` (`#3B0054`).
+- **Steel Legend** (`{colors.steel}`): Helper copy, field labels, 1px borders (typically `/35`–`/50`), scrollbar thumb, pending marks. Light uses `{colors.lightSteel}`.
+- **On-proof ink** (`{colors.onProof}`): Legend on blue fills (near-black purple) so 13px stamp actions meet AA.
 
 ### Named Rules
-**The Proof-Mark Rule.** Brass is a mark, not a wash. If brass covers more than rivets, focus, a hover, or a small proof value, it is too much.
+**The Proof-Mark Rule.** Blue is a mark and the primary action, not a wash. If blue covers more than rivets, focus, a primary fill, or a small proof value, it is too much.
 
-**The Semantic Ledger Rule.** Green and red only mean complete or failed. They do not decorate idle chrome.
+**The Semantic Ledger Rule.** Green and red only mean complete or failed. They do not decorate idle chrome. Status is never blue-only.
 
 ## Typography
 
@@ -163,7 +168,7 @@ A dark iron shop: one warm proof-mark metal, two ledger greens/reds, four neutra
 **Body Font:** Geist (ui-sans-serif, system-ui)
 **Label/Mono Font:** Barlow Condensed for labels, buttons, and dates; tabular numerals on countdowns and counts
 
-**Character:** Condensed grotesk stamps the plate; Geist reads the inspection notes. Titles shout in metal; body copy stays quiet and warm-white.
+**Character:** Condensed grotesk stamps the plate; Geist reads the inspection notes. Titles shout in metal; body copy stays quiet white on purple, purple on white.
 
 ### Hierarchy
 - **Display** (700, 32px on login / 36px on in-app headers, line-height 1, uppercase 0.04em): Product and challenge names. `h1` default weight supplies the 700.
@@ -187,19 +192,19 @@ Mobile is the primary density. Desktop login is the same plate, not a split mark
 
 ## Elevation & Depth
 
-Flat. Depth is tonal: graphite floor, iron plate, graphite wells. No drop shadows. The only `box-shadow` in the system is an inset graphite fill to kill autofill yellow. Texture is two hatches: an 8px ground stitch in iron on graphite, a 6px plate stitch in graphite on iron.
+Flat. Depth is tonal: purple floor, iron plate, purple wells. No drop shadows. The only `box-shadow` in the system is an inset well fill to kill browser autofill. Texture is two hatches: an 8px ground stitch in iron on canvas, a 6px plate stitch in canvas on iron.
 
 ### Shadow Vocabulary
 None at rest. None on hover.
 
 ### Named Rules
-**The No-Glow Rule.** No gradients, neon, glow, glass, or offset shadows. Focus is a 2px brass outline, 3px offset, not a halo.
+**The No-Glow Rule.** No gradients, neon, glow, glass, or offset shadows. Focus is a 2px proof-blue outline, 3px offset, not a halo.
 
 ## Shapes
 
-Every plate, field, button, banner, and avatar well uses an 8px corner. Edges are 1px steel (often at 35–50% opacity). Rivets are 10px circles: graphite cup, brass ring, brass pin. Daily cards may use 6px brass dots instead of full rivets; that is a lighter inspection card, not a second radius language.
+Every plate, field, button, banner, and avatar well uses an 8px corner. Edges are 1px steel (often at 35–50% opacity). Rivets are 10px circles: purple cup, blue ring, blue pin. Daily cards may use 6px blue dots instead of full rivets; that is a lighter inspection card, not a second radius language.
 
-Hairline dividers inside cards are steel at 20% opacity. Head-to-head pins are 36px squares with an 8px corner, brass stroke, sliding on a 1px steel rail.
+Hairline dividers inside cards are steel at 20% opacity. Head-to-head pins are 36px squares with an 8px corner, blue stroke, sliding on a 1px steel rail.
 
 ### Named Rules
 **The Eight-Pixel Plate Rule.** 8px is the only container radius. Do not round the world into pills or leave plates square.
@@ -208,10 +213,10 @@ Hairline dividers inside cards are steel at 20% opacity. Head-to-head pins are 3
 
 ### Buttons
 - **Shape:** 8px corners; min-height 44px; stamp type 13px uppercase.
-- **Primary:** Off-white fill, graphite legend. Hover: brass fill, graphite legend. Full-width on auth.
-- **Ghost:** Transparent, steel/50 stroke, off-white type; hover stroke goes off-white.
-- **Danger:** Transparent, failure/70 stroke, failure type; hover fills failure with off-white type.
-- **Disabled:** 50% opacity. Caret and focus remain brass.
+- **Primary:** Proof-blue fill, on-proof legend. Dark hover: white fill, purple legend. Light hover: purple fill, white legend. Full-width on auth.
+- **Ghost:** Transparent, steel/50 stroke, stamp-ink type; hover stroke goes stamp-ink.
+- **Danger:** Transparent, failure/70 stroke, failure type; hover fills failure with stamp-ink type.
+- **Disabled:** 50% opacity. Caret and focus remain proof blue.
 
 ### Cards / Containers
 - **Corner Style:** 8px (`{rounded.plate}`)
@@ -222,16 +227,16 @@ Hairline dividers inside cards are steel at 20% opacity. Head-to-head pins are 3
 - **Signature:** Four corner rivets on `Plate`. Content sits above them.
 
 ### Inputs / Fields
-- **Style:** Graphite well, 1px steel/40 stroke, 8px corners, 12×10px padding, 15px Geist off-white.
+- **Style:** Canvas well, 1px steel/40 stroke, 8px corners, 12×10px padding, 15px Geist stamp-ink.
 - **Label:** Stamp 11px steel, 8px above the well.
-- **Focus:** Global 2px brass outline, 3px offset. Autofill keeps off-white type on graphite.
+- **Focus:** Global 2px proof-blue outline, 3px offset. Autofill keeps stamp-ink type on the well.
 - **Placeholder:** Steel at 80%.
-- **Error:** Failure-stroked banner, failure/10 fill, off-white body copy, 8px corners.
+- **Error:** Failure-stroked banner, failure/10 fill, stamp-ink body copy, 8px corners.
 
 ### Navigation
-- Graphite bar, 1px steel/30 rule (top on mobile, bottom on `md`).
+- Canvas-colored bar, 1px steel/30 rule (top on mobile, bottom on `md`).
 - Stamp labels, 20px stroke icons, min-height 56px (48px row on `md`).
-- Idle: steel. Hover: off-white. Active: brass.
+- Idle: steel. Hover: stamp-ink. Active: proof blue.
 
 ### Status marks
 - Perfect / Done: success + ✓
@@ -241,21 +246,21 @@ Hairline dividers inside cards are steel at 20% opacity. Head-to-head pins are 3
 
 ### Head-to-head rack (related surface)
 - Graphite track, 1px steel/30, 40px tall.
-- Pins 36px, brass border, 300ms ease-out on `left`.
-- Not a login token; reuse brass/steel/graphite only.
+- Pins 36px, proof-blue border, 300ms ease-out on `left`.
+- Not a login token; reuse proof/steel/purple only.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** set plates on the graphite hatch with iron fill, 8px corners, 1px steel edges, and brass rivets or dots.
+- **Do** set plates on the purple hatch with iron fill, 8px corners, 1px steel edges, and blue rivets or dots.
 - **Do** stamp titles, labels, buttons, and dates in Barlow Condensed uppercase at 0.04em.
 - **Do** use Geist for helper copy and typed values.
-- **Do** keep brass on rivets, focus, selection, hover, active nav, and proof numerals.
+- **Do** keep proof blue on rivets, focus, selection, primary action, active nav, and proof numerals.
 - **Do** pair status colour with Perfect / Failed / Pending (or Done / Missed) plus ✓ / ✕ / ○.
 
 ### Don't:
 - **Don't** use gradients, neon, glow, glass, or drop shadows.
 - **Don't** introduce a third display face or set body copy in Barlow Condensed.
-- **Don't** flood a screen with brass fills.
+- **Don't** flood a screen with blue fills.
 - **Don't** use radii other than 8px on plates, fields, and buttons.
 - **Don't** communicate status with colour alone.
