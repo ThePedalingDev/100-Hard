@@ -21,12 +21,12 @@ export function AppNav() {
 
   return (
     <nav aria-label="Challenge" className="tabbar">
-      <ul className="mx-auto flex w-full items-stretch justify-between px-1 md:justify-center md:gap-1 md:px-0">
+      <ul className="mx-auto flex w-full items-stretch justify-between gap-1 px-1">
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
-            <li key={item.href} className="min-w-0 flex-1 md:flex-none">
+            <li key={item.href} className="min-w-0 flex-1">
               <Link
                 href={item.href}
                 prefetch

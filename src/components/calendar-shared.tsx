@@ -46,9 +46,9 @@ function ringTone(status: PersonStatus["status"]) {
 }
 
 function ringWidth(size: PinSize) {
-  if (size === "xl") return "p-1.5";
+  if (size === "xl") return "p-[5px]";
   if (size === "lg") return "p-1";
-  return "p-[3px]";
+  return "p-0.5";
 }
 
 function ringInnerRadius(size: PinSize) {
@@ -73,25 +73,49 @@ export function settleStatus(
   return "pending";
 }
 
+export type CellCompletion = "failed" | "perfect" | "partial" | "pending";
+
+export function cellCompletion(people: PersonStatus[]): CellCompletion {
+  const statuses = people.map((person) => person.status);
+  if (statuses.some((status) => status === "failed")) return "failed";
+  if (statuses.length > 0 && statuses.every((status) => status === "perfect")) return "perfect";
+  if (statuses.some((status) => status === "perfect")) return "partial";
+  return "pending";
+}
+
 export function cellSurface(
   people: PersonStatus[],
   today: boolean,
   milestone: ChallengeMilestone | undefined,
 ) {
-  const statuses = people.map((person) => person.status);
-  const failed = statuses.some((status) => status === "failed");
-  const perfect = statuses.length > 0 && statuses.every((status) => status === "perfect");
-  const fill = failed ? "bg-failure/12" : perfect ? "bg-success/12" : "bg-graphite";
+  const completion = cellCompletion(people);
+  const fill =
+    completion === "failed"
+      ? "bg-failure/28"
+      : completion === "perfect"
+        ? "bg-success/32"
+        : completion === "partial"
+          ? "bg-success/18"
+          : "bg-graphite";
   const edge = today
-    ? "border-brass"
+    ? "border-brass ring-1 ring-brass/45"
     : milestone
       ? "border-signal"
-      : failed
-        ? "border-failure/40"
-        : perfect
-          ? "border-success/40"
-          : "border-steel/25";
-  return `${fill} ${edge}`;
+      : completion === "failed"
+        ? "border-failure/70"
+        : completion === "perfect"
+          ? "border-success/75"
+          : completion === "partial"
+            ? "border-success/50"
+            : "border-steel/35";
+  return `${fill} ${edge} calendar-cell-${completion}`;
+}
+
+export function cellDayTone(completion: CellCompletion) {
+  if (completion === "perfect") return "text-success";
+  if (completion === "failed") return "text-failure";
+  if (completion === "partial") return "text-success/80";
+  return "";
 }
 
 export function peopleForDate(

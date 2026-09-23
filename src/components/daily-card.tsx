@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useOptimistic, useRef, useState, useTransition, type ReactNode } from "react";
+
+const NOTE_SAVE_MS = 500;
 import { toggleCheckAction, saveNoteAction } from "@/lib/actions/checkin";
 import { addCommentAction, toggleLikeAction } from "@/lib/actions/social";
 import { CategoryStill, type StampKind } from "@/components/art";
@@ -39,11 +41,28 @@ export function DailyCard({
   avatarUrl: string | null;
 }) {
   const toast = useToast();
-  const [pending, start] = useTransition();
-  const [state, setState] = useOptimistic(checkin, (current, patch: Partial<DailyCheckin>) => ({
-    ...current,
-    ...patch,
-  }));
+  const [state, setState] = useState(checkin);
+  const [busyKeys, setBusyKeys] = useState<Set<string>>(() => new Set());
+  const busyRef = useRef(busyKeys);
+  const noteFlight = useRef<Record<string, number>>({});
+  const stateRef = useRef(state);
+  busyRef.current = busyKeys;
+  stateRef.current = state;
+
+  useEffect(() => {
+    const current = stateRef.current;
+    if (busyRef.current.size === 0) {
+      stateRef.current = checkin;
+      setState(checkin);
+      return;
+    }
+    const next: DailyCheckin = { ...checkin };
+    const saved = next as Record<string, unknown>;
+    const local = current as Record<string, unknown>;
+    for (const key of busyRef.current) saved[key] = local[key];
+    stateRef.current = next;
+    setState(next);
+  }, [checkin]);
 
   const locked = Boolean(state.finalized_at) || !canEdit;
   const complete = completedCategories(state);
@@ -51,43 +70,59 @@ export function DailyCard({
   const status = state.finalized_at ? state.status : "pending";
   const showDayComplete = canEdit && !state.finalized_at && allComplete;
 
-  function toggle(key: CheckKey) {
-    if (locked || pending) return;
-    const next = !state[key];
-    start(async () => {
-      const nextState = { ...state, [key]: next };
-      setState({ [key]: next });
-      const result = await toggleCheckAction(key, next);
-      if (!result.ok) {
-        setState({ [key]: !next });
-        toast.error(result.error);
-        return;
-      }
-      if (isPerfect(nextState)) {
-        toast.success("Your day is complete");
-      } else {
-        toast.success("Progress logged");
-      }
+  function markBusy(key: string, on: boolean) {
+    setBusyKeys((current) => {
+      const next = new Set(current);
+      if (on) next.add(key);
+      else next.delete(key);
+      return next;
     });
   }
 
-  function saveNote(key: "diet_note" | "workout_note" | "water_note" | "bible_note" | "bible_reference" | "day_note" | "failure_reason", value: string) {
-    if (pending) return;
-    start(async () => {
-      setState({ [key]: value });
-      const result = await saveNoteAction(key, value);
+  function toggle(key: CheckKey) {
+    if (locked || busyRef.current.has(key)) return;
+    const next = !stateRef.current[key];
+    const nextState = { ...stateRef.current, [key]: next };
+    stateRef.current = nextState;
+    setState(nextState);
+    markBusy(key, true);
+    void toggleCheckAction(key, next).then((result) => {
+      markBusy(key, false);
       if (!result.ok) {
+        const reverted = { ...stateRef.current, [key]: !next };
+        stateRef.current = reverted;
+        setState(reverted);
         toast.error(result.error);
         return;
       }
-      toast.success("Note saved");
+      if (isPerfect(nextState)) toast.success("Your day is complete");
+      else toast.success("Progress logged");
     });
+  }
+
+  async function saveNote(
+    key: "diet_note" | "workout_note" | "water_note" | "bible_note" | "bible_reference" | "day_note" | "failure_reason",
+    value: string,
+  ) {
+    const flight = (noteFlight.current[key] ?? 0) + 1;
+    noteFlight.current[key] = flight;
+    markBusy(key, true);
+    const result = await saveNoteAction(key, value);
+    if (noteFlight.current[key] !== flight) return result.ok;
+    markBusy(key, false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return false;
+    }
+    const nextState = { ...stateRef.current, [key]: value || null };
+    stateRef.current = nextState;
+    setState(nextState);
+    return true;
   }
 
   return (
     <article
       className="plate-metal relative rounded-plate border border-steel/45 bg-iron px-5 py-5 md:px-6 md:py-6"
-      aria-busy={pending || undefined}
     >
       <span className="pointer-events-none absolute left-2 top-2 size-3 rounded-full border border-brass bg-club" aria-hidden="true">
         <span className="absolute inset-[3px] rounded-full bg-brass" />
@@ -127,20 +162,21 @@ export function DailyCard({
         kind="diet"
         done={state.diet_complete}
         locked={locked}
-        pending={pending}
+        busy={busyKeys.has("diet_complete")}
+        saving={busyKeys.has("diet_complete") || busyKeys.has("diet_note")}
         note={state.diet_note}
         onToggle={() => toggle("diet_complete")}
         onNote={(value) => saveNote("diet_note", value)}
       />
-      <RequirementPlate kind="workout">
+      <RequirementPlate kind="workout" saving={["workout_1_complete", "workout_2_complete", "outdoor_complete", "workout_note"].some((key) => busyKeys.has(key))}>
         <div className="requirement-header mb-2">
           <p className="requirement-title">Workout</p>
           <LiveStatus status={isWorkoutComplete(state) ? "complete" : state.finalized_at ? "incomplete" : "pending"} />
         </div>
         <div className="space-y-3">
-          <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_1_complete")} />
-          <StampCheck label="Workout 2 — 45 min" checked={state.workout_2_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("workout_2_complete")} />
-          <StampCheck label="At least one outdoors" checked={state.outdoor_complete} locked={locked || pending} busy={pending} onToggle={() => toggle("outdoor_complete")} />
+          <StampCheck label="Workout 1 — 45 min" checked={state.workout_1_complete} locked={locked} busy={busyKeys.has("workout_1_complete")} onToggle={() => toggle("workout_1_complete")} />
+          <StampCheck label="Workout 2 — 45 min" checked={state.workout_2_complete} locked={locked} busy={busyKeys.has("workout_2_complete")} onToggle={() => toggle("workout_2_complete")} />
+          <StampCheck label="At least one outdoors" checked={state.outdoor_complete} locked={locked} busy={busyKeys.has("outdoor_complete")} onToggle={() => toggle("outdoor_complete")} />
         </div>
         <NoteField
           className="mt-2"
@@ -154,7 +190,8 @@ export function DailyCard({
         kind="water"
         done={state.water_complete}
         locked={locked}
-        pending={pending}
+        busy={busyKeys.has("water_complete")}
+        saving={busyKeys.has("water_complete") || busyKeys.has("water_note")}
         note={state.water_note}
         onToggle={() => toggle("water_complete")}
         onNote={(value) => saveNote("water_note", value)}
@@ -164,7 +201,8 @@ export function DailyCard({
         kind="bible"
         done={state.bible_complete}
         locked={locked}
-        pending={pending}
+        busy={busyKeys.has("bible_complete")}
+        saving={busyKeys.has("bible_complete") || busyKeys.has("bible_note") || busyKeys.has("bible_reference")}
         note={state.bible_note}
         extra={
           <NoteField
@@ -217,9 +255,17 @@ export function DailyCard({
   );
 }
 
-function RequirementPlate({ kind, children }: { kind: StampKind; children: ReactNode }) {
+function RequirementPlate({
+  kind,
+  saving = false,
+  children,
+}: {
+  kind: StampKind;
+  saving?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <section className="requirement-plate">
+    <section className={`requirement-plate${saving ? " is-saving" : ""}`} aria-busy={saving || undefined}>
       <CategoryStill kind={kind} />
       <div className="requirement-body">{children}</div>
     </section>
@@ -231,7 +277,8 @@ function Requirement({
   kind,
   done,
   locked,
-  pending,
+  busy,
+  saving,
   note,
   extra,
   onToggle,
@@ -241,11 +288,12 @@ function Requirement({
   kind: StampKind;
   done: boolean;
   locked: boolean;
-  pending: boolean;
+  busy: boolean;
+  saving: boolean;
   note: string | null;
   extra?: React.ReactNode;
   onToggle: () => void;
-  onNote: (value: string) => void;
+  onNote: (value: string) => Promise<boolean>;
 }) {
   const [noteOpen, setNoteOpen] = useState(Boolean(note));
 
@@ -254,7 +302,7 @@ function Requirement({
   }, [note]);
 
   return (
-    <RequirementPlate kind={kind}>
+    <RequirementPlate kind={kind} saving={saving}>
       <div className="requirement-toolbar">
         <div className="requirement-header">
           <p className="requirement-title">{label}</p>
@@ -272,8 +320,8 @@ function Requirement({
             ) : null}
             <StampPad
               checked={done}
-              locked={locked || pending}
-              busy={pending}
+              locked={locked}
+              busy={busy}
               onToggle={onToggle}
               label={label}
               inline
@@ -405,13 +453,23 @@ function NoteField({
   max?: number;
   className?: string;
   startOpen?: boolean;
-  onSave: (value: string) => void;
+  onSave: (value: string) => Promise<boolean>;
 }) {
   const [open, setOpen] = useState(Boolean(value) || startOpen);
   const [draft, setDraft] = useState(value);
+  const [phase, setPhase] = useState<"idle" | "saving" | "saved">("idle");
   const fieldRef = useRef<HTMLDivElement>(null);
+  const draftRef = useRef(value);
+  const savedRef = useRef(value);
+  const timerRef = useRef<number | null>(null);
+  const focusedRef = useRef(false);
+  const onSaveRef = useRef(onSave);
+  onSaveRef.current = onSave;
 
   useEffect(() => {
+    if (focusedRef.current || draftRef.current !== savedRef.current) return;
+    draftRef.current = value;
+    savedRef.current = value;
     setDraft(value);
   }, [value]);
 
@@ -419,6 +477,50 @@ function NoteField({
     if (!open || !fieldRef.current) return;
     scrollFieldIntoView(fieldRef.current);
   }, [open]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+      if (draftRef.current !== savedRef.current) void onSaveRef.current(draftRef.current);
+    };
+  }, []);
+
+  async function commit(next: string) {
+    if (locked || next === savedRef.current) return;
+    setPhase("saving");
+    const ok = await onSaveRef.current(next);
+    if (next !== draftRef.current && ok) {
+      savedRef.current = next;
+      void commit(draftRef.current);
+      return;
+    }
+    if (!ok) {
+      setPhase("idle");
+      return;
+    }
+    savedRef.current = next;
+    setPhase("saved");
+  }
+
+  function queue(next: string) {
+    draftRef.current = next;
+    setDraft(next);
+    if (locked) return;
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => {
+      timerRef.current = null;
+      void commit(draftRef.current);
+    }, NOTE_SAVE_MS);
+  }
+
+  function flush() {
+    focusedRef.current = false;
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    void commit(draftRef.current);
+  }
 
   if (!open && !value) {
     if (locked) return null;
@@ -435,19 +537,25 @@ function NoteField({
     );
   }
 
+  const status = phase === "saving" ? "Saving" : phase === "saved" ? "Saved" : null;
+
   return (
     <div ref={fieldRef} className={`w-full ${className}`.trim()}>
-      <p className="stamp mb-1 text-[11px] text-steel">{label}</p>
+      <p className="stamp mb-1 flex items-center justify-between text-[11px] text-steel">
+        <span>{label}</span>
+        {status ? <span>{status}</span> : null}
+      </p>
       <TextArea
         value={draft}
         maxLength={max}
         readOnly={locked}
         rows={2}
-        onChange={(event) => setDraft(event.target.value)}
-        onFocus={(event) => scrollFieldIntoView(event.currentTarget)}
-        onBlur={() => {
-          if (draft !== value) onSave(draft);
+        onChange={(event) => queue(event.target.value)}
+        onFocus={(event) => {
+          focusedRef.current = true;
+          scrollFieldIntoView(event.currentTarget);
         }}
+        onBlur={flush}
       />
     </div>
   );

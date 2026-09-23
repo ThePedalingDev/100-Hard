@@ -121,9 +121,9 @@ export async function toggleCheckAction(key: BooleanKey, value: boolean): Promis
       });
       revalidatePath("/social");
     }
+    revalidatePath("/dashboard");
   }
 
-  revalidatePath("/dashboard");
   return { ok: true, data: undefined };
 }
 
@@ -155,8 +155,6 @@ export async function saveNoteAction(key: TextKey, value: string): Promise<Actio
     return { ok: false, error: error.message, code: "CHECKIN_SAVE_FAILED" };
   }
 
-  revalidatePath("/dashboard");
-  revalidatePath("/calendar");
   return { ok: true, data: undefined };
 }
 

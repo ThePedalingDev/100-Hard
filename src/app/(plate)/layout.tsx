@@ -22,7 +22,7 @@ export default async function PlateLayout({ children }: { children: React.ReactN
         <AppNav />
         <div className="plate-scroll">
           <div className="content-shell">
-            <RealtimeRefresh challengeId={context.challenge?.id} />
+            <RealtimeRefresh challengeId={context.challenge?.id} userId={context.userId} />
             <PageEnter>
               {context.loadError ? (
                 <Plate>

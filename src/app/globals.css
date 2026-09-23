@@ -271,6 +271,9 @@ textarea:-webkit-autofill:focus {
   background-color: var(--canvas);
   background-image: var(--hatch-ground);
   background-size: 40px 40px;
+}
+
+html:has(.plate-frame) {
   box-shadow: inset 8px 0 0 var(--club);
 }
 
@@ -626,6 +629,18 @@ textarea:-webkit-autofill:focus {
   touch-action: manipulation;
 }
 
+.calendar-cell-perfect {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--success) 35%, transparent);
+}
+
+.calendar-cell-failed {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--failure) 35%, transparent);
+}
+
+.calendar-cell-partial {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--success) 22%, transparent);
+}
+
 @media (max-width: 767px) {
   .calendar-month-grid a::after {
     position: absolute;
@@ -754,6 +769,10 @@ textarea:-webkit-autofill:focus {
   border: 1px solid color-mix(in oklch, var(--mute) 40%, transparent);
   border-radius: 8px;
   background: var(--iron);
+}
+
+.requirement-plate.is-saving {
+  border-color: var(--proof);
 }
 
 .requirement-still {
@@ -1019,19 +1038,19 @@ textarea:-webkit-autofill:focus {
   #main-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .content-shell {
-    width: min(100% - 3rem, 56rem);
+    width: min(100% - 3rem, 72rem);
     margin-inline: auto;
   }
 
   .plate-frame {
     flex: none;
     flex-direction: column;
-    width: min(100%, 56rem);
-    margin-inline: auto;
+    width: 100%;
+    margin-inline: 0;
     height: auto;
     max-height: none;
     min-height: 100dvh;
@@ -1058,8 +1077,8 @@ textarea:-webkit-autofill:focus {
 
   .tabbar {
     align-self: center;
-    width: fit-content;
-    max-width: min(calc(100% - 3rem), 56rem);
+    width: min(100% - 3rem, 72rem);
+    max-width: none;
     margin-top: max(1.5rem, env(safe-area-inset-top, 0px));
     margin-inline: auto;
     margin-bottom: 1.5rem;
@@ -1072,12 +1091,12 @@ textarea:-webkit-autofill:focus {
   }
 
   .tabbar ul {
-    justify-content: center;
+    justify-content: stretch;
     gap: 0.25rem;
   }
 
   .tabbar li {
-    flex: 0 1 auto;
+    flex: 1 1 0;
   }
 
   .crop-dialog {
@@ -1091,18 +1110,16 @@ textarea:-webkit-autofill:focus {
 }
 
 @media (min-width: 1024px) {
-  .content-shell {
-    width: min(100% - 4rem, 64rem);
-    margin-inline: auto;
-  }
-
-  .plate-frame {
-    width: min(100%, 64rem);
-  }
-
+  .content-shell,
   .tabbar {
-    max-width: min(calc(100% - 4rem), 64rem);
-    margin-inline: auto;
+    width: min(100% - 4rem, 80rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .content-shell,
+  .tabbar {
+    width: min(100% - 5rem, 90rem);
   }
 }
 

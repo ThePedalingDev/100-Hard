@@ -3,6 +3,8 @@ import { challengeDayNumber, challengeMilestones } from "@/lib/challenge-dates";
 import { formatShortDate } from "@/lib/challenge";
 import {
   CalendarLegend,
+  cellCompletion,
+  cellDayTone,
   cellSurface,
   FacePin,
   peopleForDate,
@@ -42,17 +44,19 @@ export function CalendarWeek({
           const inChallenge = iso >= start && iso <= end;
           const milestone = byDate.get(iso);
           const dayPeople = peopleForDate(iso, inChallenge, today, people, rows);
+          const completion = cellCompletion(dayPeople);
           const surface = inChallenge
             ? cellSurface(dayPeople, iso === today, milestone)
             : "border-steel/15 bg-canvas opacity-45";
           const dayNumber = inChallenge ? challengeDayNumber(iso, start) : null;
+          const dayTone = inChallenge ? cellDayTone(completion) : "";
 
           const inner = (
             <>
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <div className="flex w-14 shrink-0 flex-col">
                   <p className="stamp text-[11px] text-steel">{weekdayName(iso)}</p>
-                  <p className="stamp tabular text-lg leading-none">{iso.slice(8, 10)}</p>
+                  <p className={`stamp tabular text-lg leading-none ${dayTone}`}>{iso.slice(8, 10)}</p>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-offwhite">{formatShortDate(iso)}</p>

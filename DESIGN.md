@@ -209,7 +209,7 @@ South African Planet Fitness local brand, baked down for daylight plates: navy `
 
 ## Layout
 
-Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: locked to the visual viewport on small screens, with the document scroll disabled so Safari cannot hide the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`). Padding is `max(safe-area-inset-bottom, --safari-chrome)` because latest iOS Safari overlays a bottom URL bar that `svh` does not exclude. `content-shell` is 48rem on small screens, 56rem from 640px, 64rem from 1024px, with 16/24/32px gutters. From `md` the shell is centered, and the tab bar shares that column's left edge. The frame unlocks and the tab bar becomes a top plate.
+Auth sits as a single centered plate: max width 32rem page, 28rem plate, 16px side padding, 40px vertical padding, vertically centered. In-app chrome is `plate-frame`: locked to the visual viewport on small screens, with the document scroll disabled so Safari cannot hide the tab bar. Inner `plate-scroll` is the only scroller. The tab bar is in-flow (not `position: fixed`). Padding is `max(safe-area-inset-bottom, --safari-chrome)` because latest iOS Safari overlays a bottom URL bar that `svh` does not exclude. `content-shell` is 48rem on small screens, 56rem from 640px, 72rem from 768px, 80rem from 1024px, and 90rem from 1280px, with 16/24/32/40px gutters. The floor is the full viewport. From `md` the shell stays centered in that floor, and the tab bar is the same width as the shell. The frame unlocks and the tab bar becomes a top plate.
 
 Rhythm is 8 / 16 / 24. Plate padding is 20px, 24px from `md`. Form stacks are 16px gaps; field label-to-control is 8px. Inspection pages stack plates at 24px. Dashboard uses a two-column board from `lg`: pin rack leading, stats plate supporting.
 
@@ -217,7 +217,7 @@ Mobile is the primary density. Desktop login is the same plate, not a split mark
 
 ## Elevation & Depth
 
-Flat. Depth is tonal: navy-tinted paper floor, white plate, pale wells. The floor is asymmetric on purpose: an 8px navy spine on the left, a loose well plate hanging off the top-right, and a ghost 100 in the lower-left field. No drop shadows on content plates. The only shadows are that spine, an inset autofill fill, and a 3px yellow focus ring. Texture is 32px graph paper on the floor and 16px plate-metal on cards.
+Flat. Depth is tonal: navy-tinted paper floor, white plate, pale wells. The floor is the full viewport: an 8px navy spine on the screen's left wall, a loose well plate hanging off the top-right of the auth screen only, and a ghost 100 in the lower-left field. No drop shadows on content plates. The only shadows are that spine, an inset autofill fill, and a 3px yellow focus ring. Texture is 32px graph paper on the floor and 16px plate-metal on cards.
 
 ### Shadow Vocabulary
 None on content plates. Focus is a 3px signal-yellow outline, 3px offset.

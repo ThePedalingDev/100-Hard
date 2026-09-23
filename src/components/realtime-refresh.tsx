@@ -1,10 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { startTransition, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function RealtimeRefresh({ challengeId }: { challengeId?: string }) {
+export function RealtimeRefresh({
+  challengeId,
+  userId,
+}: {
+  challengeId?: string;
+  userId?: string;
+}) {
   const router = useRouter();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -13,13 +19,19 @@ export function RealtimeRefresh({ challengeId }: { challengeId?: string }) {
 
     const refresh = () => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => router.refresh(), 400);
+      timerRef.current = setTimeout(() => {
+        startTransition(() => router.refresh());
+      }, 400);
     };
 
     const supabase = createClient();
     const channel = supabase
       .channel(`challenge-${challengeId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "daily_checkins" }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "daily_checkins" }, (payload) => {
+        const row = payload.new as { user_id?: string };
+        if (userId && row.user_id === userId) return;
+        refresh();
+      })
       .on("postgres_changes", { event: "*", schema: "public", table: "daily_likes" }, refresh)
       .on("postgres_changes", { event: "*", schema: "public", table: "daily_comments" }, refresh)
       .on("postgres_changes", { event: "*", schema: "public", table: "spoon_entries" }, refresh)
@@ -31,7 +43,7 @@ export function RealtimeRefresh({ challengeId }: { challengeId?: string }) {
       if (timerRef.current) clearTimeout(timerRef.current);
       void supabase.removeChannel(channel);
     };
-  }, [challengeId, router]);
+  }, [challengeId, router, userId]);
 
   return null;
 }

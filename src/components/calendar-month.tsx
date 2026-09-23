@@ -4,6 +4,8 @@ import type { Profile } from "@/lib/supabase/types";
 import {
   CalendarLegend,
   type CalendarRow,
+  cellCompletion,
+  cellDayTone,
   cellSurface,
   FacePin,
   milestoneCellLabel,
@@ -58,14 +60,16 @@ export function CalendarMonth({
           const inChallenge = iso >= start && iso <= end;
           const milestone = byDate.get(iso);
           const dayPeople = peopleForDate(iso, inChallenge, today, people, rows);
+          const completion = cellCompletion(dayPeople);
           const dayNumber = inChallenge ? challengeDayNumber(iso, start) : null;
           const surface = inChallenge
             ? cellSurface(dayPeople, iso === today, milestone)
             : "border-steel/15 bg-canvas opacity-45";
+          const dayTone = inChallenge ? cellDayTone(completion) : "";
           const inner = (
             <>
               <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="stamp tabular text-[11px] leading-none md:text-[13px]">{index + 1}</p>
+                <p className={`stamp tabular text-[11px] leading-none md:text-[13px] ${dayTone}`}>{index + 1}</p>
                 {milestone ? (
                   <p
                     className="stamp truncate text-[7px] leading-none text-mark md:text-[9px]"

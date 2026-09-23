@@ -36,7 +36,7 @@ export default async function PhotosPage() {
         kicker="Optional. Private. One official photo each calendar month."
       />
       {hasCurrentMonth ? null : <PhotoUpload month={context.today} />}
-      <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {photos.length === 0 ? (
           <figure className="flex flex-col items-center">
             <EmptyPlate />
