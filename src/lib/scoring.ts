@@ -73,7 +73,7 @@ export function statsDayStatus(
 export type TodayDisplayStatus = "perfect" | "failed" | "pending" | "complete";
 
 export function todayDisplayStatus(
-  checkin: (CheckinFields & { finalized_at?: string | null }) | null | undefined,
+  checkin: (CheckinFields & { finalized_at?: string | null; status?: DayStatus }) | null | undefined,
 ): TodayDisplayStatus {
   if (!checkin) return "pending";
   if (checkin.finalized_at) {
@@ -81,6 +81,13 @@ export function todayDisplayStatus(
   }
   if (isPerfect(checkin)) return "complete";
   return "pending";
+}
+
+/** UI status for any day card/history row (Done while open, Perfect once finalized). */
+export function checkinDisplayStatus(
+  checkin: (CheckinFields & { finalized_at?: string | null; status: DayStatus }) | null | undefined,
+): TodayDisplayStatus {
+  return todayDisplayStatus(checkin);
 }
 
 export type TodayRingMetric = {

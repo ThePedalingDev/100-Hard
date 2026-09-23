@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { challengeDayNumber, challengeMilestones } from "@/lib/challenge-dates";
-import type { DailyCheckin, Profile } from "@/lib/supabase/types";
+import type { Profile } from "@/lib/supabase/types";
 import {
   CalendarLegend,
+  type CalendarRow,
   cellSurface,
   FacePin,
   milestoneCellLabel,
@@ -29,7 +30,7 @@ export function CalendarMonth({
   start: string;
   end: string;
   people: Array<{ id: string; profile: Profile; avatarUrl: string | null }>;
-  rows: Array<Pick<DailyCheckin, "user_id" | "challenge_date" | "status">>;
+  rows: CalendarRow[];
 }) {
   const milestones = challengeMilestones(start, end);
   const byDate = new Map(milestones.map((item) => [item.iso, item]));

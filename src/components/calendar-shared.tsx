@@ -3,6 +3,7 @@ import {
   challengeDayNumber,
   type ChallengeMilestone,
 } from "@/lib/challenge-dates";
+import { statsDayStatus } from "@/lib/scoring";
 import type { DailyCheckin, Profile } from "@/lib/supabase/types";
 
 export type PersonStatus = {
@@ -18,7 +19,19 @@ export type CalendarPerson = {
   avatarUrl: string | null;
 };
 
-export type CalendarRow = Pick<DailyCheckin, "user_id" | "challenge_date" | "status">;
+export type CalendarRow = Pick<
+  DailyCheckin,
+  | "user_id"
+  | "challenge_date"
+  | "status"
+  | "diet_complete"
+  | "workout_1_complete"
+  | "workout_2_complete"
+  | "outdoor_complete"
+  | "water_complete"
+  | "bible_complete"
+  | "finalized_at"
+>;
 
 function wordFor(status: PersonStatus["status"]) {
   if (status === "perfect") return "Perfect";
@@ -79,11 +92,16 @@ export function peopleForDate(
   if (!inChallenge) return [];
   return people.map(({ id, profile, avatarUrl }) => {
     const row = rows.find((item) => item.user_id === id && item.challenge_date === iso);
+    const derived = row
+      ? statsDayStatus(row)
+      : iso < today
+        ? "failed"
+        : "pending";
     return {
       id,
       name: profile.display_name,
       avatarUrl,
-      status: settleStatus((row?.status ?? "pending") as PersonStatus["status"], iso, today),
+      status: settleStatus(derived as PersonStatus["status"], iso, today),
     };
   });
 }

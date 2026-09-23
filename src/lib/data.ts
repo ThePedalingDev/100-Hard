@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { resolveActiveChallengeId } from "@/lib/active-challenge";
 import { createMediaSignedUrl, mediaSrc } from "@/lib/media";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/admin";
@@ -240,14 +241,6 @@ async function loadAppContextInner(): Promise<AppContext | null> {
   ]);
   const challenges = (challengeRows ?? []) as Challenge[];
 
-  let activeId = typedProfile?.active_challenge_id ?? null;
-  if (!activeId || !challengeIds.includes(activeId)) {
-    activeId = membershipRows[0]?.challenge_id ?? null;
-    if (activeId && activeId !== typedProfile?.active_challenge_id) {
-      void supabase.from("profiles").update({ active_challenge_id: activeId }).eq("id", user.id);
-    }
-  }
-
   const memberIds = [...new Set((allMemberRows ?? []).map((row) => row.user_id))];
   const { data: profileRows } = memberIds.length
     ? await supabase.from("profiles").select("*").in("id", memberIds)
@@ -278,7 +271,29 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     ];
   });
 
-  const challenge = challenges.find((row) => row.id === activeId) ?? null;
+  let activeId = await resolveActiveChallengeId(supabase, user.id);
+  if (!activeId && memberships.length === 1) {
+    activeId = memberships[0]?.challenge.id ?? null;
+  }
+
+  if (activeId && activeId !== typedProfile?.active_challenge_id) {
+    await supabase.from("profiles").update({ active_challenge_id: activeId }).eq("id", user.id);
+    if (typedProfile) typedProfile.active_challenge_id = activeId;
+  }
+
+  let challenge = challenges.find((row) => row.id === activeId) ?? null;
+  if (!challenge && activeId) {
+    const { data: activeRow } = await supabase.from("challenges").select("*").eq("id", activeId).maybeSingle();
+    challenge = (activeRow as Challenge | null) ?? null;
+  }
+  if (!challenge && memberships.length === 1) {
+    challenge = memberships[0]?.challenge ?? null;
+    activeId = challenge?.id ?? null;
+    if (activeId && activeId !== typedProfile?.active_challenge_id) {
+      await supabase.from("profiles").update({ active_challenge_id: activeId }).eq("id", user.id);
+      if (typedProfile) typedProfile.active_challenge_id = activeId;
+    }
+  }
   if (!challenge) {
     return baseContext(user.id, user.email, today, { profile: typedProfile, memberships });
   }
@@ -288,7 +303,7 @@ async function loadAppContextInner(): Promise<AppContext | null> {
     .filter((row) => row.challenge_id === active.id)
     .map((row) => row.user_id);
 
-  void maybeFinalizeYesterday(supabase, active, activeMemberIds, today);
+  await maybeFinalizeYesterday(supabase, active, activeMemberIds, today);
 
   const remaining = daysRemainingFor(active.start_date, active.end_date, today);
   const finished = isChallengeComplete(active.end_date, today);
@@ -369,12 +384,28 @@ export async function loadRange(challengeId: string, start: string, end: string)
   const supabase = await createClient();
   const { data } = await supabase
     .from("daily_checkins")
-    .select("user_id, challenge_date, status")
+    .select(
+      "user_id, challenge_date, status, diet_complete, workout_1_complete, workout_2_complete, outdoor_complete, water_complete, bible_complete, finalized_at",
+    )
     .eq("challenge_id", challengeId)
     .gte("challenge_date", start)
     .lte("challenge_date", end);
 
-  return (data ?? []) as Array<Pick<DailyCheckin, "user_id" | "challenge_date" | "status">>;
+  return (data ?? []) as Array<
+    Pick<
+      DailyCheckin,
+      | "user_id"
+      | "challenge_date"
+      | "status"
+      | "diet_complete"
+      | "workout_1_complete"
+      | "workout_2_complete"
+      | "outdoor_complete"
+      | "water_complete"
+      | "bible_complete"
+      | "finalized_at"
+    >
+  >;
 }
 
 export async function loadMonth(challengeId: string, month: string) {

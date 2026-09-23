@@ -1,10 +1,10 @@
 import { Plate, StatusMark } from "@/components/plate";
-import { completedCategories, isWorkoutComplete, missedCategories } from "@/lib/scoring";
+import { checkinDisplayStatus, completedCategories, isWorkoutComplete, missedCategories } from "@/lib/scoring";
 import type { DailyCheckin } from "@/lib/supabase/types";
 
 export function HistoryDay({ checkin }: { checkin: DailyCheckin }) {
   const complete = completedCategories(checkin);
-  const status = checkin.finalized_at ? checkin.status : "pending";
+  const status = checkinDisplayStatus(checkin);
   const workoutDone = isWorkoutComplete(checkin);
   const missed = missedCategories(checkin);
 

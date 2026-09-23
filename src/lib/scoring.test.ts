@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { currentStreak, statsDayStatus } from "@/lib/scoring";
+import { checkinDisplayStatus, currentStreak, statsDayStatus } from "@/lib/scoring";
 
 describe("statsDayStatus", () => {
   it("counts an open perfect day as perfect", () => {
@@ -30,6 +30,23 @@ describe("statsDayStatus", () => {
         bible_complete: true,
       }),
     ).toBe("failed");
+  });
+});
+
+describe("checkinDisplayStatus", () => {
+  it("shows Done for a complete day that is not finalized yet", () => {
+    expect(
+      checkinDisplayStatus({
+        status: "pending",
+        finalized_at: null,
+        diet_complete: true,
+        workout_1_complete: true,
+        workout_2_complete: true,
+        outdoor_complete: true,
+        water_complete: true,
+        bible_complete: true,
+      }),
+    ).toBe("complete");
   });
 });
 
