@@ -32,13 +32,10 @@ export default async function DashboardPage() {
       <div className="flex flex-col gap-6">
         <PageHeader title="Home" />
         <Plate>
-          <h2 className="text-[18px] leading-none">You have no active challenge at the moment.</h2>
-          <p className="mt-2 text-sm leading-6 text-steel">
-            Create a challenge or join with a code to start today&apos;s inspection.
-            {context.memberships.length > 0
-              ? " You already belong to a challenge — switch to it from Profile."
-              : ""}
-          </p>
+          <h2 className="text-[18px] leading-none">No active challenge</h2>
+          {context.memberships.length > 0 ? (
+            <p className="mt-2 text-sm leading-6 text-steel">Switch to one from Profile, or start another.</p>
+          ) : null}
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/onboarding/challenge"

@@ -215,6 +215,21 @@ input[type="range"] {
   accent-color: var(--proof);
 }
 
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="month"],
+input[type="week"] {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -659,6 +674,7 @@ html:has(.plate-frame) {
 
 .activity-member-body {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 1.25rem;
 }

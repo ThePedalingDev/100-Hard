@@ -56,9 +56,6 @@ export default async function ProfilePage() {
       {context.challenge ? (
         <Plate tone="well">
           <h2 className="text-[18px] leading-none">History</h2>
-          <p className="mt-2 text-sm leading-6 text-steel">
-            Scroll the full challenge ledger: every day you stamped, with notes and spoon record.
-          </p>
           <Link
             href="/profile/history"
             className="stamp-press mt-4 inline-flex min-h-12 items-center rounded-plate bg-brass px-4 text-[15px] font-bold tracking-[-0.01em] text-onproof"
@@ -70,9 +67,6 @@ export default async function ProfilePage() {
       {context.challenge ? (
         <Plate tone="well">
           <h2 className="text-[18px] leading-none">Members</h2>
-          <p className="mt-2 text-sm leading-6 text-steel">
-            Inspection plates for everyone on this challenge: stats for the race, and a way onto their days.
-          </p>
           <Link
             href="/profile/members"
             className="stamp-press mt-4 inline-flex min-h-12 items-center rounded-plate bg-brass px-4 text-[15px] font-bold tracking-[-0.01em] text-onproof"

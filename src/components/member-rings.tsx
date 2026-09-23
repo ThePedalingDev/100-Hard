@@ -37,13 +37,10 @@ export function MemberRings({
 
   return (
     <Plate>
-      <div className="mb-5 flex items-end justify-between gap-3">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-[18px] leading-none">Activity rings</h2>
-          <p className="mt-2 text-sm leading-6 text-steel">
-            {isToday ? "Today" : formatStampDate(date)}. Four stamps, one ring each. Outer to inner: diet,
-            workout, water, bible.
-          </p>
+          <p className="stamp mt-2 text-[11px] text-steel">{isToday ? "Today" : formatStampDate(date)}</p>
         </div>
         <Link
           href="/profile/members"
@@ -52,12 +49,6 @@ export function MemberRings({
           Members
         </Link>
       </div>
-
-      {others.length === 0 ? (
-        <p className="mb-5 text-sm leading-6 text-steel">
-          Your rings are on the board. Other members land here when they join.
-        </p>
-      ) : null}
 
       {rack.length === 0 ? (
         <p className="text-sm leading-6 text-steel">Invite someone from Profile to see their rings.</p>

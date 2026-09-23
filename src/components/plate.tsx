@@ -68,7 +68,7 @@ export function Plate({
           <Rivet className="bottom-2 right-2" />
         </>
       ) : null}
-      <div className="relative">{children}</div>
+      <div className="relative min-w-0">{children}</div>
     </Tag>
   );
 }
@@ -126,13 +126,15 @@ export function Field({
   label,
   htmlFor,
   children,
+  className = "",
 }: {
   label: string;
   htmlFor: string;
   children: ReactNode;
+  className?: string;
 }) {
   return (
-    <label className="block space-y-2" htmlFor={htmlFor}>
+    <label className={`block min-w-0 w-full space-y-2 ${className}`.trim()} htmlFor={htmlFor}>
       <span className="stamp text-[11px] text-steel">{label}</span>
       {children}
     </label>
@@ -147,7 +149,7 @@ export function TextInput({ className = "", onFocus, ...props }: InputHTMLAttrib
         scrollFieldIntoView(event.currentTarget);
         onFocus?.(event);
       }}
-      className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
+      className={`min-h-12 w-full min-w-0 max-w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
     />
   );
 }
@@ -162,7 +164,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
           scrollFieldIntoView(event.currentTarget);
           onFocus?.(event);
         }}
-        className={`min-h-12 w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
+        className={`min-h-12 w-full min-w-0 max-w-full rounded-plate border border-steel/40 bg-graphite px-4 py-3 text-[16px] text-offwhite placeholder:text-steel ${className}`}
       />
     );
   },

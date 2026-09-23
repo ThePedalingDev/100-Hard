@@ -41,12 +41,7 @@ export default async function HistoryPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title="My history"
-        backHref="/profile"
-        backLabel="Profile"
-        kicker="Every challenge day you have stamped, newest first."
-      />
+      <PageHeader title="My history" backHref="/profile" backLabel="Profile" />
       <Plate tone="well">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <HistoryStat value={dates.length} label="Days in view" />

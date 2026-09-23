@@ -22,7 +22,7 @@ export function HistoryDatePicker({
 
   return (
     <form
-      className="flex flex-col gap-3 sm:flex-row sm:items-end"
+      className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-end"
       action={path}
       onSubmit={(event) => {
         event.preventDefault();
@@ -30,7 +30,7 @@ export function HistoryDatePicker({
         if (typeof next === "string" && next) openDate(next);
       }}
     >
-      <Field label="Choose a day" htmlFor="date">
+      <Field label="Choose a day" htmlFor="date" className="sm:flex-1">
         <TextInput
           key={value}
           id="date"
@@ -46,7 +46,7 @@ export function HistoryDatePicker({
           }}
         />
       </Field>
-      <Button type="submit" className="sm:min-w-36">
+      <Button type="submit" className="w-full shrink-0 sm:w-auto sm:min-w-36">
         View day
       </Button>
     </form>
