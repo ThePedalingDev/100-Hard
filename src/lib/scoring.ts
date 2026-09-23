@@ -161,9 +161,27 @@ export function completionPercent(completed: number, possible: number): number {
   return Math.round((completed / possible) * 1000) / 10;
 }
 
+export function perfectDayDates(statuses: { date: string; status: DayStatus }[]): string[] {
+  return statuses
+    .filter((row) => row.status === "perfect")
+    .map((row) => row.date)
+    .sort((a, b) => b.localeCompare(a));
+}
+
 export function currentStreak(statuses: { date: string; status: DayStatus }[], today: string): number {
   const byDate = new Map(statuses.map((row) => [row.date, row.status]));
+  const todayStatus = byDate.get(today);
+
+  // Today still open — streak continues from yesterday until today fails at lock.
   let cursor = today;
+  if (todayStatus === undefined || todayStatus === "pending") {
+    const yesterday = previousDay(today);
+    if (!yesterday) return 0;
+    cursor = yesterday;
+  } else if (todayStatus === "failed") {
+    return 0;
+  }
+
   let streak = 0;
   while (true) {
     const status = byDate.get(cursor);

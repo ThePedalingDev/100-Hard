@@ -6,7 +6,8 @@ import { Leaderboard } from "@/components/leaderboard";
 import { PageHeader, Plate } from "@/components/plate";
 import { SpoonIcon } from "@/components/icons";
 import { formatStampDate } from "@/lib/challenge";
-import { MAX_CHALLENGE_MEMBERS, challengeLength } from "@/lib/challenge-dates";
+import { PerfectDaysStat } from "@/components/perfect-days-sheet";
+import { MAX_CHALLENGE_MEMBERS, challengeDayNumber, challengeLength } from "@/lib/challenge-dates";
 import { loadAppContext, signedUrl } from "@/lib/data";
 
 export default async function DashboardPage() {
@@ -117,7 +118,13 @@ export default async function DashboardPage() {
         {context.me ? (
           <Plate tone="well">
             <div className="grid grid-cols-2 gap-x-4 gap-y-5">
-              <Stat value={context.me.stats.perfectDays} label="Perfect days" accent="success" />
+              <PerfectDaysStat
+                count={context.me.stats.perfectDays}
+                days={context.me.stats.perfectDayDates.map((date) => ({
+                  date,
+                  dayNumber: challengeDayNumber(date, context.challenge!.start_date),
+                }))}
+              />
               <Stat value={`${context.me.stats.completion}%`} label="Completion" />
               <Stat value={context.me.stats.streak} label="Current streak" />
               <Stat value={context.me.stats.spoons} label="Spoons" icon accent="proof" />

@@ -62,4 +62,22 @@ describe("currentStreak", () => {
       ),
     ).toBe(2);
   });
+
+  it("counts yesterday when today is still open", () => {
+    expect(
+      currentStreak([{ date: "2026-09-22", status: "perfect" }], "2026-09-23"),
+    ).toBe(1);
+  });
+
+  it("returns zero when today failed even if yesterday was perfect", () => {
+    expect(
+      currentStreak(
+        [
+          { date: "2026-09-22", status: "perfect" },
+          { date: "2026-09-23", status: "failed" },
+        ],
+        "2026-09-23",
+      ),
+    ).toBe(0);
+  });
 });

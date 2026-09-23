@@ -634,6 +634,45 @@ textarea:-webkit-autofill:focus {
   }
 }
 
+.perfect-days-dialog {
+  width: min(100% - 2rem, 28rem);
+  max-width: 100%;
+  margin: auto;
+  padding: 0;
+  border: 1px solid color-mix(in oklch, var(--mute) 35%, transparent);
+  border-radius: 8px;
+  background: var(--iron);
+  color: var(--ink);
+  box-shadow: var(--shadow-nav);
+  overflow: hidden;
+}
+
+.perfect-days-dialog::backdrop {
+  background: color-mix(in oklch, var(--canvas) 72%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.perfect-days-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: min(85svh, var(--vv-height, 85svh));
+}
+
+@media (max-width: 767px) {
+  .perfect-days-dialog {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 0;
+  }
+
+  .perfect-days-panel {
+    max-height: min(78svh, var(--vv-height, 78svh));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
 .crop-dialog {
   inset: 0;
   width: 100%;

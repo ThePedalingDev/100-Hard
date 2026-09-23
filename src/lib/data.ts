@@ -10,6 +10,7 @@ import {
   completionPercent,
   currentStreak,
   longestStreak,
+  perfectDayDates,
   statsDayStatus,
   type CheckinFields,
 } from "@/lib/scoring";
@@ -32,6 +33,7 @@ export type MemberView = {
   comments: DailyComment[];
   stats: {
     perfectDays: number;
+    perfectDayDates: string[];
     completion: number;
     streak: number;
     longest: number;
@@ -107,6 +109,7 @@ function statsFor(userId: string, checkins: StatsCheckin[], spoons: SpoonEntry[]
   const possible = mine.length * 4;
   return {
     perfectDays,
+    perfectDayDates: perfectDayDates(statuses),
     completion: completionPercent(completed, possible),
     streak: currentStreak(statuses, today),
     longest: longestStreak(statuses),
