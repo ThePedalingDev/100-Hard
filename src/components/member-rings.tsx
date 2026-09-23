@@ -1,14 +1,15 @@
 import Link from "next/link";
+import { ProfileChallengePills } from "@/components/profile-challenge-pills";
 import { Plate, StatusMark } from "@/components/plate";
 import { formatShortDate, formatStampClock, formatStampDate } from "@/lib/challenge";
 import type { MemberView } from "@/lib/data";
 import { todayDisplayStatus, todayRingMetrics, type TodayRingMetric } from "@/lib/scoring";
 
-const RING_LAYOUT: Array<{ id: TodayRingMetric["id"]; radius: number; tone: string }> = [
-  { id: "diet", radius: 52, tone: "activity-ring-diet" },
-  { id: "workout", radius: 40, tone: "activity-ring-workout" },
-  { id: "water", radius: 28, tone: "activity-ring-water" },
-  { id: "bible", radius: 16, tone: "activity-ring-bible" },
+const RING_LAYOUT: Array<{ id: TodayRingMetric["id"]; radius: number; stroke: number; tone: string }> = [
+  { id: "diet", radius: 54, stroke: 8, tone: "activity-ring-diet" },
+  { id: "workout", radius: 44, stroke: 8, tone: "activity-ring-workout" },
+  { id: "water", radius: 34, stroke: 8, tone: "activity-ring-water" },
+  { id: "bible", radius: 26, stroke: 8, tone: "activity-ring-bible" },
 ];
 
 export function MemberRings({
@@ -95,10 +96,13 @@ function MemberRing({
   return (
     <li>
       <article className="activity-member-card rounded-plate border border-steel/35 bg-well px-4 py-4 md:px-5">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="truncate text-[16px] leading-none font-semibold tracking-[-0.03em]">
-            {mine ? "You" : member.profile.display_name}
-          </h3>
+        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h3 className="truncate text-[16px] leading-none font-semibold tracking-[-0.03em]">
+              {mine ? "You" : member.profile.display_name}
+            </h3>
+            <ProfileChallengePills stats={member.stats} className="mt-2" />
+          </div>
           <StatusMark status={status} />
         </div>
 
@@ -148,26 +152,32 @@ function ActivityRings({
   return (
     <div className="activity-rings" aria-hidden="true">
       <svg className="activity-rings-svg" viewBox="0 0 128 128">
-        <g transform="rotate(-90 64 64)">
-          {RING_LAYOUT.map(({ id, radius, tone }) => {
-            const progress = byId.get(id)?.progress ?? 0;
-            const circumference = 2 * Math.PI * radius;
-            const dashoffset = circumference * (1 - Math.min(Math.max(progress, 0), 1));
-            return (
-              <g key={id}>
-                <circle className="activity-ring-track" cx={64} cy={64} r={radius} />
-                <circle
-                  className={`activity-ring-meter ${tone}`}
-                  cx={64}
-                  cy={64}
-                  r={radius}
-                  strokeDasharray={circumference}
-                  strokeDashoffset={dashoffset}
-                />
-              </g>
-            );
-          })}
-        </g>
+        {RING_LAYOUT.map(({ id, radius, stroke, tone }) => {
+          const progress = Math.min(Math.max(byId.get(id)?.progress ?? 0, 0), 1);
+          const dashoffset = 100 - progress * 100;
+          return (
+            <g key={id} transform="rotate(-90 64 64)">
+              <circle
+                className="activity-ring-track"
+                cx={64}
+                cy={64}
+                r={radius}
+                strokeWidth={stroke}
+                pathLength={100}
+              />
+              <circle
+                className={`activity-ring-meter ${tone}`}
+                cx={64}
+                cy={64}
+                r={radius}
+                strokeWidth={stroke}
+                pathLength={100}
+                strokeDasharray="100"
+                strokeDashoffset={dashoffset}
+              />
+            </g>
+          );
+        })}
       </svg>
       <div className={`activity-rings-core ${mine ? "is-you" : ""}`}>
         {avatarUrl ? (

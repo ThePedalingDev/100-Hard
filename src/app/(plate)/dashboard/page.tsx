@@ -144,6 +144,7 @@ export default async function DashboardPage() {
             comments={context.me.comments}
             canEdit
             avatarUrl={avatars.get(context.userId) ?? null}
+            challengeStats={context.me.stats}
           />
         ) : null}
         {others.map((member) => (
@@ -156,6 +157,7 @@ export default async function DashboardPage() {
             comments={member.comments}
             canEdit={false}
             avatarUrl={avatars.get(member.profile.id) ?? null}
+            challengeStats={member.stats}
           />
         ))}
         {context.members.length < 2 ? (

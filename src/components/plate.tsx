@@ -1,5 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { StampLoader } from "@/components/loader";
+import { PageBack } from "@/components/page-back";
 import { scrollFieldIntoView } from "@/lib/mobile-focus";
 
 type PlateTone = "iron" | "club" | "well";
@@ -23,18 +24,25 @@ export function PageHeader({
   title,
   kicker,
   action,
+  backHref,
+  backLabel,
 }: {
   title: string;
   kicker?: ReactNode;
   action?: ReactNode;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
-    <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-      <div className="min-w-0">
-        <h1 className="text-[36px] leading-none">{title}</h1>
-        {kicker ? <div className="mt-2 text-sm leading-6 text-steel">{kicker}</div> : null}
+    <header className="flex flex-col gap-4">
+      {backHref && backLabel ? <PageBack href={backHref} label={backLabel} /> : null}
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-[36px] leading-none">{title}</h1>
+          {kicker ? <div className="mt-2 text-sm leading-6 text-steel">{kicker}</div> : null}
+        </div>
+        {action ? <div className="w-full shrink-0 md:w-auto">{action}</div> : null}
       </div>
-      {action ? <div className="w-full shrink-0 md:w-auto">{action}</div> : null}
     </header>
   );
 }

@@ -9,7 +9,9 @@ import {
   completedCategories,
   completionPercent,
   currentStreak,
+  currentStreakDates,
   longestStreak,
+  longestStreakDates,
   perfectDayDates,
   statsDayStatus,
   type CheckinFields,
@@ -35,8 +37,12 @@ export type MemberView = {
     perfectDays: number;
     perfectDayDates: string[];
     completion: number;
+    stampsCompleted: number;
+    stampsPossible: number;
     streak: number;
+    streakDates: string[];
     longest: number;
+    longestStreakDates: string[];
     spoons: number;
   };
 };
@@ -98,6 +104,26 @@ function spoonBalance(entries: SpoonEntry[], userId: string): number {
     }, 0);
 }
 
+export function challengeMemberStats(
+  userId: string,
+  challenge: Pick<Challenge, "id" | "start_date" | "end_date">,
+  checkins: StatsCheckin[],
+  spoons: SpoonEntry[],
+  today: string,
+): ChallengeMemberStats {
+  const startBound = challenge.start_date;
+  const endBound = today < challenge.end_date ? today : challenge.end_date;
+  const mine = checkins.filter(
+    (row) =>
+      row.user_id === userId &&
+      row.challenge_id === challenge.id &&
+      row.challenge_date >= startBound &&
+      row.challenge_date <= endBound,
+  );
+  const challengeSpoons = spoons.filter((row) => row.challenge_id === challenge.id);
+  return statsFor(userId, mine, challengeSpoons, today);
+}
+
 function statsFor(userId: string, checkins: StatsCheckin[], spoons: SpoonEntry[], today: string) {
   const mine = checkins.filter((row) => row.user_id === userId);
   const statuses = mine.map((row) => ({
@@ -111,8 +137,12 @@ function statsFor(userId: string, checkins: StatsCheckin[], spoons: SpoonEntry[]
     perfectDays,
     perfectDayDates: perfectDayDates(statuses),
     completion: completionPercent(completed, possible),
+    stampsCompleted: completed,
+    stampsPossible: possible,
     streak: currentStreak(statuses, today),
+    streakDates: currentStreakDates(statuses, today),
     longest: longestStreak(statuses),
+    longestStreakDates: longestStreakDates(statuses),
     spoons: spoonBalance(spoons, userId),
   };
 }
@@ -140,8 +170,10 @@ function baseContext(
   };
 }
 
-const CHECKIN_STATS =
+export const CHECKIN_STATS =
   "user_id, challenge_id, challenge_date, status, diet_complete, workout_1_complete, workout_2_complete, outdoor_complete, water_complete, bible_complete, finalized_at";
+
+export type ChallengeMemberStats = MemberView["stats"];
 
 type StatsCheckin = Pick<
   DailyCheckin,
@@ -453,6 +485,25 @@ export async function loadUserCheckin(challengeId: string, userId: string, date:
     .eq("challenge_date", date)
     .maybeSingle();
   return (data as DailyCheckin | null) ?? null;
+}
+
+export async function loadUserHistory(
+  challengeId: string,
+  userId: string,
+  start: string,
+  end: string,
+) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("daily_checkins")
+    .select("*")
+    .eq("challenge_id", challengeId)
+    .eq("user_id", userId)
+    .gte("challenge_date", start)
+    .lte("challenge_date", end)
+    .order("challenge_date", { ascending: false });
+
+  return (data ?? []) as DailyCheckin[];
 }
 
 export async function loadSpoons(challengeId: string) {

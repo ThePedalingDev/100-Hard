@@ -169,51 +169,63 @@ export function perfectDayDates(statuses: { date: string; status: DayStatus }[])
 }
 
 export function currentStreak(statuses: { date: string; status: DayStatus }[], today: string): number {
+  return currentStreakDates(statuses, today).length;
+}
+
+export function currentStreakDates(
+  statuses: { date: string; status: DayStatus }[],
+  today: string,
+): string[] {
   const byDate = new Map(statuses.map((row) => [row.date, row.status]));
   const todayStatus = byDate.get(today);
 
-  // Today still open — streak continues from yesterday until today fails at lock.
   let cursor = today;
   if (todayStatus === undefined || todayStatus === "pending") {
     const yesterday = previousDay(today);
-    if (!yesterday) return 0;
+    if (!yesterday) return [];
     cursor = yesterday;
   } else if (todayStatus === "failed") {
-    return 0;
+    return [];
   }
 
-  let streak = 0;
+  const dates: string[] = [];
   while (true) {
     const status = byDate.get(cursor);
     if (status !== "perfect") break;
-    streak += 1;
+    dates.push(cursor);
     const previous = previousDay(cursor);
     if (!previous) break;
     cursor = previous;
   }
-  return streak;
+  return dates;
 }
 
 export function longestStreak(statuses: { date: string; status: DayStatus }[]): number {
+  return longestStreakDates(statuses).length;
+}
+
+export function longestStreakDates(statuses: { date: string; status: DayStatus }[]): string[] {
   const ordered = [...statuses].sort((a, b) => a.date.localeCompare(b.date));
-  let best = 0;
-  let run = 0;
+  let best: string[] = [];
+  let run: string[] = [];
   let previous: string | null = null;
+
   for (const row of ordered) {
     if (row.status !== "perfect") {
-      run = 0;
+      run = [];
       previous = row.date;
       continue;
     }
     if (previous && nextDay(previous) === row.date) {
-      run += 1;
+      run.push(row.date);
     } else {
-      run = 1;
+      run = [row.date];
     }
-    best = Math.max(best, run);
+    if (run.length > best.length) best = [...run];
     previous = row.date;
   }
-  return best;
+
+  return best.sort((a, b) => b.localeCompare(a));
 }
 
 function previousDay(iso: string): string {

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { DailyCard } from "@/components/daily-card";
 import { PageHeader } from "@/components/plate";
@@ -33,19 +32,13 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
     <div className="flex flex-col gap-6">
       <PageHeader
         title={formatStampDate(date)}
+        backHref="/calendar"
+        backLabel="Calendar"
         kicker={
           <>
             Day {dayNumber}
             {milestone ? ` · ${milestone.label}` : ""}
           </>
-        }
-        action={
-          <Link
-            className="stamp-press inline-flex min-h-12 items-center rounded-plate border border-steel/40 px-4 text-[15px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite"
-            href="/calendar"
-          >
-            Calendar
-          </Link>
         }
       />
       {context.members.map((member) => {
@@ -67,6 +60,7 @@ export default async function DayPage({ params }: { params: Promise<{ date: stri
             comments={day.comments.filter((comment) => comment.daily_checkin_id === checkin.id)}
             canEdit={member.profile.id === context.userId && date === context.today && !checkin.finalized_at}
             avatarUrl={avatars.get(member.profile.id) ?? null}
+            challengeStats={member.stats}
           />
         );
       })}

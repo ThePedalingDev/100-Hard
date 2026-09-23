@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/lib/actions/auth";
 import { ChallengeRoster } from "@/components/challenge-roster";
+import { ProfileChallengePills } from "@/components/profile-challenge-pills";
 import { ProfileForm } from "@/components/profile-form";
 import { PageHeader, Plate } from "@/components/plate";
 import { SubmitButton } from "@/components/submit-button";
@@ -28,7 +29,13 @@ export default async function ProfilePage() {
     <div className="flex flex-col gap-6">
       <PageHeader title="Profile" />
       <Plate tone="club">
-        <p className="text-sm leading-6 text-canvas">{context.email}</p>
+        <h2 className="text-[18px] leading-none text-canvas">{context.profile?.display_name ?? "Your profile"}</h2>
+        <ProfileChallengePills
+          stats={context.me?.stats ?? null}
+          tone="club"
+          className="mt-3"
+        />
+        <p className="mt-3 text-sm leading-6 text-canvas/85">{context.email}</p>
         {avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -50,7 +57,7 @@ export default async function ProfilePage() {
         <Plate tone="well">
           <h2 className="text-[18px] leading-none">History</h2>
           <p className="mt-2 text-sm leading-6 text-steel">
-            Open any challenge day to see the stamps, notes, and spoon record for that inspection.
+            Scroll the full challenge ledger: every day you stamped, with notes and spoon record.
           </p>
           <Link
             href="/profile/history"

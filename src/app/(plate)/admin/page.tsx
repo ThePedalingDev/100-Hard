@@ -2,8 +2,15 @@ import { redirect } from "next/navigation";
 import { AdminDesk, type AdminAccount } from "@/components/admin-desk";
 import { PageHeader } from "@/components/plate";
 import { isAdminEmail } from "@/lib/admin";
-import { loadAppContext, requireUser, signedUrl } from "@/lib/data";
-import type { Challenge } from "@/lib/supabase/types";
+import { dateInChallengeTz } from "@/lib/challenge";
+import {
+  CHECKIN_STATS,
+  challengeMemberStats,
+  loadAppContext,
+  requireUser,
+  signedUrl,
+} from "@/lib/data";
+import type { Challenge, SpoonEntry } from "@/lib/supabase/types";
 
 type RpcAccount = {
   id: string;
@@ -19,15 +26,22 @@ export default async function AdminPage() {
   if (!isAdminEmail(context.email)) redirect("/dashboard");
 
   const { supabase } = await requireUser();
-  const [{ data: rpcAccounts }, { data: challenges }, { data: profiles }, { data: memberships }] = await Promise.all([
-    supabase.rpc("admin_list_accounts"),
-    supabase.from("challenges").select("*").order("created_at", { ascending: false }),
-    supabase.from("profiles").select("id, display_name, avatar_path, diet_commitment, created_at, updated_at"),
-    supabase.from("challenge_members").select("user_id, challenge_id"),
-  ]);
+  const today = dateInChallengeTz();
+  const [{ data: rpcAccounts }, { data: challenges }, { data: profiles }, { data: memberships }, { data: checkins }, { data: spoons }] =
+    await Promise.all([
+      supabase.rpc("admin_list_accounts"),
+      supabase.from("challenges").select("*").order("created_at", { ascending: false }),
+      supabase.from("profiles").select("id, display_name, avatar_path, diet_commitment, created_at, updated_at"),
+      supabase.from("challenge_members").select("user_id, challenge_id"),
+      supabase.from("daily_checkins").select(CHECKIN_STATS),
+      supabase.from("spoon_entries").select("*"),
+    ]);
 
   const typedChallenges = (challenges ?? []) as Challenge[];
+  const challengeById = new Map(typedChallenges.map((row) => [row.id, row]));
   const challengeName = new Map(typedChallenges.map((row) => [row.id, row.name]));
+  const typedCheckins = checkins ?? [];
+  const typedSpoons = (spoons ?? []) as SpoonEntry[];
   const profileById = new Map(
     (
       (profiles ?? []) as Array<{
@@ -50,6 +64,13 @@ export default async function AdminPage() {
     ((rpcAccounts ?? []) as RpcAccount[]).map(async (account) => {
       const profile = profileById.get(account.id);
       const challengeIds = challengesByUser.get(account.id) ?? [];
+      const activeChallenge = account.active_challenge_id
+        ? challengeById.get(account.active_challenge_id) ?? null
+        : null;
+      const activeStats = activeChallenge
+        ? challengeMemberStats(account.id, activeChallenge, typedCheckins, typedSpoons, today)
+        : null;
+
       return {
         id: account.id,
         email: account.email,
@@ -63,13 +84,16 @@ export default async function AdminPage() {
           name: challengeName.get(id) ?? "Unnamed challenge",
           active: id === account.active_challenge_id,
         })),
+        activeStats: activeStats
+          ? { streak: activeStats.streak, perfectDays: activeStats.perfectDays }
+          : null,
       };
     }),
   );
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Admin" kicker="Accounts and challenges" />
+      <PageHeader title="Admin" backHref="/profile" backLabel="Profile" kicker="Accounts and challenges" />
       <AdminDesk accounts={accounts} challenges={typedChallenges} />
     </div>
   );

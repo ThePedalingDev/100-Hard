@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { deleteChallengeAdminAction, updateChallengeAdminAction } from "@/lib/actions/admin";
+import {
+  ProfileChallengePills,
+  type ProfileChallengePillStats,
+} from "@/components/profile-challenge-pills";
 import { Button, ErrorBanner, Field, Plate, TextInput } from "@/components/plate";
 import { usePlatePending } from "@/components/route-progress";
 import type { Challenge } from "@/lib/supabase/types";
@@ -16,6 +20,7 @@ export type AdminAccount = {
   diet_commitment: string | null;
   active_challenge_id: string | null;
   challenges: Array<{ id: string; name: string; active: boolean }>;
+  activeStats: ProfileChallengePillStats | null;
 };
 
 export function AdminDesk({
@@ -65,6 +70,7 @@ export function AdminDesk({
                   <p className="stamp mt-1 text-[11px] text-steel">
                     Joined {account.created_at.slice(0, 10)}
                   </p>
+                  <ProfileChallengePills stats={account.activeStats} className="mt-3" />
                 </div>
               </div>
               {account.diet_commitment ? (

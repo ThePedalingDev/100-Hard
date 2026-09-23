@@ -21,9 +21,8 @@ function ticks(totalDays: number): ScaleMark[] {
   return marks;
 }
 
-function pinLeft(perfectDays: number, totalDays: number) {
-  const percent = (perfectDays / Math.max(totalDays, 1)) * 100;
-  return `${Math.min(Math.max(percent, 6), 94)}%`;
+function pinPercent(perfectDays: number, totalDays: number) {
+  return Math.min(Math.max((perfectDays / Math.max(totalDays, 1)) * 100, 4), 96);
 }
 
 export function RaceRack({
@@ -43,77 +42,95 @@ export function RaceRack({
     if (byDays !== 0) return byDays;
     return a.profile.display_name.localeCompare(b.profile.display_name);
   });
+  const leaderDays = ranked[0]?.stats.perfectDays ?? 0;
 
   return (
-    <div className="space-y-5">
-      <div className="relative h-4 px-6">
-        {scale.map((mark) => (
-          <p
-            key={mark.day}
-            className={`stamp absolute top-0 text-[10px] text-steel ${
-              mark.edge === "start" ? "left-0" : mark.edge === "end" ? "right-0" : "-translate-x-1/2"
-            }`}
-            style={mark.edge === "mid" ? { left: `${mark.percent}%` } : undefined}
-          >
-            {mark.label}
-          </p>
-        ))}
+    <div className="race-rack space-y-4">
+      <div className="race-scale" aria-hidden="true">
+        <div className="race-scale-track">
+          {scale.map((mark) => (
+            <span
+              key={mark.day}
+              className={`race-scale-tick ${mark.edge === "start" ? "is-start" : mark.edge === "end" ? "is-end" : ""}`}
+              style={mark.edge === "mid" ? { left: `${mark.percent}%` } : undefined}
+            />
+          ))}
+        </div>
+        <div className="race-scale-labels">
+          {scale.map((mark) => (
+            <p
+              key={mark.day}
+              className={`stamp race-scale-label ${mark.edge === "start" ? "is-start" : mark.edge === "end" ? "is-end" : ""}`}
+              style={mark.edge === "mid" ? { left: `${mark.percent}%` } : undefined}
+            >
+              {mark.label}
+            </p>
+          ))}
+        </div>
       </div>
-      {ranked.map((member, index) => {
-        const mine = member.profile.id === userId;
-        const avatar = avatars?.get(member.profile.id) ?? null;
-        return (
-          <div key={member.profile.id} className="space-y-2">
-            <div className="flex items-end justify-between gap-3">
-              <p className="min-w-0 truncate text-[16px] leading-none font-semibold tracking-[-0.03em]">
-                <span className="stamp mr-2 text-[11px] text-steel">{index + 1}</span>
-                {mine ? "You" : member.profile.display_name}
-              </p>
-              <p className="stamp shrink-0 tabular text-[11px] text-steel">
-                {member.stats.perfectDays} perfect
-              </p>
-            </div>
-            <div className="relative h-11 rounded-plate border border-steel/35 bg-graphite">
-              <div className="absolute inset-x-3 top-1/2 h-px -translate-y-1/2 bg-steel/40" />
-              {scale.map((mark) => (
-                <span
-                  key={mark.day}
-                  className="absolute top-1.5 bottom-1.5 w-px bg-signal/70"
-                  style={{ left: `${Math.min(Math.max(mark.percent, 2), 98)}%` }}
-                  aria-hidden="true"
-                />
-              ))}
+
+      <ol className="race-lanes space-y-4">
+        {ranked.map((member, index) => {
+          const mine = member.profile.id === userId;
+          const avatar = avatars?.get(member.profile.id) ?? null;
+          const progress = pinPercent(member.stats.perfectDays, totalDays);
+          const leading = member.stats.perfectDays === leaderDays && leaderDays > 0;
+
+          return (
+            <li key={member.profile.id} className={`race-lane${mine ? " is-you" : ""}${leading ? " is-leading" : ""}`}>
+              <div className="race-lane-head">
+                <div className="race-lane-meta">
+                  <span className="race-rank stamp tabular">{index + 1}</span>
+                  <p className="race-name truncate">{mine ? "You" : member.profile.display_name}</p>
+                </div>
+                <p className="stamp race-perfect tabular">{member.stats.perfectDays} perfect</p>
+              </div>
+
               <div
-                className="pin-rail"
-                style={{ "--pin-x": pinLeft(member.stats.perfectDays, totalDays) } as CSSProperties}
+                className="race-track"
+                style={{ "--race-progress": `${progress}%` } as CSSProperties}
+                aria-label={`${member.profile.display_name}: ${member.stats.perfectDays} of ${totalDays} perfect days`}
               >
+                <div className="race-track-fill" aria-hidden="true" />
+                {scale.map((mark) => (
+                  <span
+                    key={mark.day}
+                    className="race-track-tick"
+                    style={{ left: `${Math.min(Math.max(mark.percent, 2), 98)}%` }}
+                    aria-hidden="true"
+                  />
+                ))}
                 <div
-                  className={`pin-slide absolute top-1/2 size-9 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-plate border-2 bg-iron ${
-                    mine ? "z-10 border-brass" : "border-steel/55"
-                  }`}
-                  title={`${member.profile.display_name}: ${member.stats.perfectDays} perfect`}
+                  className="pin-rail"
+                  style={{ "--pin-x": `${progress}%` } as CSSProperties}
                 >
-                  {avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={avatar} alt="" width={36} height={36} className="size-full object-cover" />
-                  ) : (
-                    <span className="stamp flex size-full items-center justify-center text-[11px] text-mark">
-                      {member.profile.display_name.slice(0, 1)}
-                    </span>
-                  )}
+                  <div
+                    className={`pin-slide race-pin${mine ? " is-you" : ""}${leading ? " is-leading" : ""}`}
+                    title={`${member.profile.display_name}: ${member.stats.perfectDays} perfect`}
+                  >
+                    {avatar ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={avatar} alt="" width={36} height={36} className="size-full object-cover" />
+                    ) : (
+                      <span className="stamp flex size-full items-center justify-center text-[11px] text-mark">
+                        {member.profile.display_name.slice(0, 1)}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center justify-between text-steel">
-              <p className="stamp text-[11px]">{member.stats.streak} day streak</p>
-              <p className="stamp inline-flex items-center gap-1 text-[11px] text-mark">
-                <SpoonIcon className="size-3.5" />
-                {member.stats.spoons}
-              </p>
-            </div>
-          </div>
-        );
-      })}
+
+              <div className="race-lane-foot">
+                <p className="stamp race-streak tabular">{member.stats.streak} day streak</p>
+                <p className="stamp race-spoons inline-flex items-center gap-1 tabular">
+                  <SpoonIcon className="size-3.5" />
+                  {member.stats.spoons}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

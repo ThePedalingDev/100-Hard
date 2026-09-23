@@ -19,7 +19,7 @@ export default async function PlateLayout({ children }: { children: React.ReactN
   return (
     <SocialNoticesProvider userId={context.userId} messages={systemNotices}>
       <div className="plate-frame">
-        <AppNav />
+        <AppNav challengeName={context.challenge?.name} />
         <div className="plate-scroll">
           <div className="content-shell">
             <RealtimeRefresh challengeId={context.challenge?.id} userId={context.userId} />

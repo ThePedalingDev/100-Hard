@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { MemberPlate } from "@/components/member-plate";
 import { PageHeader, Plate } from "@/components/plate";
@@ -28,19 +27,13 @@ export default async function MembersPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Members"
+        backHref="/profile"
+        backLabel="Profile"
         kicker={
           <>
             {context.challenge.name} ·{" "}
             <span className="stamp tabular text-offwhite">{ranked.length}</span> of {MAX_CHALLENGE_MEMBERS}
           </>
-        }
-        action={
-          <Link
-            className="stamp-press inline-flex min-h-12 items-center rounded-plate border border-steel/40 px-4 text-[15px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite"
-            href="/profile"
-          >
-            Profile
-          </Link>
         }
       />
       {ranked.length === 0 ? (
@@ -57,6 +50,7 @@ export default async function MembersPage() {
               member={member}
               mine={member.profile.id === context.userId}
               avatarUrl={avatars.get(member.profile.id) ?? null}
+              challengeStart={context.challenge.start_date}
             />
           ))}
         </div>

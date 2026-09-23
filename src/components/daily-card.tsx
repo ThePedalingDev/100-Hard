@@ -7,6 +7,10 @@ import { toggleCheckAction, saveNoteAction } from "@/lib/actions/checkin";
 import { addCommentAction, toggleLikeAction } from "@/lib/actions/social";
 import { CategoryStill, type StampKind } from "@/components/art";
 import { DayCompleteBanner } from "@/components/day-complete-banner";
+import {
+  ProfileChallengePills,
+  type ProfileChallengePillStats,
+} from "@/components/profile-challenge-pills";
 import { AcknowledgeIcon, CommentIcon } from "@/components/icons";
 import { StampLoader } from "@/components/loader";
 import { Button, StatusMark, TextArea } from "@/components/plate";
@@ -31,6 +35,7 @@ export function DailyCard({
   comments,
   canEdit,
   avatarUrl,
+  challengeStats,
 }: {
   checkin: DailyCheckin;
   owner: Profile;
@@ -39,6 +44,7 @@ export function DailyCard({
   comments: Array<DailyComment & { author?: Profile }>;
   canEdit: boolean;
   avatarUrl: string | null;
+  challengeStats?: ProfileChallengePillStats | null;
 }) {
   const toast = useToast();
   const [state, setState] = useState(checkin);
@@ -149,7 +155,8 @@ export function DailyCard({
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-[18px] leading-none">{owner.display_name}</h3>
-          <p className="mt-1 text-sm text-steel">{complete} / 4 complete</p>
+          <ProfileChallengePills stats={challengeStats} className="mt-2" />
+          <p className="mt-2 text-sm text-steel">{complete} / 4 complete</p>
         </div>
         <LiveStatus status={showDayComplete ? "complete" : status} />
       </header>
@@ -168,7 +175,11 @@ export function DailyCard({
         onToggle={() => toggle("diet_complete")}
         onNote={(value) => saveNote("diet_note", value)}
       />
-      <RequirementPlate kind="workout" saving={["workout_1_complete", "workout_2_complete", "outdoor_complete", "workout_note"].some((key) => busyKeys.has(key))}>
+      <RequirementPlate
+        kind="workout"
+        done={isWorkoutComplete(state)}
+        saving={["workout_1_complete", "workout_2_complete", "outdoor_complete", "workout_note"].some((key) => busyKeys.has(key))}
+      >
         <div className="requirement-header mb-2">
           <p className="requirement-title">Workout</p>
           <LiveStatus status={isWorkoutComplete(state) ? "complete" : state.finalized_at ? "incomplete" : "pending"} />
@@ -218,7 +229,7 @@ export function DailyCard({
       </div>
 
       <NoteField
-        className="mt-2"
+        className="mt-5 border-t border-steel/20 pt-4"
         label="Day note"
         value={state.day_note ?? ""}
         locked={locked}
@@ -227,7 +238,7 @@ export function DailyCard({
       />
 
       {state.status === "failed" || missedCategories(state).length ? (
-        <div className="mt-4 border-t border-steel/20 pt-3">
+        <div className="mt-5 border-t border-steel/20 pt-4">
           <p className="stamp text-[11px] text-mark">Wooden spoon</p>
           {state.finalized_at && state.status === "failed" ? (
             <p className="mt-1 text-sm text-steel">
@@ -257,15 +268,20 @@ export function DailyCard({
 
 function RequirementPlate({
   kind,
+  done = false,
   saving = false,
   children,
 }: {
   kind: StampKind;
+  done?: boolean;
   saving?: boolean;
   children: ReactNode;
 }) {
   return (
-    <section className={`requirement-plate${saving ? " is-saving" : ""}`} aria-busy={saving || undefined}>
+    <section
+      className={`requirement-plate${done ? " is-complete" : ""}${saving ? " is-saving" : ""}`}
+      aria-busy={saving || undefined}
+    >
       <CategoryStill kind={kind} />
       <div className="requirement-body">{children}</div>
     </section>
@@ -302,7 +318,7 @@ function Requirement({
   }, [note]);
 
   return (
-    <RequirementPlate kind={kind} saving={saving}>
+    <RequirementPlate kind={kind} done={done} saving={saving}>
       <div className="requirement-toolbar">
         <div className="requirement-header">
           <p className="requirement-title">{label}</p>
@@ -525,15 +541,17 @@ function NoteField({
   if (!open && !value) {
     if (locked) return null;
     return (
-      <Button
-        type="button"
-        variant="secondary"
-        size="compact"
-        className="w-fit"
-        onClick={() => setOpen(true)}
-      >
-        Add {label.toLowerCase()}
-      </Button>
+      <div className={className || undefined}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="compact"
+          className="w-fit"
+          onClick={() => setOpen(true)}
+        >
+          Add {label.toLowerCase()}
+        </Button>
+      </div>
     );
   }
 

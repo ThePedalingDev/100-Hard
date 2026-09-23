@@ -1,15 +1,20 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { HistoryDatePicker } from "@/components/history-date-picker";
-import { HistoryDay } from "@/components/history-day";
+import { HistoryTimeline } from "@/components/history-timeline";
 import { PageHeader, Plate } from "@/components/plate";
-import { formatStampDate } from "@/lib/challenge";
-import {
-  challengeDayNumber,
-  challengeMilestones,
-  clampToChallengeRange,
-} from "@/lib/challenge-dates";
-import { loadAppContext, loadUserCheckin } from "@/lib/data";
+import { addDays, formatStampDate } from "@/lib/challenge";
+import { challengeDayNumber, clampToChallengeRange } from "@/lib/challenge-dates";
+import { completedCategories, isPerfect } from "@/lib/scoring";
+import { loadAppContext, loadUserHistory } from "@/lib/data";
+
+function challengeDatesDesc(start: string, end: string): string[] {
+  const dates: string[] = [];
+  let cursor = end;
+  while (cursor >= start) {
+    dates.push(cursor);
+    cursor = addDays(cursor, -1);
+  }
+  return dates;
+}
 
 export default async function HistoryPage({
   searchParams,
@@ -24,47 +29,64 @@ export default async function HistoryPage({
   const start = context.challenge.start_date;
   const end = context.challenge.end_date;
   const latest = clampToChallengeRange(context.today, start, end);
-  const requested =
-    params.date && /^\d{4}-\d{2}-\d{2}$/.test(params.date) ? params.date : latest;
-  const date = clampToChallengeRange(requested, start, latest);
-  const checkin = await loadUserCheckin(context.challenge.id, context.userId, date);
-  const dayNumber = challengeDayNumber(date, start);
-  const milestone = challengeMilestones(start, end).find((item) => item.iso === date);
+  const focusDate =
+    params.date && /^\d{4}-\d{2}-\d{2}$/.test(params.date)
+      ? clampToChallengeRange(params.date, start, latest)
+      : undefined;
+  const checkins = await loadUserHistory(context.challenge.id, context.userId, start, latest);
+  const byDate = new Map(checkins.map((checkin) => [checkin.challenge_date, checkin]));
+  const dates = challengeDatesDesc(start, latest);
+  const perfectDays = checkins.filter((checkin) => isPerfect(checkin)).length;
+  const stampedDays = checkins.filter((checkin) => completedCategories(checkin) > 0).length;
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title="My history"
-        kicker="Pick a challenge day to inspect what you stamped and wrote."
-        action={
-          <Link
-            className="stamp-press inline-flex min-h-12 items-center rounded-plate border border-steel/40 px-4 text-[15px] font-bold tracking-[-0.01em] text-steel hover:border-club hover:text-offwhite"
-            href="/profile"
-          >
-            Profile
-          </Link>
-        }
+        backHref="/profile"
+        backLabel="Profile"
+        kicker="Every challenge day you have stamped, newest first."
       />
-      <Plate>
-        <HistoryDatePicker start={start} max={latest} value={date} />
-      </Plate>
-      <div>
-        <h2 className="text-[18px] leading-none">{formatStampDate(date)}</h2>
-        <p className="mt-2 text-sm leading-6 text-steel">
-          Day {dayNumber}
-          {milestone ? ` · ${milestone.label}` : ""}
+      <Plate tone="well">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <HistoryStat value={dates.length} label="Days in view" />
+          <HistoryStat value={stampedDays} label="Days stamped" />
+          <HistoryStat value={perfectDays} label="Perfect days" accent="success" />
+          <HistoryStat
+            value={dates.length ? `${Math.round((perfectDays / dates.length) * 100)}%` : "0%"}
+            label="Perfect rate"
+          />
+        </div>
+        <p className="mt-4 text-sm leading-6 text-steel">
+          Challenge window {formatStampDate(start)} through {formatStampDate(latest)}.
         </p>
-      </div>
-      {checkin ? (
-        <HistoryDay checkin={checkin} />
-      ) : (
-        <Plate>
-          <p className="text-sm leading-6 text-steel">
-            No inspection recorded for this day. Pending days stay empty until you stamp them on the
-            dashboard.
-          </p>
-        </Plate>
-      )}
+      </Plate>
+      <HistoryTimeline
+        start={start}
+        today={context.today}
+        dates={dates}
+        checkins={byDate}
+        focusDate={focusDate}
+      />
+    </div>
+  );
+}
+
+function HistoryStat({
+  value,
+  label,
+  accent,
+}: {
+  value: string | number;
+  label: string;
+  accent?: "success";
+}) {
+  return (
+    <div>
+      <p className={`stamp tabular text-[28px] leading-none ${accent === "success" ? "text-success" : ""}`}>
+        {value}
+      </p>
+      <p className="stamp mt-2 text-[11px] text-steel">{label}</p>
     </div>
   );
 }

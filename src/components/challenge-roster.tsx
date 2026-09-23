@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { setActiveChallengeAction } from "@/lib/actions/challenge";
 import { InviteShare } from "@/components/invite-share";
+import { ProfileChallengePills } from "@/components/profile-challenge-pills";
 import { Button, Plate } from "@/components/plate";
 import { SpoonIcon } from "@/components/icons";
 import { formatStampDate } from "@/lib/challenge";
@@ -72,12 +73,10 @@ export function ChallengeRoster({
                     <p className="truncate text-[15px] leading-none font-semibold tracking-[-0.03em]">
                       {member.profile.display_name}
                     </p>
-                    <p className="stamp mt-1 inline-flex items-center gap-2 text-[11px] text-steel">
-                      {member.stats.perfectDays} perfect
-                      <span className="inline-flex items-center gap-1 text-mark">
-                        <SpoonIcon className="size-3.5" />
-                        {member.stats.spoons}
-                      </span>
+                    <ProfileChallengePills stats={member.stats} className="mt-2" />
+                    <p className="stamp mt-2 inline-flex items-center gap-1 text-[11px] text-mark">
+                      <SpoonIcon className="size-3.5" />
+                      {member.stats.spoons} spoons
                     </p>
                   </div>
                 </li>
