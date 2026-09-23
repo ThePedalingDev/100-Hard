@@ -39,10 +39,22 @@ function wordFor(status: PersonStatus["status"]) {
   return "Pending";
 }
 
-function ringFor(status: PersonStatus["status"]) {
-  if (status === "perfect") return "border-success";
-  if (status === "failed") return "border-failure";
-  return "border-steel/40";
+function ringTone(status: PersonStatus["status"]) {
+  if (status === "perfect") return "bg-success";
+  if (status === "failed") return "bg-failure";
+  return "bg-steel";
+}
+
+function ringWidth(size: PinSize) {
+  if (size === "xl") return "p-1.5";
+  if (size === "lg") return "p-1";
+  return "p-[3px]";
+}
+
+function ringInnerRadius(size: PinSize) {
+  if (size === "xl") return "rounded-[2px]";
+  if (size === "lg") return "rounded-[4px]";
+  return "rounded-[5px]";
 }
 
 export function milestoneCellLabel(milestone: ChallengeMilestone) {
@@ -157,20 +169,24 @@ export function FacePin({
   return (
     <span
       title={`${person.name}: ${word}`}
-      className={`relative shrink-0 overflow-hidden rounded-plate border-2 bg-graphite ${sizeClass} ${ringFor(person.status)}`}
+      className={`relative inline-flex shrink-0 rounded-plate ${ringWidth(size)} ${ringTone(person.status)} ${sizeClass}`}
     >
-      {person.avatarUrl ? (
-        <AvatarImg
-          src={person.avatarUrl}
-          name={person.name}
-          className="size-full object-cover"
-          fallbackClassName={`stamp flex size-full items-center justify-center text-mark ${textClass}`}
-        />
-      ) : (
-        <span className={`stamp flex size-full items-center justify-center text-mark ${textClass}`}>
-          {person.name.slice(0, 1)}
+      <span className={`flex size-full bg-iron p-px ${ringInnerRadius(size)}`}>
+        <span className="size-full overflow-hidden rounded-[2px] bg-graphite">
+          {person.avatarUrl ? (
+            <AvatarImg
+              src={person.avatarUrl}
+              name={person.name}
+              className="size-full object-cover"
+              fallbackClassName={`stamp flex size-full items-center justify-center text-mark ${textClass}`}
+            />
+          ) : (
+            <span className={`stamp flex size-full items-center justify-center text-mark ${textClass}`}>
+              {person.name.slice(0, 1)}
+            </span>
+          )}
         </span>
-      )}
+      </span>
       <span className="sr-only">{`${person.name} ${word}`}</span>
     </span>
   );
@@ -181,15 +197,21 @@ export function CalendarLegend({ milestones }: { milestones: ChallengeMilestone[
     <div className="mt-5 flex flex-col gap-3 text-sm text-steel md:flex-row md:items-center md:justify-between">
       <ul className="flex flex-wrap gap-x-4 gap-y-2">
         <li className="inline-flex items-center gap-1.5">
-          <span className="size-4 rounded-plate border-2 border-success bg-graphite md:size-5" aria-hidden="true" />
+          <span className="inline-flex size-5 rounded-plate bg-success p-[3px] md:size-6" aria-hidden="true">
+            <span className="size-full rounded-[4px] bg-graphite" />
+          </span>
           Perfect
         </li>
         <li className="inline-flex items-center gap-1.5">
-          <span className="size-4 rounded-plate border-2 border-failure bg-graphite md:size-5" aria-hidden="true" />
+          <span className="inline-flex size-5 rounded-plate bg-failure p-[3px] md:size-6" aria-hidden="true">
+            <span className="size-full rounded-[4px] bg-graphite" />
+          </span>
           Failed
         </li>
         <li className="inline-flex items-center gap-1.5">
-          <span className="size-4 rounded-plate border-2 border-steel/40 bg-graphite md:size-5" aria-hidden="true" />
+          <span className="inline-flex size-5 rounded-plate bg-steel p-[3px] md:size-6" aria-hidden="true">
+            <span className="size-full rounded-[4px] bg-graphite" />
+          </span>
           Pending
         </li>
       </ul>

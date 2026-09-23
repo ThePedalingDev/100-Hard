@@ -6,12 +6,25 @@ import { Button, Field, Plate, TextArea } from "@/components/plate";
 import { useSocialNotices } from "@/components/social-notices-provider";
 import { useToast } from "@/components/toast";
 import { usePlatePending } from "@/components/route-progress";
-import { asSystemMessage, dayCompleteLabel } from "@/lib/chat-system";
+import { formatShortDate, formatStampClock } from "@/lib/challenge";
+import { asSystemMessage, dayCompleteLabel, messageChallengeDate } from "@/lib/chat-system";
 import type { ChatMessage, Profile } from "@/lib/supabase/types";
 
 export type ChatRow = ChatMessage & { author?: Profile };
 
-export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: string }) {
+function stampLabel(row: ChatRow) {
+  return `${formatShortDate(messageChallengeDate(row))} · ${formatStampClock(row.created_at)}`;
+}
+
+export function ChatRoom({
+  messages,
+  userId,
+  canWrite,
+}: {
+  messages: ChatRow[];
+  userId: string;
+  canWrite: boolean;
+}) {
   const toast = useToast();
   const { dismiss, isDismissed } = useSocialNotices();
   const [body, setBody] = useState("");
@@ -29,7 +42,7 @@ export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: st
       <Plate>
         <ul aria-live="polite" className="space-y-4">
           {visibleMessages.length === 0 ? (
-            <li className="text-sm leading-6 text-steel">No stamps in this room yet.</li>
+            <li className="text-sm leading-6 text-steel">No messages on this day.</li>
           ) : (
             visibleMessages.map((row) => {
               const mine = row.user_id === userId;
@@ -43,7 +56,9 @@ export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: st
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="stamp text-[11px] text-success">Challenge update</p>
+                        <p className="stamp text-[11px] text-success">
+                          Challenge update · <span className="tabular">{stampLabel(row)}</span>
+                        </p>
                         <p className="mt-1 text-sm leading-6">
                           {dayCompleteLabel(row.author?.display_name ?? "A member")}
                         </p>
@@ -64,6 +79,8 @@ export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: st
                 <li key={row.id}>
                   <p className="stamp text-[11px] text-steel">
                     {mine ? "You" : row.author?.display_name ?? "Member"}
+                    {" · "}
+                    <span className="tabular">{stampLabel(row)}</span>
                   </p>
                   <p className="mt-1 text-sm leading-6">{row.body}</p>
                 </li>
@@ -72,6 +89,7 @@ export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: st
           )}
         </ul>
       </Plate>
+      {canWrite ? (
       <Plate>
         <form
           className="space-y-3"
@@ -107,6 +125,13 @@ export function ChatRoom({ messages, userId }: { messages: ChatRow[]; userId: st
           </Button>
         </form>
       </Plate>
+      ) : (
+        <Plate>
+          <p className="text-sm leading-6 text-steel">
+            This day is closed. Choose today to stamp a new message.
+          </p>
+        </Plate>
+      )}
     </div>
   );
 }

@@ -83,6 +83,15 @@ export function formatShortDate(iso: string): string {
   }).format(date);
 }
 
+export function formatStampClock(isoTimestamp: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: CHALLENGE_TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date(isoTimestamp));
+}
+
 export function monthKey(iso: string): string {
   return `${iso.slice(0, 7)}-01`;
 }

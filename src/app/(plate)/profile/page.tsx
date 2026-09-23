@@ -90,7 +90,7 @@ export default async function ProfilePage() {
       </div>
       <ChallengeRoster
         memberships={memberships}
-        activeId={context.challenge?.id ?? null}
+        activeId={context.challenge?.id ?? context.profile?.active_challenge_id ?? null}
         today={context.today}
       />
       <ProfileForm

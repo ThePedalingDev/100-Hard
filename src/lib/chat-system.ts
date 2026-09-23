@@ -1,3 +1,4 @@
+import { dateInChallengeTz } from "@/lib/challenge";
 import type { ChatMessage } from "@/lib/supabase/types";
 
 export const DAY_COMPLETE_PREFIX = "[sys:day_complete:";
@@ -28,6 +29,12 @@ export function asSystemMessage(row: ChatMessage): SystemChatMessage | null {
   const date = dayCompleteDate(row.body);
   if (!date) return null;
   return { ...row, kind: "day_complete", date };
+}
+
+export function messageChallengeDate(row: ChatMessage): string {
+  const system = asSystemMessage(row);
+  if (system) return system.date;
+  return dateInChallengeTz(new Date(row.created_at));
 }
 
 export function dismissedStorageKey(userId: string) {

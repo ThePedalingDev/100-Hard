@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plate, StatusMark } from "@/components/plate";
+import { formatShortDate, formatStampClock, formatStampDate } from "@/lib/challenge";
 import type { MemberView } from "@/lib/data";
 import { todayDisplayStatus, todayRingMetrics, type TodayRingMetric } from "@/lib/scoring";
 
@@ -14,10 +15,14 @@ export function MemberRings({
   members,
   viewerId,
   avatars,
+  date,
+  isToday,
 }: {
   members: MemberView[];
   viewerId: string;
   avatars: Map<string, string | null>;
+  date: string;
+  isToday: boolean;
 }) {
   const others = [...members]
     .filter((member) => member.profile.id !== viewerId)
@@ -35,7 +40,8 @@ export function MemberRings({
         <div className="min-w-0">
           <h2 className="text-[18px] leading-none">Activity rings</h2>
           <p className="mt-2 text-sm leading-6 text-steel">
-            Today&apos;s four stamps, one ring each. Outer to inner: diet, workout, water, bible.
+            {isToday ? "Today" : formatStampDate(date)}. Four stamps, one ring each. Outer to inner: diet,
+            workout, water, bible.
           </p>
         </div>
         <Link
@@ -62,6 +68,7 @@ export function MemberRings({
               member={member}
               mine={member.profile.id === viewerId}
               avatarUrl={avatars.get(member.profile.id) ?? null}
+              date={date}
             />
           ))}
         </ul>
@@ -74,10 +81,12 @@ function MemberRing({
   member,
   mine,
   avatarUrl,
+  date,
 }: {
   member: MemberView;
   mine: boolean;
   avatarUrl: string | null;
+  date: string;
 }) {
   const status = todayDisplayStatus(member.checkin);
   const metrics = todayRingMetrics(member.checkin);
@@ -113,6 +122,11 @@ function MemberRing({
         </div>
 
         <p className="stamp mt-3 tabular text-[11px] text-steel">
+          {formatShortDate(date)}
+          {member.checkin?.updated_at
+            ? ` · ${formatStampClock(member.checkin.updated_at)}`
+            : " · No stamp yet"}
+          {" · "}
           {member.stats.completion}% challenge · {member.stats.perfectDays} perfect days
         </p>
       </article>

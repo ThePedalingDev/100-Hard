@@ -244,6 +244,11 @@ begin
     end if;
 
     if checkin.finalized_at is not null then
+      if checkin.status = 'failed' then
+        insert into public.spoon_entries (challenge_id, user_id, daily_checkin_id, type, quantity)
+        values (member.challenge_id, member.user_id, checkin.id, 'earned', 1)
+        on conflict (daily_checkin_id) where type = 'earned' do nothing;
+      end if;
       continue;
     end if;
 
@@ -269,7 +274,7 @@ $$;
 create or replace function public.finalize_challenge_day(target_date date)
 returns void
 language sql
-security invoker
+security definer
 set search_path = public
 as $$
   select private.finalize_challenge_day(target_date);
