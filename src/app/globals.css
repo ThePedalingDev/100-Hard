@@ -1016,13 +1016,22 @@ textarea:-webkit-autofill:focus {
 }
 
 @media (min-width: 768px) {
+  #main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   .content-shell {
+    width: min(100% - 3rem, 56rem);
     margin-inline: auto;
   }
 
   .plate-frame {
     flex: none;
     flex-direction: column;
+    width: min(100%, 56rem);
+    margin-inline: auto;
     height: auto;
     max-height: none;
     min-height: 100dvh;
@@ -1048,12 +1057,11 @@ textarea:-webkit-autofill:focus {
   }
 
   .tabbar {
-    align-self: flex-start;
+    align-self: center;
     width: fit-content;
     max-width: min(calc(100% - 3rem), 56rem);
     margin-top: max(1.5rem, env(safe-area-inset-top, 0px));
-    margin-left: max(1.5rem, calc((100% - 56rem) / 2));
-    margin-right: auto;
+    margin-inline: auto;
     margin-bottom: 1.5rem;
     border: 1px solid color-mix(in oklch, var(--mute) 40%, transparent);
     border-radius: 8px;
@@ -1088,9 +1096,13 @@ textarea:-webkit-autofill:focus {
     margin-inline: auto;
   }
 
+  .plate-frame {
+    width: min(100%, 64rem);
+  }
+
   .tabbar {
     max-width: min(calc(100% - 4rem), 64rem);
-    margin-left: max(2rem, calc((100% - 64rem) / 2));
+    margin-inline: auto;
   }
 }
 
