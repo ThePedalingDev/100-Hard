@@ -978,8 +978,7 @@ textarea:-webkit-autofill:focus {
 
 @media (min-width: 768px) {
   .content-shell {
-    margin-left: max(2rem, calc((100% - 56rem) * 0.22));
-    margin-right: auto;
+    margin-inline: auto;
   }
 
   .plate-frame {
@@ -1014,7 +1013,7 @@ textarea:-webkit-autofill:focus {
     width: fit-content;
     max-width: min(calc(100% - 3rem), 56rem);
     margin-top: max(1.5rem, env(safe-area-inset-top, 0px));
-    margin-left: max(2rem, calc((100% - 56rem) * 0.22));
+    margin-left: max(1.5rem, calc((100% - 56rem) / 2));
     margin-right: auto;
     margin-bottom: 1.5rem;
     border: 1px solid color-mix(in oklch, var(--mute) 40%, transparent);
@@ -1047,12 +1046,12 @@ textarea:-webkit-autofill:focus {
 @media (min-width: 1024px) {
   .content-shell {
     width: min(100% - 4rem, 64rem);
-    margin-left: max(2.5rem, calc((100% - 64rem) * 0.18));
+    margin-inline: auto;
   }
 
   .tabbar {
     max-width: min(calc(100% - 4rem), 64rem);
-    margin-left: max(2.5rem, calc((100% - 64rem) * 0.18));
+    margin-left: max(2rem, calc((100% - 64rem) / 2));
   }
 }
 
